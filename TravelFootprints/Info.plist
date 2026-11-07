@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>旅行足迹仅在你点击「GPS 打卡」或查看与景点的距离时使用你的位置，用于验证你是否到达景点。位置不会在后台持续获取，也不会离开你的设备。</string>
+	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
+	<dict>
+		<key>CheckInVerification</key>
+		<string>GPS 打卡需要精确位置，才能确认你位于景点 200 米范围内。</string>
+	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>旅行足迹会在你选择照片时将其添加到打卡记录中，照片仅保存在本设备上。</string>
+</dict>
+</plist>
