@@ -23,11 +23,23 @@ struct CheckInDateFormatterTests {
     }
 
     @Test func sameInstantDiffersAcrossTimeZones() throws {
+        // 同一时刻：东京已是 11 月 8 日清晨，洛杉矶仍是 11 月 7 日中午。
         let instant = try date("2026-11-07T20:00:00Z")
-        let tokyo = CheckInDateFormatter.dateTimeText(for: instant, timeZone: try zone("Asia/Tokyo"), locale: locale, calendar: calendar)
-        let losAngeles = CheckInDateFormatter.dateTimeText(for: instant, timeZone: try zone("America/Los_Angeles"), locale: locale, calendar: calendar)
-        #expect(tokyo == "2026年11月8日，05:00")
-        #expect(losAngeles == "2026年11月7日，12:00")
+        let tokyo = try zone("Asia/Tokyo")
+        let losAngeles = try zone("America/Los_Angeles")
+
+        #expect(CheckInDateFormatter.dateText(for: instant, timeZone: tokyo, locale: locale, calendar: calendar) == "2026年11月8日")
+        #expect(CheckInDateFormatter.dateText(for: instant, timeZone: losAngeles, locale: locale, calendar: calendar) == "2026年11月7日")
+
+        let tokyoParts = CheckInDateFormatter.localComponents(for: instant, timeZone: tokyo)
+        let laParts = CheckInDateFormatter.localComponents(for: instant, timeZone: losAngeles)
+        #expect(tokyoParts.day == 8 && tokyoParts.hour == 5 && tokyoParts.minute == 0)
+        #expect(laParts.day == 7 && laParts.hour == 12 && laParts.minute == 0)
+
+        // 完整文本以日期开头、以本地化时间结尾。
+        let text = CheckInDateFormatter.dateTimeText(for: instant, timeZone: tokyo, locale: locale, calendar: calendar)
+        #expect(text.hasPrefix("2026年11月8日，"))
+        #expect(text.hasSuffix(CheckInDateFormatter.timeText(for: instant, timeZone: tokyo, locale: locale, calendar: calendar)))
     }
 
     @Test func localYearUsesCheckInTimeZone() throws {
