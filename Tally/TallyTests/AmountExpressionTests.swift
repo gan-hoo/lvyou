@@ -112,6 +112,10 @@ struct DecimalCodecTests {
         let splits = [Decimal(string: "33.33")!, Decimal(string: "66.67")!].map { $0.rounded(scale: 2) }
         #expect(splits.sum { $0 } == Decimal(100).rounded(scale: 2))
         #expect(Decimal(string: "1470.00")!.canonical == 1_470)
+        // Same value, different internal forms: compare by value.
+        #expect(Decimal(string: "1470.00")!.isSameAmount(as: 1_000 + 470))
+        #expect(parts.sum { $0 }.isSameAmount(as: Decimal(1_000) + Decimal(470)))
+        #expect(!Decimal(string: "1470.01")!.isSameAmount(as: 1_470))
     }
 }
 

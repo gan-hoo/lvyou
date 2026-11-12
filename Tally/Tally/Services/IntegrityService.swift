@@ -63,7 +63,7 @@ struct IntegrityService {
             if e.isSplit {
                 let digits = CurrencyInfo.info(for: e.currencyCode).fractionDigits
                 let total = e.splitList.sum { $0.amount }.rounded(scale: digits)
-                if total != e.amount.rounded(scale: digits) {
+                if !total.isSameAmount(as: e.amount.rounded(scale: digits)) {
                     report.issues.append(Issue(kind: .splitMismatch, entryID: e.id, detail: label))
                 }
             }

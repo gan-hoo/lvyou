@@ -232,7 +232,7 @@ struct FinanceEngine: Sendable {
                 count: value.1
             )
         }
-        .sorted { $0.amount == $1.amount ? $0.id < $1.id : $0.amount > $1.amount }
+        .sorted { $0.amount.isSameAmount(as: $1.amount) ? $0.id < $1.id : $0.amount > $1.amount }
     }
 
     /// Net spending per day (zero-filled).

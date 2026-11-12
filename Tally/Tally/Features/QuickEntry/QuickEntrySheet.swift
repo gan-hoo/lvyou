@@ -394,7 +394,7 @@ private struct QuickEntryContent: View {
                     }
                     .font(.subheadline)
                 }
-                if model.splitTotal != model.amount {
+                if !model.splitTotal.isSameAmount(as: model.amount) {
                     Text("Splits total \(MoneyFormat.string(model.splitTotal, code: model.currencyCode, reveal: true)) — must equal the amount.")
                         .font(.footnote)
                         .foregroundStyle(DS.Colors.warning)
@@ -492,7 +492,7 @@ private struct QuickEntryContent: View {
             withMotion(.linear(duration: 0.4)) { shakeAmount += 1 }
             if model.amount <= 0 {
                 model.errorMessage = LedgerError.amountMustBePositive.localizedDescription
-            } else if !model.splits.isEmpty && model.splitTotal != model.amount {
+            } else if !model.splits.isEmpty && !model.splitTotal.isSameAmount(as: model.amount) {
                 model.errorMessage = LedgerError.splitTotalMismatch.localizedDescription
             }
             return

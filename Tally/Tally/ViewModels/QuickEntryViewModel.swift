@@ -101,7 +101,7 @@ final class QuickEntryViewModel {
     var canSave: Bool {
         guard amount > 0, account != nil else { return false }
         if kind == .transfer { return toAccount != nil && toAccount?.id != account?.id }
-        if !splits.isEmpty { return splitTotal == amount }
+        if !splits.isEmpty { return splitTotal.isSameAmount(as: amount) }
         return true
     }
 

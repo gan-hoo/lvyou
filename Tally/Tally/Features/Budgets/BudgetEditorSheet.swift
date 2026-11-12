@@ -170,7 +170,7 @@ struct BudgetEditorSheet: View {
 
     private var hasChanges: Bool {
         guard let b = request.budget else { return !amountText.isEmpty }
-        return amount != b.amount || currency != b.currencyCode || period != b.periodKind
+        return !(amount?.isSameAmount(as: b.amount) ?? false) || currency != b.currencyCode || period != b.periodKind
             || rollover != b.rollover || threshold != b.alertThreshold || excluded != b.excludedCategoryIDs
             || categoryID != b.category?.id
     }

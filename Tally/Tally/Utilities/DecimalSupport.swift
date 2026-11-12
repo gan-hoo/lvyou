@@ -53,6 +53,14 @@ extension Decimal {
         return result.canonical
     }
 
+    /// Value equality that does not depend on how the two numbers are stored.
+    /// `Decimal ==` can report two equal values as different when their internal
+    /// mantissa/exponent forms differ (seen with the iOS 26.2 runtime: a sum equal
+    /// to 1470 compared unequal to 1470). Money checks use this instead.
+    func isSameAmount(as other: Decimal) -> Bool {
+        (self - other).isZero
+    }
+
     /// The same value in compact form (no trailing mantissa zeros, minimal length,
     /// a plain zero for any zero). Arithmetic on non-compact values — for example
     /// the zero produced by `0 × rate` — can otherwise yield sums that print the

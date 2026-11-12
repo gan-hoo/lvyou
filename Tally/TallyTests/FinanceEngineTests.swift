@@ -64,7 +64,7 @@ struct FinanceEngineTests {
         let afterSpend = engine.balances(accounts: accounts, entries: [spend])
         let worth = engine.netWorth(accounts: accounts, balances: afterSpend)
         #expect(worth.liabilities == 5_300)       // card 300 + loan 5000
-        #expect(worth.assets == 1_000 + 470)      // cash + AUD 100 × 4.70
+        #expect(worth.assets.isSameAmount(as: 1_000 + 470))      // cash + AUD 100 × 4.70
         #expect(worth.net == worth.assets - 5_300)
     }
 

@@ -8,7 +8,7 @@ struct SplitDraft: Identifiable, Equatable {
     var note: String = ""
 
     static func == (lhs: SplitDraft, rhs: SplitDraft) -> Bool {
-        lhs.id == rhs.id && lhs.category?.id == rhs.category?.id && lhs.amount == rhs.amount && lhs.note == rhs.note
+        lhs.id == rhs.id && lhs.category?.id == rhs.category?.id && lhs.amount.isSameAmount(as: rhs.amount) && lhs.note == rhs.note
     }
 }
 
@@ -63,7 +63,7 @@ struct TransactionService {
         if d.kind == .expense, !d.splits.isEmpty {
             let digits = account.currency.fractionDigits
             let total = d.splits.sum { $0.amount.rounded(scale: digits) }
-            guard total == d.amount.rounded(scale: digits) else { throw LedgerError.splitTotalMismatch }
+            guard total.isSameAmount(as: d.amount.rounded(scale: digits)) else { throw LedgerError.splitTotalMismatch }
             guard d.splits.allSatisfy({ $0.category != nil && $0.amount > 0 }) else { throw LedgerError.splitNeedsCategory }
         }
     }
@@ -101,7 +101,7 @@ struct TransactionService {
 
         let needsSnapshot = existing == nil
             || d.manualRate != nil
-            || entry.amount != amount
+            || !entry.amount.isSameAmount(as: amount)
             || entry.currencyCode != currency
             || !Calendar.ledger.isDate(entry.date, inSameDayAs: d.date)
             || entry.baseCurrencyCode != baseCurrency
@@ -228,7 +228,7 @@ struct TransactionService {
         let actual = actualBalance.rounded(scale: digits)
         let delta = actual - currentBalance.rounded(scale: digits)
         account.markReconciled(actual, at: date)
-        guard delta != 0 else {
+        guard !delta.isZero else {
             try repository.commit()
             return nil
         }
