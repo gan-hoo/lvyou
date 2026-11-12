@@ -19,6 +19,15 @@ enum DemoData {
         }
     }
 
+    /// Every note the demo uses (English source keys), so they can follow the language.
+    static let noteKeys = [
+        "Rent", "Music streaming", "Video streaming", "Cloud storage", "Monthly salary",
+        "Monthly saving", "Electricity & water", "Card repayment", "Interest", "Local lunch",
+        "Ferry & train", "Sightseeing", "Top up travel card", "Flights", "Flat white",
+        "Team lunch", "Dinner with friends", "Weekly groceries", "Metro", "Taxi",
+        "Movie night", "Pharmacy", "Freelance project",
+    ]
+
     static func load(into context: ModelContext, base: String = AppSettings.baseCurrency, days: Int = 100, now: Date = .now) {
         DefaultData.ensureSeeded(in: context)
         let store = LedgerStore(context: context)

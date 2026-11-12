@@ -92,41 +92,49 @@ enum DefaultData {
     ]
     static let builtInTagKeys = ["Work", "Trip"]
 
-    /// Renames built-in categories, accounts and tags that still carry a default
-    /// name in another language, so switching language also switches the data
-    /// Tally created. Anything the user renamed is left untouched.
+    /// Renames built-in categories, accounts, tags and demo notes that still carry
+    /// a default name in another language, so switching language also switches
+    /// the data Tally created. Anything the user renamed or wrote is untouched.
     @MainActor
     static func relocalizeBuiltInNames(in context: ModelContext) {
-        var changed = false
-
-        func relocalize(_ name: String, keys: [String]) -> String? {
-            for key in keys where L10n.variants(of: key).contains(name) {
+        /// Maps every translation of each key to the key's name in the running language.
+        func table(_ keys: [String]) -> [String: String] {
+            var map: [String: String] = [:]
+            for key in keys {
                 let target = L10n.current(key)
-                return target == name ? nil : target
+                for variant in L10n.variants(of: key) where map[variant] == nil {
+                    map[variant] = target
+                }
             }
-            return nil
+            return map
         }
 
-        let expenseKeys = expenseCategories.map(\.key)
-        let incomeKeys = incomeCategories.map(\.key)
+        var changed = false
+        func apply(_ name: String, _ map: [String: String]) -> String? {
+            guard let target = map[name], target != name else { return nil }
+            changed = true
+            return target
+        }
+
+        let expense = table(expenseCategories.map(\.key))
+        let income = table(incomeCategories.map(\.key))
         for category in (try? context.fetch(FetchDescriptor<LedgerCategory>())) ?? [] {
-            let keys = category.kind == .expense ? expenseKeys : incomeKeys
-            if let name = relocalize(category.name, keys: keys) {
+            if let name = apply(category.name, category.kind == .expense ? expense : income) {
                 category.name = name
-                changed = true
             }
         }
+        let accounts = table(builtInAccountKeys)
         for account in (try? context.fetch(FetchDescriptor<Account>())) ?? [] {
-            if let name = relocalize(account.name, keys: builtInAccountKeys) {
-                account.name = name
-                changed = true
-            }
+            if let name = apply(account.name, accounts) { account.name = name }
         }
+        let tags = table(builtInTagKeys)
         for tag in (try? context.fetch(FetchDescriptor<Tag>())) ?? [] {
-            if let name = relocalize(tag.name, keys: builtInTagKeys) {
-                tag.name = name
-                changed = true
-            }
+            if let name = apply(tag.name, tags) { tag.name = name }
+        }
+        let notes = table(DemoData.noteKeys)
+        let demoEntries = (try? context.fetch(FetchDescriptor<LedgerEntry>(predicate: #Predicate { $0.isDemo == true }))) ?? []
+        for entry in demoEntries where !entry.note.isEmpty {
+            if let note = apply(entry.note, notes) { entry.note = note }
         }
         if changed { try? context.save() }
     }
