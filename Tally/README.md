@@ -2,13 +2,13 @@
 
 <img src="docs/icon-preview.png" width="96" align="right" alt="Tally icon">
 
-原生 iOS 个人记账 App：SwiftUI + SwiftData + Swift Charts，支持收入 / 支出 / 转账、多账户、多币种与历史汇率、月度与分类预算、CSV 导入导出、Face ID 锁定，中英双语，完全离线。
+原生 iOS 个人记账 App（V3）：SwiftUI + SwiftData + Swift Charts，资产优先的五个标签页（资产 / 流水 / 统计 / 预算 / 设置），支持资产与负债、转账手续费、退款、拆分、信用卡还款、余额调整、周期交易、多币种历史汇率、周 / 月 / 年 / 自定义统计与预算、CSV 与 JSON 备份、Face ID 锁定，简体中文 / 繁體中文 / English，完全离线。
 
 - **最低系统**：iOS 17.0（iPhone，竖屏）
 - **工程**：`Tally.xcodeproj`（Xcode 16+，文件夹同步组格式；新增 Swift 文件放进 `Tally/` 任意子目录即可自动加入目标）
 - **依赖**：无第三方依赖，全部使用 Apple 系统框架
 - **Bundle Identifier**：`com.ganhoo.tally`（测试目标 `com.ganhoo.tallyTests`）
-- 设计与架构说明见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- 架构：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · 财务规则：[docs/FINANCE_RULES.md](docs/FINANCE_RULES.md) · 构建与测试记录、已知问题：[docs/DELIVERY.md](docs/DELIVERY.md)
 
 ---
 
@@ -16,19 +16,17 @@
 
 | 模块 | 内容 |
 |---|---|
-| 首页 | 本月结余（数字过渡动画）、收入 / 支出、环比变化、总预算进度与每日可用、总资产与各账户余额、本月累计支出趋势（与上月对比，可拖动查看）、预算温和提醒、最近交易。标题下拉菜单切换月份，左右滑动结余卡片也可切换 |
-| 快速记账 | 底部 Sheet；支出 / 收入 / 转账；计算器键盘（`+` `−`，Decimal 精度）；分类网格（记住上次分类）；账户、日期时间、标签、备注；跨币种显示折算与汇率；跨币种转账可手填实际到账金额；保存后首页即时刷新 |
-| 流水 | 按日分组 + 每日收支小计；搜索（备注、分类、账户、标签、金额）；筛选（类型、日期范围、金额区间、账户、分类、标签）；排序（时间 / 金额）；左滑编辑 / 删除，右滑复制到今天；长按菜单；详情页显示原币金额与记账汇率 |
-| 统计 | 月 / 年切换；总额、日均 / 月均、环比、笔数；分类环形图（点击扇区或图例查看明细）；月视图每日柱状图，年视图收支折线；近 6 个月 / 近 4 年收支对比；分类排行，点进看该分类全部交易 |
-| 预算 | 月度总预算（圆环）+ 分类预算（进度条）；剩余 / 超出、每日可用；提醒阈值 50%–100%；每项预算每月每个级别只提醒一次，App 内安静提示，不推送；可一键使用近 3 个月平均值 |
-| 账户 | 现金、储蓄卡、信用卡、储蓄、电子钱包、投资；任意币种；余额 = 期初余额 + 全部交易实时计算（从不硬编码）；排序、归档、设为默认；删除时说明影响的交易数 |
-| 汇率 | 汇率历史（每条有生效日期）；每笔交易按「交易日期当天生效的最新汇率」折算；原币金额与折算快照分开存储，新增或修改汇率不会改动历史账目；可选一键下载欧洲央行参考汇率 |
-| 数据 | CSV 导出（UTF-8 BOM，Excel / Numbers 直接打开中文）；CSV 导入（识别中英文表头、多种日期格式、GB18030 编码、预览与错误行、自动建账户 / 分类、重复记录自动跳过，重复导入同一文件不会产生重复）；演示数据一键加载 / 移除；清除全部数据（需身份验证） |
-| 安全 | Face ID / Touch ID / Optic ID 解锁，失败可用设备密码；锁定设置存于钥匙串（仅本机）；后台锁定延时；多任务界面隐藏内容 |
-| 语言 | 简体中文 / 繁體中文 / English；默认跟随 iPhone 系统语言，也可在欢迎页右上角或「设置 › 语言」单独指定（重新打开 App 后生效）；内置分类、默认账户和演示数据的名称会随语言自动切换，你改过名的不受影响 |
-| 外观 | 浅色 / 深色 / 跟随系统；SF Pro + SF Symbols；轻量玻璃材质（iOS 26 上自动使用系统 Liquid Glass）；弹簧动画与触感反馈，全部尊重「减弱动态效果」 |
+| 资产（默认页） | 净资产、总资产、总负债，本位币一键切换，隐藏金额；账户类型：现金、日常卡、储蓄、电子钱包、多币种、投资、其他资产、信用卡、负债；按类型 / 币种 / 自定义分组，拖动排序，归档；初始余额 + 初始余额日期、备注、是否计入净资产；无汇率的账户标记「待折算」，不按 1:1 计入 |
+| 账户详情 | 当前余额、已核对余额、账户信息、该账户交易；记一笔、转账、对账（生成可审计的余额调整）、信用卡还款、编辑、归档 |
+| 快速记账 | 底部 Sheet；支出（默认）/ 收入 / 转账；计算器键盘（`+` `−`，按币种小数位）；分类、账户、日期时间、备注、标签、收付款方；拆分（合计必须等于总额）；转账手续费（计入「手续费」分类支出）与两端不同金额；记住上次选择；保存成功后才关闭，触感 + Toast；有改动时下滑关闭会二次确认 |
+| 流水 | 月份切换 / 自定义区间；搜索（备注、收付款方、分类、账户、标签、金额）；按账户、分类、类型、标签、金额筛选；左滑编辑 / 删除，复制；退款关联原交易；周期计划管理 |
+| 统计 | 周 / 月 / 年 / 自定义；收入、支出、净收支与上期同口径对比；分类环形图 + 排行，点分类跳到筛选好的流水；每日支出、月度收支、月度净收支；显示汇率口径与待换算笔数；转账、还款、余额调整不计入收支 |
+| 预算 | 总预算与分类预算；月 / 周 / 年 / 自定义周期，月度起始日可设；已用、剩余、百分比、剩余天数、每日可用；超支显示超出金额；结转；排除分类；退款冲减；跨币种预算按汇率换算；预算多时自动紧凑列表；超过阈值 App 内提醒（每期每级一次） |
+| 设置 | 外观（经典 / 液态玻璃主题、浅色 / 深色 / 跟随系统、强调色、金额格式、语言）；财务（本位币、汇率、账户入口、默认账户、分类、标签、周期计划、预算月起始日）；数据（CSV 导入导出、JSON 备份与恢复、数据完整性检查、变更记录、演示数据、清除数据）；隐私（Face ID 锁、自动锁定、多任务遮罩、隐藏金额、隐私说明）；关于（版本、更新说明、致谢、反馈诊断信息） |
+| 多币种 | 每笔交易保存原币金额、币种、日期、账户、类型和当日汇率快照；没有汇率时标记「待换算」，**绝不假设 1:1**；补录汇率后自动补齐；手动汇率与历史汇率表；离线可用 |
+| 数据安全 | 所有写入原子提交、失败回滚；删除 / 编辑 / 调整 / 导入 / 恢复记入变更记录；备份带格式版本与 SHA-256 校验，恢复前预览、合并时按 ID 去重 |
 
-演示数据：首次启动可选「使用演示数据体验」，生成约 100 天的真实感记录（含澳元旅行卡与跨币种转账）。所有演示对象都带 `isDemo` 标记，首页顶部有横幅提示，可随时一键移除且不影响自己的记录。
+演示数据：首次启动可选「使用演示数据体验」，生成约 100 天的记录（含澳元账户、跨币种转账与手续费、拆分 + 退款、信用卡、贷款、每月房租周期计划）。所有演示对象带 `isDemo` 标记，可在资产页或设置 › 数据中一键移除，不影响自己的记录。
 
 ---
 
@@ -36,7 +34,7 @@
 
 1. 用 Xcode 16 或更高版本打开 `Tally/Tally.xcodeproj`。
 2. 选择 Scheme **Tally** 和一台 iPhone 模拟器，⌘R。
-3. ⌘U 运行单元测试（Swift Testing：计算器、Decimal 编解码、历史汇率换算、余额与转账、快照不漂移、预算级别、CSV 往返与幂等导入、演示数据清理）。
+3. ⌘U 运行单元测试（Swift Testing，覆盖收支、转账与手续费、退款、信用卡消费与还款、负债、多币种与待换算、拆分、预算与结转、编辑删除、余额调整、舍入、周期交易去重、备份校验、CSV 往返等，清单见 docs/DELIVERY.md）。
 
 命令行：
 
@@ -98,7 +96,7 @@ cd Tally
 
 未签名 IPA 不能直接安装，需要用你自己的 Apple ID 重新签名，例如 Sideloadly、AltStore，或 `codesign` + 描述文件手动重签。
 
-> 调试截图模式仅存在于 Debug 构建：启动参数 `-TallyScreenshotMode`（首次自动加载演示数据并跳过引导）、`-TallyTab statistics`、`-TallyOpenEntry`。
+> 调试截图模式仅存在于 Debug 构建：启动参数 `-TallyScreenshotMode`（首次自动加载演示数据并跳过引导）、`-TallyTab assets|transactions|analytics|budgets|settings`、`-TallyOpenEntry`。
 
 ---
 
@@ -125,18 +123,20 @@ cd Tally
 Tally/
 ├── Tally.xcodeproj
 ├── Tally/
-│   ├── App/            入口、根视图（Tab + 锁屏 + 隐私遮罩）、路由、持久化、设置项
-│   ├── DesignSystem/   颜色 / 字体 / 间距 / 圆角 / 动画、玻璃材质、通用组件、触感
-│   ├── Models/         SwiftData 模型（Account、LedgerEntry、LedgerCategory、Tag、Budget、ExchangeRate）
-│   ├── Services/       LedgerStore、LedgerMath、CurrencyConverter、BudgetEvaluator、CSV、AppLock、Keychain、演示数据
+│   ├── App/            入口、根视图（Tab + 锁屏 + 隐私遮罩）、路由、持久化、设置项、语言
+│   ├── DesignSystem/   颜色 / 字体 / 间距 / 圆角 / 动画、主题表面（经典 / 液态玻璃）、通用组件、触感
+│   ├── Domain/         纯值类型财务引擎：LedgerSnapshot、FinanceEngine、BudgetEngine、Recurrence
+│   ├── Models/         SwiftData 模型：Account、LedgerEntry、TransactionSplit、LedgerCategory、Tag、Budget、RecurringRule、ExchangeRate、AuditRecord
+│   ├── Services/       TransactionService、LedgerRepository、LedgerCache、RecurringService、BackupService、IntegrityService、CSV、BudgetNotifier、AppLock、Keychain、汇率、演示数据
 │   ├── ViewModels/     QuickEntryViewModel、AmountExpression（计算器）、TransactionFilter
-│   ├── Features/       Dashboard、QuickEntry、Transactions、Statistics、Budget、Accounts、Settings、Lock、Onboarding
-│   ├── Utilities/      Decimal 存储与解析、日期周期、格式化
-│   └── Resources/      Assets（App 图标浅色 / 深色 / 着色）、Localizable.xcstrings、InfoPlist.xcstrings
+│   ├── Features/       Assets、Transactions、QuickEntry、Analytics、Budgets、Settings、Lock、Onboarding
+│   ├── Utilities/      Decimal 存储与解析、统计周期、格式化
+│   └── Resources/      Assets（App 图标）、Localizable.xcstrings、InfoPlist.xcstrings
 ├── TallyTests/         Swift Testing 单元测试
 ├── ExportOptions/      导出 IPA 的 plist 模板
-├── scripts/            build_ipa.sh、本地化提取脚本与中文翻译表
-└── docs/
+├── scripts/            build_ipa.sh、本地化脚本与翻译表、OCR 校验脚本
+├── release/            CI 生成的未签名 IPA
+└── docs/               架构、财务规则、交付记录
 ```
 
 ## 本地化
@@ -154,8 +154,12 @@ python3 Tally/scripts/l10n_extract.py --list   # 列出尚未翻译的候选文�
 
 ## CSV 格式
 
-导出列：`Date, Type, Amount, Currency, Account, To Account, To Amount, To Currency, Category, Tags, Note, Base Currency, Rate To Base, Base Amount, ID`。
-导入时只需要 `Date`（日期）和 `Amount`（金额）两列；`Type` 缺失时按金额正负判断收支；标签用 `;` 分隔。
+导出列：`Date, Type, Amount, Currency, Account, To Account, To Amount, To Currency, Category, Splits, Payee, Fee, Tags, Note, Base Currency, Rate To Base, Base Amount, ID`。
+导入时只需要 `Date`（日期）和 `Amount`（金额）两列；`Type` 缺失时按金额正负判断收支；标签用 `;` 分隔；拆分写作 `分类=金额; 分类=金额`。外币行如果没有可用汇率，不会被导入（导入结果会列出这些行）。
+
+## 备份
+
+设置 › 数据 › 创建备份：生成一个 JSON 文件（`format = tally-backup`、`schemaVersion = 3`、SHA-256 校验），包含账户、分类、标签、交易（含拆分）、预算、周期计划和汇率。恢复时先显示文件内容，可选「合并」（按 ID 跳过已有记录）或「替换」（需身份验证）。
 
 ## 隐私
 
