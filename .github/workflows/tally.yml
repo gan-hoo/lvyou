@@ -63,7 +63,7 @@ jobs:
           path: Tally/build.log
 
   xcode16:
-    name: Build with Xcode 16.0 (oldest supported toolchain)
+    name: Build with Xcode 16 (iOS 18 SDK, non-Liquid-Glass path)
     needs: archive
     runs-on: macos-15
     timeout-minutes: 40
@@ -73,9 +73,9 @@ jobs:
         working-directory: Tally
     steps:
       - uses: actions/checkout@v4
-      - name: Select Xcode 16.0
+      - name: Select Xcode 16
         run: |
-          OLDEST=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | head -1)
+          OLDEST=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | tail -1)
           if [ -z "$OLDEST" ]; then echo "No Xcode 16 installed; skipping"; echo "SKIP=1" >> "$GITHUB_ENV"; exit 0; fi
           echo "Using $OLDEST"
           sudo xcode-select -s "$OLDEST"
@@ -212,14 +212,14 @@ jobs:
               canvas = Image.new("RGB", (width * len(ims) + 8 * (len(ims) - 1), h), (128, 128, 128))
               for i, im in enumerate(ims):
                   canvas.paste(im, (i * (width + 8), 0))
-              canvas.save(out, quality=55)
+              canvas.save(out, quality=50, optimize=True)
               data = base64.b64encode(open(out, "rb").read()).decode()
               print(f"{out}-BEGIN")
               for i in range(0, len(data), 400):
                   print(data[i:i + 400])
               print(f"{out}-END")
-          sheet(files[:3], "sheetA.jpg")
-          sheet(files[3:6], "sheetB.jpg")
+          picks = [f for f in files if any(k in f for k in ("1-home", "2-entry", "4-statistics"))]
+          sheet(picks, "sheet.jpg", width=240)
           PY
       - uses: actions/upload-artifact@v4
         if: always()
