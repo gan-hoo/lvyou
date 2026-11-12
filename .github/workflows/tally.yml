@@ -135,3 +135,83 @@ jobs:
         with:
           name: tally-test-log
           path: Tally/test.log
+
+  screenshots:
+    name: Simulator screenshots
+    needs: archive
+    runs-on: macos-15
+    timeout-minutes: 40
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: Tally
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build for simulator and capture screens
+        run: |
+          set -o pipefail
+          UDID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          ios = sorted((k for k in data if "iOS" in k), reverse=True)
+          for runtime in ios:
+              for d in data[runtime]:
+                  if d["name"].startswith("iPhone") and "Pro" in d["name"] and "Max" not in d["name"]:
+                      print(d["udid"]); sys.exit(0)
+          sys.exit(1)')
+          echo "Device $UDID"
+          xcodebuild build -project Tally.xcodeproj -scheme Tally -configuration Debug \
+            -destination "id=$UDID" -derivedDataPath build CODE_SIGNING_ALLOWED=NO \
+            | grep -E "error:|BUILD" || true
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" build/Build/Products/Debug-iphonesimulator/Tally.app
+          xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
+          mkdir -p shots
+          shoot() { # name appearance lang tab extra...
+            local name=$1 look=$2 lang=$3 tab=$4; shift 4
+            xcrun simctl ui "$UDID" appearance "$look"
+            local locale=zh_CN; [ "$lang" = en ] && locale=en_US
+            xcrun simctl launch --terminate-running-process "$UDID" com.ganhoo.tally \
+              -TallyScreenshotMode -TallyTab "$tab" "$@" -AppleLanguages "($lang)" -AppleLocale "$locale"
+            sleep 9
+            xcrun simctl io "$UDID" screenshot "shots/$name.png"
+          }
+          shoot 1-home light zh-Hans home
+          sleep 2
+          shoot 1-home light zh-Hans home
+          shoot 2-entry light zh-Hans home -TallyOpenEntry
+          shoot 3-transactions light zh-Hans transactions
+          shoot 4-statistics dark zh-Hans statistics
+          shoot 5-budget dark zh-Hans budget
+          shoot 6-settings light en settings
+          ls -la shots
+      - name: Contact sheets (printed to log)
+        run: |
+          python3 -m venv /tmp/venv && /tmp/venv/bin/pip install --quiet pillow
+          /tmp/venv/bin/python - <<'PY'
+          from PIL import Image
+          import glob, base64
+          files = sorted(glob.glob("shots/*.png"))
+          def sheet(paths, out, width=230):
+              ims = [Image.open(p).convert("RGB") for p in paths]
+              ims = [im.resize((width, int(im.height * width / im.width)), Image.LANCZOS) for im in ims]
+              h = max(im.height for im in ims)
+              canvas = Image.new("RGB", (width * len(ims) + 8 * (len(ims) - 1), h), (128, 128, 128))
+              for i, im in enumerate(ims):
+                  canvas.paste(im, (i * (width + 8), 0))
+              canvas.save(out, quality=55)
+              data = base64.b64encode(open(out, "rb").read()).decode()
+              print(f"{out}-BEGIN")
+              for i in range(0, len(data), 400):
+                  print(data[i:i + 400])
+              print(f"{out}-END")
+          sheet(files[:3], "sheetA.jpg")
+          sheet(files[3:6], "sheetB.jpg")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tally-screenshots
+          path: Tally/shots
+
