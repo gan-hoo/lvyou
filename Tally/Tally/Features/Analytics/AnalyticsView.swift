@@ -337,7 +337,7 @@ private struct DailyCard: View {
                 Text("Daily Spending").font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
                 Spacer()
                 if let p = selected {
-                    Text(verbatim: p.date.formatted(.dateTime.month(.abbreviated).day()) + " · " + MoneyFormat.string(p.amount, code: base))
+                    Text(verbatim: p.date.text(.dateTime.month(.abbreviated).day()) + " · " + MoneyFormat.string(p.amount, code: base))
                         .font(.footnote.weight(.semibold).monospacedDigit())
                 }
             }
@@ -410,7 +410,7 @@ private struct MonthlyCard: View {
             .chartXSelection(value: $selectedMonth)
             .chartXAxis {
                 AxisMarks(values: .stride(by: .month)) { _ in
-                    AxisValueLabel(format: .dateTime.month(.narrow))
+                    AxisValueLabel(format: .dateTime.month(.narrow).locale(AppLocale.current))
                 }
             }
             .chartYAxis {
@@ -441,7 +441,7 @@ private struct NetTrendCard: View {
                 RuleMark(y: .value("Zero", 0)).foregroundStyle(Color.secondary.opacity(0.3))
             }
             .chartXAxis {
-                AxisMarks(values: .stride(by: .month)) { _ in AxisValueLabel(format: .dateTime.month(.narrow)) }
+                AxisMarks(values: .stride(by: .month)) { _ in AxisValueLabel(format: .dateTime.month(.narrow).locale(AppLocale.current)) }
             }
             .chartYAxis {
                 AxisMarks(position: .trailing, values: .automatic(desiredCount: 3)) { value in

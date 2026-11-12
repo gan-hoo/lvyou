@@ -4,7 +4,7 @@ extension Calendar {
     /// Gregorian calendar in the user's time zone with weeks starting on Monday.
     static var ledger: Calendar {
         var cal = Calendar(identifier: .gregorian)
-        cal.locale = .current
+        cal.locale = AppLocale.current
         cal.timeZone = .current
         cal.firstWeekday = 2
         cal.minimumDaysInFirstWeek = 4
@@ -103,8 +103,7 @@ struct Period: Hashable, Sendable {
         case .month: return start.monthTitle
         case .year: return start.yearTitle
         case .week, .custom:
-            let last = end.addingTimeInterval(-1)
-            return (start..<last).formatted(.interval.month(.abbreviated).day())
+            return Date.rangeText(start, end.addingTimeInterval(-1))
         }
     }
 

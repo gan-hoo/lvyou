@@ -98,7 +98,7 @@ struct TransactionDetailView: View {
                 if !entry.payee.isEmpty {
                     LabeledContent("Payee", value: entry.payee)
                 }
-                LabeledContent("Date", value: entry.date.formatted(date: .long, time: .shortened))
+                LabeledContent("Date", value: entry.date.text(date: .long, time: .shortened))
                 if !entry.tagList.isEmpty {
                     LabeledContent("Tags", value: entry.tagList.map { "#" + $0.name }.joined(separator: " "))
                 }
@@ -167,7 +167,7 @@ struct TransactionDetailView: View {
                 }
                 Button(role: .destructive) { confirmDelete = true } label: { Label("Delete", systemImage: "trash") }
             } footer: {
-                Text("Created \(entry.createdAt.formatted(date: .abbreviated, time: .shortened)) · Updated \(entry.updatedAt.formatted(date: .abbreviated, time: .shortened))")
+                Text("Created \(entry.createdAt.text(date: .abbreviated, time: .shortened)) · Updated \(entry.updatedAt.text(date: .abbreviated, time: .shortened))")
             }
         }
         .listStyle(.insetGrouped)

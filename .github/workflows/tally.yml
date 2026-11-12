@@ -161,6 +161,8 @@ jobs:
   screenshots:
     name: Simulator screenshots
     needs: archive
+    permissions:
+      contents: write
     runs-on: macos-15
     timeout-minutes: 40
     continue-on-error: true
@@ -198,7 +200,10 @@ jobs:
           shoot() { # name appearance lang tab extra...
             local name=$1 look=$2 lang=$3 tab=$4; shift 4
             xcrun simctl ui "$UDID" appearance "$look"
-            local locale=zh_CN; [ "$lang" = en ] && locale=en_US
+            # LOCALE_OVERRIDE simulates a phone whose region/format language differs
+            # from the app language (e.g. Tally in Chinese on an English (Australia) iPhone).
+            local locale=${LOCALE_OVERRIDE:-zh_CN}
+            if [ "$lang" = en ] && [ -z "$LOCALE_OVERRIDE" ]; then locale=en_US; fi
             xcrun simctl launch --terminate-running-process "$UDID" com.ganhoo.tally \
               -TallyScreenshotMode -TallyTab "$tab" "$@" -AppleLanguages "($lang)" -AppleLocale "$locale"
             sleep 9
@@ -225,6 +230,9 @@ jobs:
           shoot 8-analytics-en light en analytics
           shoot 9-budgets-hant dark zh-Hant budgets
           shoot 10-assets-hidden light en assets -settings.hideAmounts YES
+          LOCALE_OVERRIDE=en_AU shoot 11-transactions-zh-enAU light zh-Hans transactions
+          LOCALE_OVERRIDE=en_AU shoot 12-analytics-glass-zh-enAU light zh-Hans analytics -settings.theme liquidGlass
+          shoot 13-transactions-glass light zh-Hans transactions -settings.theme liquidGlass
           ls -la shots
       - name: OCR screenshots (printed to log)
         run: |
@@ -237,4 +245,25 @@ jobs:
         with:
           name: tally-screenshots
           path: Tally/shots
+
+      # Commit messages containing [publish-shots] also store reduced JPEG copies in
+      # the branch (Tally/release/shots/) so they can be reviewed without artifacts.
+      - name: Publish screenshots to branch
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-shots]')
+        run: |
+          mkdir -p release/shots
+          rm -f release/shots/*.jpg
+          for f in shots/*.png; do
+            sips -Z 1200 -s format jpeg -s formatOptions 72 "$f" --out "release/shots/$(basename "${f%.png}").jpg" >/dev/null
+          done
+          ls -la release/shots
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release/shots
+          git commit -m "Add simulator screenshots from ${GITHUB_SHA::7} [skip ci]" || exit 0
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
 

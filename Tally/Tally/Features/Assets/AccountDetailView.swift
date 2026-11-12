@@ -74,7 +74,7 @@ struct AccountDetailView: View {
                 }
                 if let reconciled = account.reconciledBalance, let at = account.reconciledAt {
                     LabeledContent("Reconciled Balance", value: MoneyFormat.string(reconciled, code: account.currencyCode))
-                    LabeledContent("Reconciled On", value: at.formatted(date: .abbreviated, time: .shortened))
+                    LabeledContent("Reconciled On", value: at.text(date: .abbreviated, time: .shortened))
                 }
                 LabeledContent("Included in Net Worth", value: account.includeInTotal ? String(localized: "Yes") : String(localized: "No"))
                 if !account.note.isEmpty {

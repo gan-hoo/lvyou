@@ -42,6 +42,7 @@ struct TallyApp: App {
                 .environment(toasts)
                 .environment(router)
                 .environment(cache)
+                .environment(\.locale, AppLocale.current)
                 .preferredColorScheme((AppearanceMode(rawValue: appearance) ?? .system).colorScheme)
                 .tint(Color(hex: accent))
         }

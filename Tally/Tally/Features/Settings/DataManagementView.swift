@@ -326,7 +326,7 @@ struct RestorePreviewSheet: View {
         NavigationStack {
             List {
                 Section {
-                    LabeledContent("Created", value: file.createdAt.formatted(date: .abbreviated, time: .shortened))
+                    LabeledContent("Created", value: file.createdAt.text(date: .abbreviated, time: .shortened))
                     LabeledContent("App version", value: file.appVersion)
                     LabeledContent("Format version", value: file.schemaVersion.formatted())
                     LabeledContent("Checksum") {
@@ -449,7 +449,7 @@ struct AuditLogView: View {
                         HStack {
                             Text(verbatim: AuditText.title(r)).font(.subheadline.weight(.medium))
                             Spacer()
-                            Text(r.date.formatted(date: .abbreviated, time: .shortened)).font(.caption).foregroundStyle(.secondary)
+                            Text(r.date.text(date: .abbreviated, time: .shortened)).font(.caption).foregroundStyle(.secondary)
                         }
                         Text(verbatim: r.summary).font(.caption).foregroundStyle(.secondary).lineLimit(3)
                     }

@@ -60,7 +60,7 @@ struct AssetsView: View {
                     }
                 }
                 .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 8, trailing: 0))
+                .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 12, trailing: 0))
 
                 if accounts.contains(where: \.isDemo) {
                     Section {

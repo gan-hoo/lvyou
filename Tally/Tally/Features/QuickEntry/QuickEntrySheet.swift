@@ -463,7 +463,7 @@ private struct QuickEntryContent: View {
         let day: String
         if cal.isDateInToday(model.date) { day = String(localized: "Today") }
         else if cal.isDateInYesterday(model.date) { day = String(localized: "Yesterday") }
-        else { day = model.date.formatted(.dateTime.month(.abbreviated).day()) }
+        else { day = model.date.text(.dateTime.month(.abbreviated).day()) }
         return day + " " + model.date.timeText
     }
 

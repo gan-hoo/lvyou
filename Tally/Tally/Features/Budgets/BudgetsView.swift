@@ -436,8 +436,7 @@ enum BudgetTitle {
     }
 
     static func interval(_ interval: DateInterval) -> String {
-        let last = interval.end.addingTimeInterval(-1)
-        return (interval.start..<last).formatted(.interval.month(.abbreviated).day())
+        Date.rangeText(interval.start, interval.end.addingTimeInterval(-1))
     }
 
     static func warnings(_ status: BudgetStatus, budget: Budget, base: String) -> [String] {

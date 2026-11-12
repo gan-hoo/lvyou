@@ -52,6 +52,29 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     }
 }
 
+/// Locale for every date, number and currency Tally formats: the language Tally is
+/// running in, combined with the phone's region. Without this, an iPhone set to
+/// English (Australia) running Tally in Chinese showed Chinese text with English
+/// month names ("November 2026") and English currency symbols.
+enum AppLocale {
+    static let current: Locale = make()
+
+    static func make(running: String = AppLanguage.running, system: Locale = .current) -> Locale {
+        let wanted = Locale.Language(identifier: running)
+        let have = system.language
+        if have.languageCode == wanted.languageCode {
+            // Same language: keep the system locale and the user's format preferences,
+            // unless the script differs (Simplified vs Traditional Chinese).
+            guard let script = wanted.script else { return system }
+            if have.maximalIdentifier.contains(script.identifier) { return system }
+        }
+        if let region = system.region?.identifier {
+            return Locale(identifier: running + "_" + region)
+        }
+        return Locale(identifier: running)
+    }
+}
+
 /// Looks up strings in a specific localization, independent of the running language.
 enum L10n {
     static let supported = ["en", "zh-Hans", "zh-Hant"]

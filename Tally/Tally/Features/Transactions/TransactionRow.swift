@@ -65,7 +65,7 @@ struct TransactionRow: View {
 
     private var subtitle: String {
         var parts: [String] = []
-        if showsDate { parts.append(entry.date.formatted(.dateTime.month(.abbreviated).day())) }
+        if showsDate { parts.append(entry.date.text(.dateTime.month(.abbreviated).day())) }
         if !entry.payee.isEmpty { parts.append(entry.payee) }
         if !entry.note.isEmpty { parts.append(entry.note) }
         switch entry.kind {

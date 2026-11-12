@@ -17,14 +17,14 @@ enum MoneyFormat {
         let digits = fractionDigits ?? CurrencyInfo.info(for: code).fractionDigits
         switch AppSettings.amountStyle {
         case .symbol:
-            var style = Decimal.FormatStyle.Currency(code: code, locale: .current)
+            var style = Decimal.FormatStyle.Currency(code: code, locale: AppLocale.current)
                 .precision(.fractionLength(digits))
             if showPlusSign {
                 style = style.sign(strategy: .always(showZero: false))
             }
             return value.formatted(style)
         case .code:
-            var number = Decimal.FormatStyle(locale: .current).precision(.fractionLength(digits))
+            var number = Decimal.FormatStyle(locale: AppLocale.current).precision(.fractionLength(digits))
             if showPlusSign {
                 number = number.sign(strategy: .always(includingZero: false))
             }
@@ -44,44 +44,59 @@ enum MoneyFormat {
 
     /// Number without currency symbol, e.g. "1,234.50".
     static func plain(_ value: Decimal, fractionDigits: Int = 2) -> String {
-        value.formatted(.number.precision(.fractionLength(fractionDigits)))
+        value.formatted(.number.precision(.fractionLength(fractionDigits)).locale(AppLocale.current))
     }
 
     /// Short axis labels for charts: "1.2K", "3万".
     static func compact(_ value: Double) -> String {
         if AppSettings.hideAmounts { return "" }
-        return value.formatted(.number.notation(.compactName).precision(.significantDigits(1...3)))
+        return value.formatted(.number.notation(.compactName).precision(.significantDigits(1...3)).locale(AppLocale.current))
     }
 
     static func percent(_ fraction: Double, digits: Int = 0) -> String {
-        fraction.formatted(.percent.precision(.fractionLength(digits)))
+        fraction.formatted(.percent.precision(.fractionLength(digits)).locale(AppLocale.current))
     }
 
     static func rate(_ value: Decimal) -> String {
-        value.formatted(.number.precision(.fractionLength(2...6)))
+        value.formatted(.number.precision(.fractionLength(2...6)).locale(AppLocale.current))
     }
 }
 
 extension Date {
+    /// Formats in Tally's running language (see `AppLocale`), not the phone's.
+    func text(_ style: Date.FormatStyle) -> String {
+        formatted(style.locale(AppLocale.current))
+    }
+
+    func text(date: Date.FormatStyle.DateStyle, time: Date.FormatStyle.TimeStyle) -> String {
+        formatted(Date.FormatStyle(date: date, time: time, locale: AppLocale.current))
+    }
+
+    /// "12–18 Nov" / "11月12日至18日"
+    static func rangeText(_ start: Date, _ end: Date) -> String {
+        let style = Date.IntervalFormatStyle(locale: AppLocale.current).month(.abbreviated).day()
+        return (start..<max(start, end)).formatted(style)
+    }
+
     /// "Wednesday, 12 Nov" / "11月12日 星期三"
     var dayHeaderText: String {
         let calendar = Calendar.current
         if calendar.isDateInToday(self) { return String(localized: "Today") }
         if calendar.isDateInYesterday(self) { return String(localized: "Yesterday") }
         if calendar.isDate(self, equalTo: .now, toGranularity: .year) {
-            return formatted(.dateTime.month(.abbreviated).day().weekday(.abbreviated))
+            return text(.dateTime.month(.abbreviated).day().weekday(.abbreviated))
         }
-        return formatted(.dateTime.year().month(.abbreviated).day().weekday(.abbreviated))
+        return text(.dateTime.year().month(.abbreviated).day().weekday(.abbreviated))
     }
 
     /// "November 2026" / "2026年11月"
-    var monthTitle: String { formatted(.dateTime.year().month(.wide)) }
+    var monthTitle: String { text(.dateTime.year().month(.wide)) }
 
-    var shortMonthTitle: String { formatted(.dateTime.month(.abbreviated)) }
+    var shortMonthTitle: String { text(.dateTime.month(.abbreviated)) }
 
-    var yearTitle: String { formatted(.dateTime.year()) }
+    var yearTitle: String { text(.dateTime.year()) }
 
-    var shortDateText: String { formatted(date: .abbreviated, time: .omitted) }
+    var shortDateText: String { text(date: .abbreviated, time: .omitted) }
 
-    var timeText: String { formatted(date: .omitted, time: .shortened) }
+    var timeText: String { text(date: .omitted, time: .shortened) }
 }

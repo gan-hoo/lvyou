@@ -40,7 +40,7 @@ struct CalculatorKeypad: View {
                     .accessibilityLabel(Text("Minus"))
             }
             GridRow {
-                KeyButton(kind: .digit, action: { onKey(.decimal) }) { Text(verbatim: Locale.current.decimalSeparator ?? ".") }
+                KeyButton(kind: .digit, action: { onKey(.decimal) }) { Text(verbatim: AppLocale.current.decimalSeparator ?? ".") }
                     .accessibilityLabel(Text("Decimal point"))
                 digit(0)
                 KeyButton(kind: .commit(tint), isEnabled: commitEnabled || showsEquals, action: { onKey(.commit) }) {

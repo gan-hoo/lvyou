@@ -10,7 +10,7 @@ struct CurrencyInfo: Identifiable, Hashable, Sendable {
 
     /// Localized display name supplied by the system (e.g. "Australian Dollar" / "澳大利亚元").
     var localizedName: String {
-        Locale.current.localizedString(forCurrencyCode: code) ?? code
+        AppLocale.current.localizedString(forCurrencyCode: code) ?? code
     }
 
     static let all: [CurrencyInfo] = [

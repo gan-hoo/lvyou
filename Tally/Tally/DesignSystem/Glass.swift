@@ -5,6 +5,10 @@ import SwiftUI
 struct GlassSurface<S: InsettableShape>: ViewModifier {
     var shape: S
     var interactive: Bool = false
+    /// Content cards keep the glass inside their own shape. Liquid Glass casts a soft
+    /// shadow below itself; inside a List row that shadow is cut off at the row edge
+    /// and shows as a grey band under the card.
+    var clipped: Bool = false
 
     func body(content: Content) -> some View {
         styled(content)
@@ -14,7 +18,13 @@ struct GlassSurface<S: InsettableShape>: ViewModifier {
     @ViewBuilder
     private func styled(_ content: Content) -> some View {
         if #available(iOS 26.0, *) {
-            content.glassEffect(interactive ? .regular.interactive() : .regular, in: shape)
+            if clipped {
+                content
+                    .glassEffect(.regular, in: shape)
+                    .clipShape(shape)
+            } else {
+                content.glassEffect(interactive ? .regular.interactive() : .regular, in: shape)
+            }
         } else {
             fallback(content)
         }
@@ -30,7 +40,7 @@ struct GlassSurface<S: InsettableShape>: ViewModifier {
         content
             .background(.ultraThinMaterial, in: shape)
             .overlay(shape.strokeBorder(DS.Colors.glassStroke, lineWidth: 0.6))
-            .shadow(color: .black.opacity(0.06), radius: 14, y: 5)
+            .shadow(color: .black.opacity(clipped ? 0 : 0.06), radius: 14, y: 5)
     }
 }
 
@@ -49,7 +59,7 @@ struct FinanceCard: ViewModifier {
         case .classic:
             padded.background(DS.Colors.card, in: shape)
         case .liquidGlass:
-            padded.modifier(GlassSurface(shape: shape))
+            padded.modifier(GlassSurface(shape: shape, clipped: true))
         }
     }
 }

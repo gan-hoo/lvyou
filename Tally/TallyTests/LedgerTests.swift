@@ -265,6 +265,20 @@ struct LocalizationTests {
         #expect(L10n.variants(of: "Cash").isSuperset(of: ["Cash", "现金", "現金"]))
     }
 
+    /// Tally in Chinese on an English (Australia) iPhone must show Chinese dates.
+    @Test func formattingFollowsTheAppLanguageNotThePhone() {
+        let phone = Locale(identifier: "en_AU")
+        let zh = AppLocale.make(running: "zh-Hans", system: phone)
+        #expect(zh.language.languageCode?.identifier == "zh")
+        #expect(zh.region?.identifier == "AU")
+        let date = Calendar(identifier: .gregorian).date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 12))!
+        #expect(date.formatted(.dateTime.year().month(.wide).locale(zh)).contains("11月"))
+
+        #expect(AppLocale.make(running: "en", system: phone) == phone)
+        let hant = AppLocale.make(running: "zh-Hant", system: Locale(identifier: "zh_CN"))
+        #expect(hant.language.script?.identifier == "Hant")
+    }
+
     @Test func builtInNamesFollowTheRunningLanguage() throws {
         let container = try ModelContainer(for: Persistence.schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
         let context = container.mainContext
