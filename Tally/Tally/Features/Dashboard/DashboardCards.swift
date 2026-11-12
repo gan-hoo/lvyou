@@ -76,7 +76,7 @@ struct HeroBalanceCard: View {
         }
         .card(padding: DS.Spacing.xl)
         .offset(x: dragX * 0.25)
-        .gesture(
+        .simultaneousGesture(
             DragGesture(minimumDistance: 24)
                 .updating($dragX) { value, state, _ in
                     if abs(value.translation.width) > abs(value.translation.height) { state = value.translation.width }

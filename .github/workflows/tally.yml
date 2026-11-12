@@ -15,6 +15,7 @@ jobs:
   archive:
     name: Archive & unsigned IPA
     runs-on: macos-15
+    timeout-minutes: 45
     defaults:
       run:
         working-directory: Tally
@@ -36,6 +37,7 @@ jobs:
             -destination 'generic/platform=iOS' \
             -archivePath build/Tally.xcarchive \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            OTHER_SWIFT_FLAGS='$(inherited) -Xfrontend -solver-expression-time-threshold=60 -Xfrontend -warn-long-expression-type-checking=400 -Xfrontend -warn-long-function-bodies=1500' \
             | tee build.log | grep -E "error:|warning:|ARCHIVE|BUILD" || true
           test -d build/Tally.xcarchive/Products/Applications/Tally.app
 
@@ -61,7 +63,9 @@ jobs:
 
   latest-sdk:
     name: Build with newest installed Xcode (Liquid Glass path)
+    needs: archive
     runs-on: macos-15
+    timeout-minutes: 40
     continue-on-error: true
     defaults:
       run:
@@ -94,7 +98,9 @@ jobs:
 
   test:
     name: Unit tests
+    needs: archive
     runs-on: macos-15
+    timeout-minutes: 40
     defaults:
       run:
         working-directory: Tally
@@ -117,6 +123,8 @@ jobs:
             -project Tally.xcodeproj \
             -scheme Tally \
             -destination "id=$DEVICE_ID" \
+            -test-timeouts-enabled YES \
+            -maximum-test-execution-time-allowance 180 \
             CODE_SIGNING_ALLOWED=NO \
             | tee test.log | grep -E "error:|✔|✘|passed|failed|TEST" || true
           grep -q "TEST SUCCEEDED" test.log

@@ -144,8 +144,9 @@ extension ButtonStyle where Self == PressableStyle {
     static var pressable: PressableStyle { PressableStyle() }
 }
 
-/// Floating "add" button with a glass rim.
+/// Floating "add" button with a glass rim. Long-press offers a kind menu.
 struct FloatingAddButton: View {
+    var onSelectKind: ((TransactionKind) -> Void)? = nil
     var action: () -> Void
 
     var body: some View {
@@ -162,6 +163,17 @@ struct FloatingAddButton: View {
                 .glass(in: Circle())
         }
         .buttonStyle(PressableStyle(scale: 0.92))
+        .contextMenu {
+            if let onSelectKind {
+                ForEach(TransactionKind.allCases) { kind in
+                    Button {
+                        onSelectKind(kind)
+                    } label: {
+                        Label(kind.title, systemImage: kind.symbol)
+                    }
+                }
+            }
+        }
         .accessibilityLabel(Text("Add Transaction"))
         .accessibilityHint(Text("Opens quick entry"))
     }

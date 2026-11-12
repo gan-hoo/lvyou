@@ -116,7 +116,7 @@ struct DashboardView: View {
             .navigationDestination(for: Account.self) { AccountDetailView(account: $0) }
             .navigationDestination(for: LedgerEntry.self) { TransactionDetailView(entry: $0) }
             .overlay(alignment: .bottomTrailing) {
-                FloatingAddButton { router.addEntry() }
+                FloatingAddButton(onSelectKind: { router.addEntry($0) }) { router.addEntry() }
                     .padding(.trailing, DS.Spacing.xl)
                     .padding(.bottom, DS.Spacing.l)
             }

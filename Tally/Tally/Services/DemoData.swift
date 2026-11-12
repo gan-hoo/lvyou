@@ -57,13 +57,11 @@ enum DemoData {
         let credit = makeAccount(String(localized: "Credit Card"), .creditCard, base, -scaled(1_500), "EB5E8C")
         let savings = makeAccount(String(localized: "Savings"), .savings, base, scaled(50_000), "9B6DD6")
         let foreignCode = base == "AUD" ? "CNY" : "AUD"
-        let foreign = makeAccount(
-            foreignCode == "AUD" ? String(localized: "AUD Travel Card") : String(localized: "CNY Wallet"),
-            foreignCode == "AUD" ? .debitCard : .eWallet,
-            foreignCode,
-            foreignCode == "AUD" ? 300 : 2_000,
-            "3BB5A6"
-        )
+        let isAUD = foreignCode == "AUD"
+        let foreignName: String = isAUD ? String(localized: "AUD Travel Card") : String(localized: "CNY Wallet")
+        let foreignKind: AccountKind = isAUD ? .debitCard : .eWallet
+        let foreignOpening: Decimal = isAUD ? 300 : 2_000
+        let foreign = makeAccount(foreignName, foreignKind, foreignCode, foreignOpening, "3BB5A6")
         AppSettings.setUUID(debit.id, forKey: SettingsKey.defaultAccountID)
 
         let work = Tag(name: String(localized: "Work"), colorHex: "4A90E2", isDemo: true)
@@ -125,21 +123,28 @@ enum DemoData {
 
             // Daily life
             if !isWeekend && chance(0.65) {
-                add(.expense, scaled(random(22...38)), day, hour: 8 + Int.random(in: 0...1, using: &rng), account: chance(0.7) ? debit : cash,
-                    category: cat("cup.and.saucer", .expense), note: chance(0.5) ? String(localized: "Flat white") : "")
+                let hour: Int = 8 + Int.random(in: 0...1, using: &rng)
+                let account: Account = chance(0.7) ? debit : cash
+                let note: String = chance(0.5) ? String(localized: "Flat white") : ""
+                add(.expense, scaled(random(22...38)), day, hour: hour, account: account, category: cat("cup.and.saucer", .expense), note: note)
             }
             if !isWeekend && chance(0.75) {
                 let team = chance(0.15)
-                add(.expense, scaled(random(team ? 60...120 : 25...65)), day, hour: 12, account: chance(0.6) ? debit : credit,
-                    category: cat("fork.knife", .expense), note: team ? String(localized: "Team lunch") : "", tags: team ? [work] : [])
+                let range: ClosedRange<Double> = team ? 60...120 : 25...65
+                let account: Account = chance(0.6) ? debit : credit
+                let note: String = team ? String(localized: "Team lunch") : ""
+                let tags: [Tag] = team ? [work] : []
+                add(.expense, scaled(random(range)), day, hour: 12, account: account, category: cat("fork.knife", .expense), note: note, tags: tags)
             }
-            if chance(isWeekend ? 0.45 : 0.2) {
-                add(.expense, scaled(random(90...280)), day, hour: 19, account: credit, category: cat("fork.knife", .expense),
-                    note: chance(0.4) ? String(localized: "Dinner with friends") : "")
+            let dinnerChance: Double = isWeekend ? 0.45 : 0.2
+            if chance(dinnerChance) {
+                let note: String = chance(0.4) ? String(localized: "Dinner with friends") : ""
+                add(.expense, scaled(random(90...280)), day, hour: 19, account: credit, category: cat("fork.knife", .expense), note: note)
             }
             if dom % 4 == 0 || (isWeekend && chance(0.4)) {
-                add(.expense, scaled(random(90...380)), day, hour: 18, account: chance(0.5) ? debit : credit,
-                    category: cat("cart", .expense), note: chance(0.5) ? String(localized: "Weekly groceries") : "")
+                let account: Account = chance(0.5) ? debit : credit
+                let note: String = chance(0.5) ? String(localized: "Weekly groceries") : ""
+                add(.expense, scaled(random(90...380)), day, hour: 18, account: account, category: cat("cart", .expense), note: note)
             }
             if !isWeekend && chance(0.85) {
                 add(.expense, scaled(random(4...12)), day, hour: 8, account: debit, category: cat("tram", .expense), note: String(localized: "Metro"))
@@ -151,8 +156,8 @@ enum DemoData {
                 add(.expense, scaled(random(120...900)), day, hour: 16, account: credit, category: cat("bag", .expense))
             }
             if isWeekend && chance(0.35) {
-                add(.expense, scaled(random(60...300)), day, hour: 20, account: credit, category: cat("gamecontroller", .expense),
-                    note: chance(0.5) ? String(localized: "Movie night") : "")
+                let note: String = chance(0.5) ? String(localized: "Movie night") : ""
+                add(.expense, scaled(random(60...300)), day, hour: 20, account: credit, category: cat("gamecontroller", .expense), note: note)
             }
             if chance(0.035) {
                 add(.expense, scaled(random(50...400)), day, hour: 11, account: debit, category: cat("cross.case", .expense), note: String(localized: "Pharmacy"))

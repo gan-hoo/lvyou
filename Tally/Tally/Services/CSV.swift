@@ -48,8 +48,10 @@ enum CSVCodec {
         return rows.filter { !($0.count == 1 && $0[0].trimmingCharacters(in: .whitespaces).isEmpty) }
     }
 
+    private static let specialCharacters: Set<Character> = [",", "\"", "\n", "\r", "\r\n"]
+
     static func escape(_ field: String) -> String {
-        if field.contains(where: { $0 == "," || $0 == "\"" || $0 == "\n" || $0 == "\r" }) {
+        if field.contains(where: { specialCharacters.contains($0) }) {
             return "\"" + field.replacingOccurrences(of: "\"", with: "\"\"") + "\""
         }
         return field

@@ -7,25 +7,35 @@ enum LedgerCSVExporter {
     static func rows(for entries: [LedgerEntry]) -> [[String]] {
         var rows: [[String]] = [LedgerCSVColumn.allCases.map(\.rawValue)]
         for e in entries.sorted(by: { $0.date < $1.date }) {
-            rows.append([
-                CSVDate.exportFormatter.string(from: e.date),
-                e.kind.rawValue,
-                DecimalCodec.encode(e.amount),
-                e.currencyCode,
-                e.account?.name ?? "",
-                e.kind == .transfer ? (e.toAccount?.name ?? "") : "",
-                e.kind == .transfer && !e.toAmountRaw.isEmpty ? DecimalCodec.encode(e.toAmount) : "",
-                e.kind == .transfer ? (e.toAccount?.currencyCode ?? "") : "",
-                e.kind == .transfer ? "" : (e.category?.name ?? ""),
-                e.tagList.map(\.name).joined(separator: "; "),
-                e.note,
-                e.baseCurrencyCode,
-                e.rateToBaseRaw,
-                e.baseAmountRaw,
-                e.id.uuidString,
-            ])
+            rows.append(row(for: e))
         }
         return rows
+    }
+
+    private static func row(for e: LedgerEntry) -> [String] {
+        let isTransfer = e.kind == .transfer
+        let toName: String = isTransfer ? (e.toAccount?.name ?? "") : ""
+        let toAmount: String = (isTransfer && !e.toAmountRaw.isEmpty) ? DecimalCodec.encode(e.toAmount) : ""
+        let toCurrency: String = isTransfer ? (e.toAccount?.currencyCode ?? "") : ""
+        let category: String = isTransfer ? "" : (e.category?.name ?? "")
+        let tags: String = e.tagList.map(\.name).joined(separator: "; ")
+        var fields: [String] = []
+        fields.append(CSVDate.exportFormatter.string(from: e.date))
+        fields.append(e.kind.rawValue)
+        fields.append(DecimalCodec.encode(e.amount))
+        fields.append(e.currencyCode)
+        fields.append(e.account?.name ?? "")
+        fields.append(toName)
+        fields.append(toAmount)
+        fields.append(toCurrency)
+        fields.append(category)
+        fields.append(tags)
+        fields.append(e.note)
+        fields.append(e.baseCurrencyCode)
+        fields.append(e.rateToBaseRaw)
+        fields.append(e.baseAmountRaw)
+        fields.append(e.id.uuidString)
+        return fields
     }
 
     static func csvString(for entries: [LedgerEntry]) -> String {
@@ -149,7 +159,7 @@ enum LedgerCSVImporter {
 
             let currency = value(.currency).uppercased()
             let tags = value(.tags)
-                .split(whereSeparator: { $0 == ";" || $0 == "|" || $0 == "，" })
+                .split(whereSeparator: { tagSeparators.contains($0) })
                 .map { $0.trimmingCharacters(in: .whitespaces) }
                 .filter { !$0.isEmpty }
 
@@ -171,6 +181,8 @@ enum LedgerCSVImporter {
         }
         return preview
     }
+
+    private static let tagSeparators: Set<Character> = [";", "|", "，", "；"]
 
     static func parseKind(_ raw: String, signedAmount: Decimal) -> TransactionKind {
         switch raw.lowercased() {

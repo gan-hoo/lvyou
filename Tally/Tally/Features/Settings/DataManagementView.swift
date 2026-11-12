@@ -187,6 +187,8 @@ struct DataManagementView: View {
         LedgerStore(context: context).eraseAllData()
         Haptics.success()
         toasts.show(ToastMessage(symbol: "trash", text: String(localized: "All data erased")))
+        // Start over from the welcome screen so a main currency and first accounts can be chosen again.
+        UserDefaults.standard.set(false, forKey: SettingsKey.hasCompletedOnboarding)
     }
 }
 

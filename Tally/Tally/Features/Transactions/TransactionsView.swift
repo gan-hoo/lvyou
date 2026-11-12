@@ -84,7 +84,7 @@ struct TransactionsView: View {
                 }
             }
             .overlay(alignment: .bottomTrailing) {
-                FloatingAddButton { router.addEntry() }
+                FloatingAddButton(onSelectKind: { router.addEntry($0) }) { router.addEntry() }
                     .padding(.trailing, DS.Spacing.xl)
                     .padding(.bottom, DS.Spacing.l)
             }
