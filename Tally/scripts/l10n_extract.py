@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+"""Extracts string literals from Swift sources and builds Localizable.xcstrings.
+
+Usage: python3 scripts/l10n_extract.py [--list]
+Translations live in scripts/translations_zh.json (English key -> Simplified Chinese).
+Interpolations become %@ unless the translations file contains the %lld variant.
+"""
+import json, re, sys, os, itertools
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC = os.path.join(ROOT, "Tally")
+LIT = re.compile(r'(?<![A-Za-z_#])"((?:[^"\\\n]|\\.)*)"')
+
+def literals(path):
+    text = open(path, encoding="utf-8").read()
+    # drop line comments
+    text = re.sub(r'(?m)^\s*//.*$', '', text)
+    for m in LIT.finditer(text):
+        raw = m.group(1)
+        if 'verbatim:' in text[max(0, m.start() - 12):m.start()]:
+            continue
+        yield raw
+
+def interp_to_placeholders(raw):
+    out, i, n = [], 0, 0
+    while i < len(raw):
+        if raw.startswith('\\(', i):
+            depth, j = 1, i + 2
+            while j < len(raw) and depth:
+                if raw[j] == '(':
+                    depth += 1
+                elif raw[j] == ')':
+                    depth -= 1
+                j += 1
+            out.append('\x00'); n += 1; i = j
+        elif raw.startswith('\\"', i):
+            out.append('"'); i += 2
+        else:
+            out.append(raw[i]); i += 1
+    return ''.join(out), n
+
+def candidates(template, n):
+    for combo in itertools.product(['%@', '%lld'], repeat=n):
+        s = template
+        for c in combo:
+            s = s.replace('\x00', c, 1)
+        yield s
+
+def main():
+    trans = json.load(open(os.path.join(ROOT, "scripts", "translations_zh.json"), encoding="utf-8"))
+    found, missing = {}, set()
+    for dirpath, _, files in os.walk(SRC):
+        for f in files:
+            if not f.endswith('.swift'):
+                continue
+            for raw in literals(os.path.join(dirpath, f)):
+                template, n = interp_to_placeholders(raw)
+                keys = list(candidates(template, n))
+                hit = next((k for k in keys if k in trans), None)
+                if hit:
+                    found[hit] = trans[hit]
+                elif re.search(r'[A-Za-z]{2,}', template) and ' ' in template or (re.match(r'^[A-Z][a-z]+$', template)):
+                    missing.add(keys[0])
+    if '--list' in sys.argv:
+        for m in sorted(missing):
+            print(repr(m))
+        print(f"\n{len(found)} translated, {len(missing)} candidates without translation", file=sys.stderr)
+        return
+
+    strings = {}
+    for key in sorted(found):
+        value = found[key]
+        entry = {"localizations": {}}
+        if isinstance(value, dict):
+            entry["localizations"] = value
+        else:
+            entry["localizations"]["zh-Hans"] = {"stringUnit": {"state": "translated", "value": value}}
+        strings[key] = entry
+    catalog = {"sourceLanguage": "en", "strings": strings, "version": "1.0"}
+    out = os.path.join(SRC, "Resources", "Localizable.xcstrings")
+    with open(out, "w", encoding="utf-8") as fh:
+        json.dump(catalog, fh, ensure_ascii=False, indent=2, sort_keys=True)
+        fh.write("\n")
+    print(f"wrote {len(strings)} strings to {out}; {len(missing)} untranslated candidates (run --list)")
+
+main()
