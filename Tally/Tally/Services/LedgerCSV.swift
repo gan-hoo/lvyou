@@ -18,6 +18,9 @@ enum LedgerCSVExporter {
         let toAmount: String = (isTransfer && !e.toAmountRaw.isEmpty) ? DecimalCodec.encode(e.toAmount) : ""
         let toCurrency: String = isTransfer ? (e.toAccount?.currencyCode ?? "") : ""
         let category: String = isTransfer ? "" : (e.category?.name ?? "")
+        let splits: String = e.splitList
+            .map { ($0.category?.name ?? "") + "=" + DecimalCodec.encode($0.amount) }
+            .joined(separator: "; ")
         let tags: String = e.tagList.map(\.name).joined(separator: "; ")
         var fields: [String] = []
         fields.append(CSVDate.exportFormatter.string(from: e.date))
@@ -29,6 +32,9 @@ enum LedgerCSVExporter {
         fields.append(toAmount)
         fields.append(toCurrency)
         fields.append(category)
+        fields.append(splits)
+        fields.append(e.payee)
+        fields.append(e.feeRaw)
         fields.append(tags)
         fields.append(e.note)
         fields.append(e.baseCurrencyCode)
@@ -56,7 +62,7 @@ enum LedgerCSVExporter {
 
 // MARK: - Import
 
-struct ImportRow: Equatable {
+struct ImportRow {
     var line: Int
     var date: Date
     var kind: TransactionKind
@@ -67,6 +73,9 @@ struct ImportRow: Equatable {
     var toAmount: Decimal?
     var toCurrency: String?
     var category: String?
+    var splits: [(category: String, amount: Decimal)] = []
+    var payee: String = ""
+    var fee: Decimal = 0
     var tags: [String]
     var note: String
     var id: UUID?
@@ -86,11 +95,13 @@ struct ImportPreview {
     var isUsable: Bool { !rows.isEmpty }
 }
 
-struct ImportResult: Equatable {
+struct ImportResult {
     var imported = 0
     var skippedDuplicates = 0
     var createdAccounts = 0
     var createdCategories = 0
+    /// Rows that could not be booked (e.g. foreign amounts without an exchange rate).
+    var failed: [ImportIssue] = []
 }
 
 enum LedgerCSVImporter {
@@ -174,6 +185,9 @@ enum LedgerCSVImporter {
                 toAmount: DecimalCodec.parseLenient(value(.toAmount))?.magnitudeValue,
                 toCurrency: value(.toCurrency).isEmpty ? nil : value(.toCurrency).uppercased(),
                 category: value(.category).isEmpty ? nil : value(.category),
+                splits: parseSplits(value(.splits)),
+                payee: value(.payee),
+                fee: DecimalCodec.parseLenient(value(.fee))?.magnitudeValue ?? 0,
                 tags: tags,
                 note: value(.note),
                 id: UUID(uuidString: value(.id))
@@ -184,11 +198,22 @@ enum LedgerCSVImporter {
 
     private static let tagSeparators: Set<Character> = [";", "|", "，", "；"]
 
+    /// "Food=60; Pets=40" → [(Food, 60), (Pets, 40)]
+    static func parseSplits(_ raw: String) -> [(category: String, amount: Decimal)] {
+        raw.split(whereSeparator: { tagSeparators.contains($0) }).compactMap { part -> (category: String, amount: Decimal)? in
+            let pieces = part.split(separator: "=", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
+            guard pieces.count == 2, !pieces[0].isEmpty, let amount = DecimalCodec.parseLenient(pieces[1]), amount > 0 else { return nil }
+            return (pieces[0], amount)
+        }
+    }
+
     static func parseKind(_ raw: String, signedAmount: Decimal) -> TransactionKind {
         switch raw.lowercased() {
         case "expense", "支出", "out", "outflow", "debit", "spend", "消费": return .expense
         case "income", "收入", "in", "inflow", "credit", "入账": return .income
         case "transfer", "转账", "transfer out", "内部转账": return .transfer
+        case "refund", "退款": return .refund
+        case "adjustment", "余额调整": return .adjustment
         default: return signedAmount < 0 ? .expense : (raw.isEmpty ? .income : .expense)
         }
     }
@@ -198,8 +223,9 @@ enum LedgerCSVImporter {
     /// existing entry — are skipped.
     @MainActor
     static func apply(_ preview: ImportPreview, context: ModelContext, baseCurrency: String = AppSettings.baseCurrency) throws -> ImportResult {
-        let store = LedgerStore(context: context)
-        let converter = store.converter()
+        let repository = LedgerRepository(context: context)
+        let service = TransactionService(repository: repository)
+        let converter = repository.converter()
         var result = ImportResult()
 
         var accounts = Dictionary(
@@ -218,7 +244,7 @@ enum LedgerCSVImporter {
         var knownIDs = Set(existing.map(\.id))
         var signatures = Set(existing.map { signature($0) })
 
-        var nextAccountOrder = store.nextAccountSortOrder()
+        var nextAccountOrder = repository.nextAccountSortOrder()
         let fallbackAccountName = String(localized: "Imported")
 
         func account(named raw: String, currency: String?) -> Account {
@@ -247,7 +273,7 @@ enum LedgerCSVImporter {
                 kind: catKind,
                 symbolName: "tag",
                 colorHex: DS.Palette.swatches[categories.count % DS.Palette.swatches.count],
-                sortOrder: store.nextCategorySortOrder(kind: catKind)
+                sortOrder: repository.nextCategorySortOrder(kind: catKind)
             )
             context.insert(c)
             categories[key] = c
@@ -272,7 +298,11 @@ enum LedgerCSVImporter {
             // Amounts recorded in another currency are converted into the account's currency.
             var amount = row.amount
             if let c = row.currency, c != source.currencyCode {
-                amount = converter.convertOrSame(amount, from: c, to: source.currencyCode, on: row.date)
+                guard let converted = converter.convert(amount, from: c, to: source.currencyCode, on: row.date) else {
+                    result.failed.append(ImportIssue(line: row.line, message: String(localized: "No exchange rate from \(c) to \(source.currencyCode)")))
+                    continue
+                }
+                amount = converted
             }
             let sig = signature(date: row.date, kind: row.kind, amount: amount, account: source.name, note: row.note)
             if signatures.contains(sig) {
@@ -291,15 +321,32 @@ enum LedgerCSVImporter {
                 entry.toAccount = dest
                 if dest.currencyCode != source.currencyCode {
                     entry.toAmount = row.toAmount
-                        ?? converter.convertOrSame(amount, from: source.currencyCode, to: dest.currencyCode, on: row.date)
+                        ?? converter.convert(amount, from: source.currencyCode, to: dest.currencyCode, on: row.date)
+                        ?? amount
                 }
             }
-            store.applySnapshot(to: entry, base: baseCurrency, converter: converter)
+            entry.payee = row.payee
+            if row.kind == .transfer, row.fee > 0 {
+                entry.fee = row.fee
+                entry.feeCategoryIDRaw = repository.feeCategory().id.uuidString
+            }
+            if row.kind == .expense, !row.splits.isEmpty {
+                entry.category = nil
+                for (i, part) in row.splits.enumerated() {
+                    let split = TransactionSplit(amount: part.amount, sortOrder: i)
+                    context.insert(split)
+                    split.category = category(named: part.category, kind: .expense)
+                    split.entry = entry
+                }
+            }
+            service.applySnapshot(to: entry, base: baseCurrency, converter: converter)
             knownIDs.insert(entry.id)
             signatures.insert(sig)
             result.imported += 1
         }
-        try context.save()
+        repository.audit(AuditRecord.Action.importCSV, "csv", id: nil,
+                         "\(result.imported) imported · \(result.skippedDuplicates) duplicates · \(result.failed.count) failed")
+        try repository.commit()
         return result
     }
 

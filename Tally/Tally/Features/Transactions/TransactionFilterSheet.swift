@@ -22,14 +22,6 @@ struct TransactionFilterSheet: View {
                     }
                 }
 
-                Section("Date") {
-                    Picker("Range", selection: $draft.range) {
-                        ForEach(TransactionFilter.DateRange.allCases) { range in
-                            Text(range.title).tag(range)
-                        }
-                    }
-                }
-
                 Section("Amount") {
                     HStack {
                         TextField("Min", text: $minText).keyboardType(.decimalPad)

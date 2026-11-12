@@ -1,40 +1,44 @@
 import SwiftUI
 import SwiftData
 
+/// The record of what happened: every entry, by period, searchable and filterable.
 struct TransactionsView: View {
     @Environment(AppRouter.self) private var router
+    @Environment(LedgerCache.self) private var cache
     @Environment(\.modelContext) private var context
     @Environment(ToastCenter.self) private var toasts
     @AppStorage(SettingsKey.baseCurrency) private var baseCurrency: String = CurrencyInfo.suggestedBase
 
     @Query(sort: \LedgerEntry.date, order: .reverse) private var entries: [LedgerEntry]
-    @Query private var rates: [ExchangeRate]
 
+    @State private var period: Period? = .month()
     @State private var filter = TransactionFilter()
     @State private var searchText = ""
     @State private var showFilter = false
+    @State private var showCustomRange = false
     @State private var pendingDelete: LedgerEntry?
 
     var body: some View {
-        let math = LedgerMath(base: baseCurrency, rates: rates)
-        let results = filter.apply(to: entries, search: searchText, math: math)
-        let summary = math.summary(results)
+        let engine = cache.engine(base: baseCurrency)
+        let results = filter.apply(to: entries, period: period, search: searchText, engine: engine)
+        let report = engine.report(results.map(EntryValue.init))
 
         NavigationStack {
             List {
-                if !results.isEmpty {
-                    Section {
-                        ResultsSummary(count: results.count, summary: summary, base: baseCurrency)
+                Section {
+                    PeriodSwitcher(period: $period, showCustomRange: $showCustomRange)
+                    if !results.isEmpty {
+                        ResultsSummary(count: results.count, report: report, base: baseCurrency)
                     }
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4))
                 }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 2, leading: 4, bottom: 2, trailing: 4))
 
                 if filter.sort.groupsByDay {
-                    ForEach(TransactionFilter.groupByDay(results, math: math)) { group in
+                    ForEach(DayGroup.group(results, engine: engine)) { group in
                         Section {
                             ForEach(group.entries) { entry in
-                                row(entry, math: math)
+                                row(entry, engine: engine)
                             }
                         } header: {
                             DayHeader(group: group, base: baseCurrency)
@@ -43,64 +47,72 @@ struct TransactionsView: View {
                 } else {
                     Section(filter.sort.title) {
                         ForEach(results) { entry in
-                            row(entry, math: math, showsDate: true)
+                            row(entry, engine: engine, showsDate: true)
                         }
                     }
                 }
             }
             .listStyle(.insetGrouped)
             .listSectionSpacing(.compact)
-            .scrollContentBackground(.hidden)
-            .background(DS.Colors.background)
-            .animation(DS.Motion.adaptive(DS.Motion.spring), value: results.map(\.id))
-            .searchable(text: $searchText, prompt: Text("Notes, categories, tags, amounts"))
+            .pageBackground()
+            .animation(DS.Motion.adaptive(DS.Motion.spring), value: results.count)
+            .searchable(text: $searchText, prompt: Text("Notes, payees, categories, tags, amounts"))
             .navigationTitle("Transactions")
             .toolbar { toolbarContent }
             .overlay {
-                if results.isEmpty {
-                    emptyState
-                }
-            }
-            .overlay(alignment: .bottomTrailing) {
-                FloatingAddButton(onSelectKind: { router.addEntry($0) }) { router.addEntry() }
-                    .padding(.trailing, DS.Spacing.xl)
-                    .padding(.bottom, DS.Spacing.l)
+                if results.isEmpty { emptyState }
             }
             .navigationDestination(for: LedgerEntry.self) { TransactionDetailView(entry: $0) }
             .navigationDestination(for: Account.self) { AccountDetailView(account: $0) }
-            .sheet(isPresented: $showFilter) {
-                TransactionFilterSheet(filter: $filter)
-            }
+            .sheet(isPresented: $showFilter) { TransactionFilterSheet(filter: $filter) }
+            .sheet(isPresented: $showCustomRange) { DateRangeSheet(period: $period) }
             .confirmationDialog(
                 "Delete this transaction?",
                 isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
                 titleVisibility: .visible,
                 presenting: pendingDelete
             ) { entry in
-                Button("Delete", role: .destructive) {
-                    withMotion { LedgerStore(context: context).delete(entry) }
-                    Haptics.success()
-                    pendingDelete = nil
-                }
+                Button("Delete", role: .destructive) { delete(entry) }
             } message: { _ in
-                Text("This can't be undone.")
+                Text("This can't be undone. The deletion is kept in the change log.")
             }
+            .onAppear(perform: applyPendingQuery)
+            .onChange(of: router.pendingQuery) { _, _ in applyPendingQuery() }
+        }
+    }
+
+    private func applyPendingQuery() {
+        guard let q = router.pendingQuery else { return }
+        router.pendingQuery = nil
+        withMotion {
+            period = q.period
+            filter.reset()
+            if let c = q.categoryID { filter.categoryIDs = [c] }
+            if let a = q.accountID { filter.accountIDs = [a] }
+            filter.kinds = q.kinds
+            searchText = ""
         }
     }
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .topBarLeading) {
             Menu {
                 Picker("Sort", selection: $filter.sort) {
                     ForEach(TransactionFilter.Sort.allCases) { sort in
                         Label(sort.title, systemImage: sort.symbol).tag(sort)
                     }
                 }
+                Divider()
+                NavigationLink {
+                    RecurringListView()
+                } label: {
+                    Label("Recurring Plans", systemImage: "repeat")
+                }
             } label: {
-                Image(systemName: "arrow.up.arrow.down")
+                Image(systemName: "ellipsis.circle")
             }
-            .accessibilityLabel(Text("Sort"))
+            .accessibilityLabel(Text("More"))
         }
         ToolbarItem(placement: .topBarTrailing) {
             Button {
@@ -110,6 +122,9 @@ struct TransactionsView: View {
             }
             .accessibilityLabel(Text("Filter"))
             .accessibilityValue(filter.isActive ? Text("\(filter.activeCount) active") : Text("Off"))
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            AddMenuButton()
         }
     }
 
@@ -127,9 +142,9 @@ struct TransactionsView: View {
             }
         } else {
             ContentUnavailableView {
-                Label("No Transactions Yet", systemImage: "tray")
+                Label("No Transactions", systemImage: "tray")
             } description: {
-                Text("Tap + to record your first expense or income.")
+                Text("Nothing recorded in this period. Tap + to record an expense or income.")
             } actions: {
                 Button("Add Transaction") { router.addEntry() }
                     .buttonStyle(.borderedProminent)
@@ -138,43 +153,138 @@ struct TransactionsView: View {
         }
     }
 
-    private func row(_ entry: LedgerEntry, math: LedgerMath, showsDate: Bool = false) -> some View {
+    private func row(_ entry: LedgerEntry, engine: FinanceEngine, showsDate: Bool = false) -> some View {
         NavigationLink(value: entry) {
-            TransactionRow(entry: entry, baseCurrency: baseCurrency, baseValue: math.value(entry), showsDate: showsDate)
+            TransactionRow(entry: entry, baseCurrency: baseCurrency, engine: engine, showsDate: showsDate)
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button(role: .destructive) {
-                pendingDelete = entry
-            } label: {
-                Label("Delete", systemImage: "trash")
+            Button(role: .destructive) { pendingDelete = entry } label: { Label("Delete", systemImage: "trash") }
+            if entry.kind != .adjustment {
+                Button { router.edit(entry) } label: { Label("Edit", systemImage: "pencil") }
+                    .tint(DS.Colors.accent)
             }
-            Button {
-                router.edit(entry)
-            } label: {
-                Label("Edit", systemImage: "pencil")
-            }
-            .tint(DS.Colors.accent)
         }
         .swipeActions(edge: .leading) {
-            Button {
-                duplicate(entry)
-            } label: {
-                Label("Duplicate", systemImage: "plus.square.on.square")
+            if entry.kind != .adjustment {
+                Button { duplicate(entry) } label: { Label("Duplicate", systemImage: "plus.square.on.square") }
+                    .tint(DS.Colors.income)
             }
-            .tint(DS.Colors.income)
         }
         .contextMenu {
-            Button { router.edit(entry) } label: { Label("Edit", systemImage: "pencil") }
-            Button { duplicate(entry) } label: { Label("Duplicate as Today", systemImage: "plus.square.on.square") }
+            if entry.kind != .adjustment {
+                Button { router.edit(entry) } label: { Label("Edit", systemImage: "pencil") }
+                Button { duplicate(entry) } label: { Label("Duplicate as Today", systemImage: "plus.square.on.square") }
+            }
+            if entry.kind == .expense {
+                Button { router.refund(entry) } label: { Label("Record Refund", systemImage: "arrow.uturn.backward") }
+            }
             Divider()
             Button(role: .destructive) { pendingDelete = entry } label: { Label("Delete", systemImage: "trash") }
         }
     }
 
     private func duplicate(_ entry: LedgerEntry) {
-        if LedgerStore(context: context).duplicate(entry) != nil {
+        do {
+            try TransactionService(context: context).duplicate(entry)
             Haptics.success()
             toasts.show(ToastMessage(symbol: "plus.square.on.square", text: String(localized: "Duplicated to today"), style: .success))
+        } catch {
+            toasts.show(ToastMessage(symbol: "exclamationmark.triangle", text: error.localizedDescription, style: .warning))
+        }
+    }
+
+    private func delete(_ entry: LedgerEntry) {
+        do {
+            try withMotion { try TransactionService(context: context).delete(entry) }
+            Haptics.success()
+        } catch {
+            toasts.show(ToastMessage(symbol: "exclamationmark.triangle", text: error.localizedDescription, style: .warning))
+        }
+        pendingDelete = nil
+    }
+}
+
+// MARK: - Period switcher
+
+struct PeriodSwitcher: View {
+    @Binding var period: Period?
+    @Binding var showCustomRange: Bool
+
+    var body: some View {
+        HStack {
+            Button { shift(-1) } label: {
+                Image(systemName: "chevron.left").font(.body.weight(.semibold)).frame(width: 36, height: 36)
+            }
+            .disabled(period == nil)
+            .accessibilityLabel(Text("Previous period"))
+            Spacer()
+            Menu {
+                Button("This Week") { set(.week()) }
+                Button("This Month") { set(.month()) }
+                Button("This Year") { set(.year()) }
+                Button("Custom Range…") { showCustomRange = true }
+                Divider()
+                Button("All Time") { set(nil) }
+            } label: {
+                HStack(spacing: 4) {
+                    Text(period?.title ?? String(localized: "All Time"))
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Image(systemName: "chevron.down").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+            Button { shift(1) } label: {
+                Image(systemName: "chevron.right").font(.body.weight(.semibold)).frame(width: 36, height: 36)
+            }
+            .disabled(period == nil || period?.next.isFuture == true)
+            .accessibilityLabel(Text("Next period"))
+        }
+        .buttonStyle(.borderless)
+    }
+
+    private func set(_ p: Period?) {
+        Haptics.selection()
+        withMotion { period = p }
+    }
+
+    private func shift(_ delta: Int) {
+        guard let p = period else { return }
+        set(p.shifted(by: delta))
+    }
+}
+
+struct DateRangeSheet: View {
+    @Binding var period: Period?
+    @Environment(\.dismiss) private var dismiss
+    @State private var start = Calendar.ledger.date(byAdding: .day, value: -30, to: .now) ?? .now
+    @State private var end = Date.now
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                DatePicker("From", selection: $start, displayedComponents: .date)
+                DatePicker("To", selection: $end, in: start..., displayedComponents: .date)
+            }
+            .navigationTitle("Custom Range")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Apply") {
+                        withMotion { period = Period(customFrom: start, through: end) }
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .onAppear {
+            if let period, period.unit == .custom {
+                start = period.start
+                end = period.end.addingTimeInterval(-1)
+            }
         }
     }
 }
@@ -192,7 +302,7 @@ private struct DayHeader: View {
                     Text(MoneyFormat.string(group.income, code: base, showPlusSign: true))
                         .foregroundStyle(DS.Colors.income)
                 }
-                if group.expense > 0 {
+                if group.expense != 0 {
                     Text(MoneyFormat.string(-group.expense, code: base))
                 }
             }
@@ -205,24 +315,29 @@ private struct DayHeader: View {
 
 private struct ResultsSummary: View {
     let count: Int
-    let summary: PeriodSummary
+    let report: PeriodReport
     let base: String
 
     var body: some View {
-        HStack(spacing: 0) {
-            item(title: "Income", value: summary.income, color: DS.Colors.income)
-            item(title: "Expenses", value: summary.expense, color: .primary)
-            item(title: "Net", value: summary.net, color: .primary)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 0) {
+                item(title: "Income", value: report.income, color: DS.Colors.income)
+                item(title: "Expenses", value: report.expense, color: .primary)
+                item(title: "Net", value: report.net, color: .primary)
+            }
+            HStack {
+                Text("\(count) items")
+                if report.pendingCount > 0 {
+                    Text("· \(report.pendingCount) pending conversion").foregroundStyle(DS.Colors.warning)
+                }
+            }
+            .font(.caption2.weight(.medium))
+            .foregroundStyle(.secondary)
+            .padding(.leading, 8)
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 8)
-        .background(DS.Colors.card, in: RoundedRectangle(cornerRadius: DS.Radius.inner + 2, style: .continuous))
-        .overlay(alignment: .topTrailing) {
-            Text("\(count) items")
-                .font(.caption2.weight(.medium))
-                .foregroundStyle(.secondary)
-                .padding(8)
-        }
+        .card(padding: 0, radius: DS.Radius.inner + 2)
     }
 
     private func item(title: LocalizedStringKey, value: Decimal, color: Color) -> some View {

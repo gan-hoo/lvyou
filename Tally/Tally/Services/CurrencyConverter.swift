@@ -61,11 +61,6 @@ struct CurrencyConverter: Sendable {
         return (amount * r).rounded(scale: CurrencyInfo.info(for: to).fractionDigits)
     }
 
-    /// Converts, falling back to the unconverted amount if no rate exists (callers flag this case).
-    func convertOrSame(_ amount: Decimal, from: String, to: String, on date: Date = .now) -> Decimal {
-        convert(amount, from: from, to: to, on: date) ?? amount
-    }
-
     private func directRate(from: String, to: String, on date: Date) -> Decimal? {
         let forward = latest(in: table[Self.key(from, to)], onOrBefore: date)
         let backward = latest(in: table[Self.key(to, from)], onOrBefore: date)

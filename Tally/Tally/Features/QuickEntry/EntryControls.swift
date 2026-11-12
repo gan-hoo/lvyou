@@ -8,7 +8,7 @@ struct KindSwitcher: View {
 
     var body: some View {
         HStack(spacing: 2) {
-            ForEach(TransactionKind.allCases) { kind in
+            ForEach(TransactionKind.primary) { kind in
                 let selected = kind == selection
                 Button {
                     guard !selected else { return }

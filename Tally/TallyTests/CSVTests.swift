@@ -59,14 +59,25 @@ struct CSVRoundTripTests {
     @Test func exportThenImportIsLosslessAndIdempotent() throws {
         let source = try ModelContainer(for: Persistence.schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
         let ctx = source.mainContext
-        let store = LedgerStore(context: ctx)
+        let service = TransactionService(context: ctx)
         let food = LedgerCategory(name: "Food", kind: .expense, symbolName: "fork.knife", colorHex: "F2994A", sortOrder: 0)
+        let pets = LedgerCategory(name: "Pets", kind: .expense, symbolName: "pawprint", colorHex: "D98E5F", sortOrder: 1)
         let cash = Account(name: "Cash, Wallet", kind: .cash, currencyCode: "CNY")
         let aud = Account(name: "AUD", kind: .debitCard, currencyCode: "AUD")
-        ctx.insert(food); ctx.insert(cash); ctx.insert(aud)
+        ctx.insert(food); ctx.insert(pets); ctx.insert(cash); ctx.insert(aud)
         ctx.insert(ExchangeRate(baseCode: "AUD", quoteCode: "CNY", rate: 5, effectiveDate: .distantPast))
-        try store.save(EntryInput(kind: .expense, amount: Decimal(string: "12.34")!, date: .now, note: "Note with \"quotes\", commas\nand newline", account: cash, category: food, tags: []), baseCurrency: "CNY")
-        try store.save(EntryInput(kind: .transfer, amount: 500, date: .now, note: "", account: cash, toAccount: aud, tags: []), baseCurrency: "CNY")
+        try ctx.save()
+
+        var expense = TransactionDraft(kind: .expense, amount: Decimal(string: "12.34")!, date: .now,
+                                       note: "Note with \"quotes\", commas\nand newline", account: cash, category: food)
+        expense.payee = "Market"
+        try service.save(expense, baseCurrency: "CNY")
+        var split = TransactionDraft(kind: .expense, amount: 10, date: .now, account: cash)
+        split.splits = [SplitDraft(category: food, amount: 6), SplitDraft(category: pets, amount: 4)]
+        try service.save(split, baseCurrency: "CNY")
+        var transfer = TransactionDraft(kind: .transfer, amount: 500, date: .now, account: cash, toAccount: aud)
+        transfer.fee = 2
+        try service.save(transfer, baseCurrency: "CNY")
 
         let csv = LedgerCSVExporter.csvString(for: try ctx.fetch(FetchDescriptor<LedgerEntry>()))
 
@@ -76,23 +87,36 @@ struct CSVRoundTripTests {
         let preview = try LedgerCSVImporter.preview(text: csv)
         #expect(preview.issues.isEmpty)
         let result = try LedgerCSVImporter.apply(preview, context: tctx, baseCurrency: "CNY")
-        #expect(result.imported == 2)
+        #expect(result.imported == 3)
         #expect(result.createdAccounts == 2)
+        #expect(result.failed.isEmpty)
 
         let imported = try tctx.fetch(FetchDescriptor<LedgerEntry>())
-        let expense = try #require(imported.first { $0.kind == .expense })
-        #expect(expense.amount == Decimal(string: "12.34"))
-        #expect(expense.note == "Note with \"quotes\", commas\nand newline")
-        #expect(expense.account?.name == "Cash, Wallet")
-        #expect(expense.category?.name == "Food")
-        let transfer = try #require(imported.first { $0.kind == .transfer })
-        #expect(transfer.toAccount?.name == "AUD")
-        #expect(transfer.toAccount?.currencyCode == "AUD")
-        #expect(transfer.toAmount == 100)
+        let plain = try #require(imported.first { $0.kind == .expense && !$0.isSplit })
+        #expect(plain.amount == Decimal(string: "12.34"))
+        #expect(plain.note == "Note with \"quotes\", commas\nand newline")
+        #expect(plain.payee == "Market")
+        #expect(plain.account?.name == "Cash, Wallet")
+        let splitBack = try #require(imported.first { $0.isSplit })
+        #expect(splitBack.splitList.map(\.amount) == [6, 4])
+        let transferBack = try #require(imported.first { $0.kind == .transfer })
+        #expect(transferBack.toAccount?.currencyCode == "AUD")
+        #expect(transferBack.toAmount == 100)
+        #expect(transferBack.fee == 2)
 
-        // Importing the same file again adds nothing.
         let again = try LedgerCSVImporter.apply(try LedgerCSVImporter.preview(text: csv), context: tctx, baseCurrency: "CNY")
         #expect(again.imported == 0)
-        #expect(again.skippedDuplicates == 2)
+        #expect(again.skippedDuplicates == 3)
+    }
+
+    @Test func foreignRowsWithoutRateAreReportedNotGuessed() throws {
+        let container = try ModelContainer(for: Persistence.schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let ctx = container.mainContext
+        ctx.insert(Account(name: "Cash", kind: .cash, currencyCode: "CNY"))
+        try ctx.save()
+        let csv = "Date,Amount,Currency,Account\n2025-03-01,10,USD,Cash\n"
+        let result = try LedgerCSVImporter.apply(try LedgerCSVImporter.preview(text: csv), context: ctx, baseCurrency: "CNY")
+        #expect(result.imported == 0)
+        #expect(result.failed.count == 1)
     }
 }

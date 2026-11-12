@@ -1,44 +1,7 @@
 import Foundation
 
-/// Filter + sort state for the transaction list.
+/// Filter + sort state for the transaction list (the period is chosen separately).
 struct TransactionFilter: Equatable {
-    enum DateRange: Hashable, CaseIterable, Identifiable {
-        case all, thisMonth, lastMonth, last3Months, thisYear
-
-        var id: Self { self }
-
-        var title: String {
-            switch self {
-            case .all: String(localized: "All Time")
-            case .thisMonth: String(localized: "This Month")
-            case .lastMonth: String(localized: "Last Month")
-            case .last3Months: String(localized: "Last 3 Months")
-            case .thisYear: String(localized: "This Year")
-            }
-        }
-
-        func interval(now: Date = .now) -> DateInterval? {
-            let cal = Calendar.current
-            switch self {
-            case .all:
-                return nil
-            case .thisMonth:
-                let p = Period.month(now)
-                return DateInterval(start: p.start, end: p.end)
-            case .lastMonth:
-                let p = Period.month(now).previous
-                return DateInterval(start: p.start, end: p.end)
-            case .last3Months:
-                let p = Period.month(now)
-                let start = cal.date(byAdding: .month, value: -2, to: p.start) ?? p.start
-                return DateInterval(start: start, end: p.end)
-            case .thisYear:
-                let p = Period.year(now)
-                return DateInterval(start: p.start, end: p.end)
-            }
-        }
-    }
-
     enum Sort: String, CaseIterable, Identifiable {
         case newest, oldest, largest, smallest
 
@@ -69,19 +32,16 @@ struct TransactionFilter: Equatable {
     var accountIDs: Set<UUID> = []
     var categoryIDs: Set<UUID> = []
     var tagIDs: Set<UUID> = []
-    var range: DateRange = .all
     var minAmount: Decimal?
     var maxAmount: Decimal?
     var sort: Sort = .newest
 
-    /// Number of active criteria (for the filter badge).
     var activeCount: Int {
         var n = 0
         if !kinds.isEmpty { n += 1 }
         if !accountIDs.isEmpty { n += 1 }
         if !categoryIDs.isEmpty { n += 1 }
         if !tagIDs.isEmpty { n += 1 }
-        if range != .all { n += 1 }
         if minAmount != nil || maxAmount != nil { n += 1 }
         return n
     }
@@ -94,43 +54,50 @@ struct TransactionFilter: Equatable {
         self.sort = sort
     }
 
-    func matches(_ e: LedgerEntry, value: Decimal) -> Bool {
+    /// `value` is the entry's base-currency value (nil when pending conversion).
+    func matches(_ e: LedgerEntry, value: Decimal?) -> Bool {
         if !kinds.isEmpty && !kinds.contains(e.kind) { return false }
         if !accountIDs.isEmpty {
             let ids = [e.account?.id, e.toAccount?.id].compactMap { $0 }
             if !ids.contains(where: accountIDs.contains) { return false }
         }
         if !categoryIDs.isEmpty {
-            guard let id = e.category?.id, categoryIDs.contains(id) else { return false }
+            var ids = Set(e.splitList.compactMap { $0.category?.id })
+            if let id = e.category?.id { ids.insert(id) }
+            if let fee = UUID(uuidString: e.feeCategoryIDRaw), e.fee > 0 { ids.insert(fee) }
+            if ids.isDisjoint(with: categoryIDs) { return false }
         }
         if !tagIDs.isEmpty {
-            let ids = Set((e.tags ?? []).map(\.id))
-            if ids.isDisjoint(with: tagIDs) { return false }
+            if Set((e.tags ?? []).map(\.id)).isDisjoint(with: tagIDs) { return false }
         }
-        if let interval = range.interval(), !(e.date >= interval.start && e.date < interval.end) { return false }
-        if let minAmount, value < minAmount { return false }
-        if let maxAmount, value > maxAmount { return false }
+        if minAmount != nil || maxAmount != nil {
+            guard let value else { return false }
+            if let minAmount, value < minAmount { return false }
+            if let maxAmount, value > maxAmount { return false }
+        }
         return true
     }
 
     static func matchesSearch(_ e: LedgerEntry, query: String) -> Bool {
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !q.isEmpty else { return true }
-        var haystack: [String] = [e.note, e.currencyCode, e.kind.title]
+        var haystack: [String] = [e.note, e.payee, e.currencyCode, e.kind.title]
         haystack.append(e.category?.name ?? "")
         haystack.append(e.account?.name ?? "")
         haystack.append(e.toAccount?.name ?? "")
         haystack.append(DecimalCodec.encode(e.amount))
         haystack.append(MoneyFormat.plain(e.amount))
+        for s in e.splitList { haystack.append(s.category?.name ?? "") }
         for tag in e.tags ?? [] { haystack.append("#" + tag.name) }
         return haystack.contains { $0.localizedCaseInsensitiveContains(q) }
     }
 
-    func apply(to entries: [LedgerEntry], search: String, math: LedgerMath) -> [LedgerEntry] {
+    func apply(to entries: [LedgerEntry], period: Period?, search: String, engine: FinanceEngine) -> [LedgerEntry] {
         var values: [UUID: Decimal] = [:]
         let filtered = entries.filter { e in
-            let v = math.value(e)
-            values[e.id] = v
+            if let period, !period.contains(e.date) { return false }
+            let v = engine.baseValue(EntryValue(e))
+            if let v { values[e.id] = v }
             return matches(e, value: v) && Self.matchesSearch(e, query: search)
         }
         switch sort {
@@ -146,13 +113,12 @@ struct DayGroup: Identifiable {
     var id: Date { day }
     let day: Date
     let entries: [LedgerEntry]
-    let income: Decimal
-    let expense: Decimal
-}
+    var income: Decimal = 0
+    var expense: Decimal = 0
 
-extension TransactionFilter {
-    static func groupByDay(_ entries: [LedgerEntry], math: LedgerMath) -> [DayGroup] {
-        let cal = Calendar.current
+    /// Groups entries by calendar day, keeping their order; totals use `engine` when given.
+    static func group(_ entries: [LedgerEntry], engine: FinanceEngine? = nil) -> [DayGroup] {
+        let cal = Calendar.ledger
         var order: [Date] = []
         var buckets: [Date: [LedgerEntry]] = [:]
         for e in entries {
@@ -162,8 +128,13 @@ extension TransactionFilter {
         }
         return order.map { day in
             let list = buckets[day] ?? []
-            let s = math.summary(list)
-            return DayGroup(day: day, entries: list, income: s.income, expense: s.expense)
+            var g = DayGroup(day: day, entries: list)
+            if let engine {
+                let r = engine.report(list.map(EntryValue.init))
+                g.income = r.income
+                g.expense = r.expense
+            }
+            return g
         }
     }
 }

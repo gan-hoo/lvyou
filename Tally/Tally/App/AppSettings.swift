@@ -13,6 +13,58 @@ enum SettingsKey {
     static let budgetAlertsEnabled = "settings.budgetAlerts"
     static let budgetNotified = "settings.budgetNotified"
     static let showsDemoBanner = "settings.demoBanner"
+    static let theme = "settings.theme"
+    static let accent = "settings.accent"
+    static let amountStyle = "settings.amountStyle"
+    static let hideAmounts = "settings.hideAmounts"
+    static let budgetStartDay = "settings.budgetStartDay"
+    static let accountGrouping = "settings.accountGrouping"
+}
+
+/// Visual theme. Both share the same pages and tokens; only surfaces differ.
+enum ThemeStyle: String, CaseIterable, Identifiable {
+    case classic
+    case liquidGlass
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .classic: String(localized: "Classic")
+        case .liquidGlass: String(localized: "Liquid Glass")
+        }
+    }
+}
+
+/// How currency amounts are written.
+enum AmountStyle: String, CaseIterable, Identifiable {
+    case symbol
+    case code
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .symbol: String(localized: "Symbol (¥1,234.50)")
+        case .code: String(localized: "Code (CNY 1,234.50)")
+        }
+    }
+}
+
+enum AccountGrouping: String, CaseIterable, Identifiable {
+    case type
+    case currency
+    case custom
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .type: String(localized: "By Type")
+        case .currency: String(localized: "By Currency")
+        case .custom: String(localized: "By Group")
+        }
+    }
 }
 
 enum AppearanceMode: String, CaseIterable, Identifiable {
@@ -62,6 +114,24 @@ enum AppSettings {
 
     static var budgetAlertsEnabled: Bool {
         defaults.object(forKey: SettingsKey.budgetAlertsEnabled) as? Bool ?? true
+    }
+
+    static var theme: ThemeStyle {
+        ThemeStyle(rawValue: defaults.string(forKey: SettingsKey.theme) ?? "") ?? .classic
+    }
+
+    static var accentHex: String { defaults.string(forKey: SettingsKey.accent) ?? "3E7BFA" }
+
+    static var amountStyle: AmountStyle {
+        AmountStyle(rawValue: defaults.string(forKey: SettingsKey.amountStyle) ?? "") ?? .symbol
+    }
+
+    static var hideAmounts: Bool { defaults.bool(forKey: SettingsKey.hideAmounts) }
+
+    /// First day of monthly budget periods (1…28).
+    static var budgetStartDay: Int {
+        let v = defaults.integer(forKey: SettingsKey.budgetStartDay)
+        return v == 0 ? 1 : min(28, max(1, v))
     }
 
     static func uuid(forKey key: String) -> UUID? {

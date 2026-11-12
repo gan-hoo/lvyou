@@ -8,11 +8,16 @@ struct AccountEditorSheet: View {
     @Environment(\.modelContext) private var context
     @AppStorage(SettingsKey.baseCurrency) private var baseCurrency: String = CurrencyInfo.suggestedBase
     @AppStorage(SettingsKey.defaultAccountID) private var defaultAccountID: String = ""
+    @Query(sort: \Account.sortOrder) private var allAccounts: [Account]
 
     @State private var name = ""
     @State private var kind: AccountKind = .debitCard
     @State private var currencyCode = "CNY"
     @State private var openingText = ""
+    @State private var openingDate = Date.now
+    @State private var openingDateTouched = false
+    @State private var group = ""
+    @State private var note = ""
     @State private var colorHex = "3E7BFA"
     @State private var symbol = "creditcard"
     @State private var includeInTotal = true
@@ -20,10 +25,13 @@ struct AccountEditorSheet: View {
     @State private var confirmDelete = false
     @State private var loaded = false
     @State private var symbolTouched = false
+    @State private var error: String?
 
     private var hasEntries: Bool { (account?.entryCount ?? 0) > 0 }
-
     private var canSave: Bool { !name.trimmingCharacters(in: .whitespaces).isEmpty }
+    private var existingGroups: [String] {
+        Array(Set(allAccounts.map(\.groupName).filter { !$0.isEmpty })).sorted()
+    }
 
     var body: some View {
         NavigationStack {
@@ -37,7 +45,7 @@ struct AccountEditorSheet: View {
                     .padding(.vertical, 4)
                 }
 
-                Section("Type") {
+                Section {
                     Picker("Type", selection: $kind) {
                         ForEach(AccountKind.allCases) { k in
                             Label(k.title, systemImage: k.defaultSymbol).tag(k)
@@ -46,37 +54,53 @@ struct AccountEditorSheet: View {
                     .onChange(of: kind) { _, newKind in
                         if !symbolTouched { symbol = newKind.defaultSymbol }
                     }
-                }
-
-                Section {
                     Picker("Currency", selection: $currencyCode) {
                         ForEach(CurrencyInfo.all) { c in
                             Text(verbatim: "\(c.code) · \(c.localizedName)").tag(c.code)
                         }
                     }
                     .disabled(hasEntries)
+                } footer: {
+                    if hasEntries {
+                        Text("The currency can't change once transactions exist, so past amounts stay correct.")
+                    }
+                }
+
+                Section {
                     HStack {
-                        Text("Opening balance")
+                        Text(kind.isLiability ? String(localized: "Amount owed") : String(localized: "Opening balance"))
                         Spacer()
                         TextField("0", text: $openingText)
                             .keyboardType(.numbersAndPunctuation)
                             .multilineTextAlignment(.trailing)
                             .monospacedDigit()
                     }
+                    DatePicker("Balance as of", selection: Binding(
+                        get: { openingDate },
+                        set: { openingDate = $0; openingDateTouched = true }
+                    ), displayedComponents: .date)
+                } header: {
+                    Text("Opening Balance")
                 } footer: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        if hasEntries {
-                            Text("The currency can't change once transactions exist, so past amounts stay correct.")
+                    Text("The balance at the start of this day. Transactions dated earlier still appear in reports but don't change the balance.")
+                }
+
+                Section("Group") {
+                    TextField("Group name (optional)", text: $group)
+                    if !existingGroups.isEmpty {
+                        ScrollView(.horizontal) {
+                            HStack {
+                                ForEach(existingGroups, id: \.self) { g in
+                                    Button { group = g } label: { Chip(title: g, isSelected: g == group) }
+                                        .buttonStyle(.plain)
+                                }
+                            }
                         }
-                        if kind.isLiability {
-                            Text("For credit cards, enter the amount owed as a negative number, e.g. -1200.")
-                        }
+                        .scrollIndicators(.hidden)
                     }
                 }
 
-                Section("Color") {
-                    ColorSwatchPicker(selection: $colorHex)
-                }
+                Section("Color") { ColorSwatchPicker(selection: $colorHex) }
 
                 Section("Icon") {
                     SymbolPickerGrid(symbols: SymbolLibrary.accounts, selection: Binding(
@@ -86,8 +110,13 @@ struct AccountEditorSheet: View {
                 }
 
                 Section {
-                    Toggle("Include in total assets", isOn: $includeInTotal)
+                    Toggle("Include in net worth", isOn: $includeInTotal)
                     Toggle("Default account for new entries", isOn: $isDefault)
+                    TextField("Note", text: $note, axis: .vertical)
+                }
+
+                if let error {
+                    Section { Text(error).foregroundStyle(DS.Colors.danger) }
                 }
 
                 if let account {
@@ -107,31 +136,27 @@ struct AccountEditorSheet: View {
             .navigationTitle(account == nil ? String(localized: "New Account") : String(localized: "Edit Account"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save", action: save)
-                        .fontWeight(.semibold)
-                        .disabled(!canSave)
+                    Button("Save", action: save).fontWeight(.semibold).disabled(!canSave)
                 }
             }
             .confirmationDialog("Delete account?", isPresented: $confirmDelete, titleVisibility: .visible) {
                 Button("Delete", role: .destructive) {
-                    if let account {
-                        dismiss()
-                        let store = LedgerStore(context: context)
-                        Task { @MainActor in
-                            try? await Task.sleep(for: .milliseconds(350))
-                            store.deleteAccount(account)
-                            Haptics.success()
-                        }
+                    guard let account else { return }
+                    let repository = LedgerRepository(context: context)
+                    dismiss()
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(350))
+                        try? repository.deleteAccount(account)
+                        Haptics.success()
                     }
                 }
             } message: {
-                Text("This also deletes \(account?.entryCount ?? 0) transactions that use this account.")
+                Text("This also deletes \(account?.entryCount ?? 0) transactions that use this account. Archiving keeps them.")
             }
         }
+        .interactiveDismissDisabled(account == nil && !name.isEmpty)
         .onAppear(perform: load)
     }
 
@@ -142,7 +167,11 @@ struct AccountEditorSheet: View {
             name = account.name
             kind = account.kind
             currencyCode = account.currencyCode
-            openingText = account.openingBalance == 0 ? "" : DecimalCodec.encode(account.openingBalance)
+            let opening = account.kind.isLiability ? -account.openingBalance : account.openingBalance
+            openingText = opening == 0 ? "" : DecimalCodec.encode(opening)
+            openingDate = account.openingDate > Date.distantPast.addingTimeInterval(86_400) ? account.openingDate : account.createdAt
+            group = account.groupName
+            note = account.note
             colorHex = account.colorHex
             symbol = account.symbolName
             symbolTouched = true
@@ -157,23 +186,37 @@ struct AccountEditorSheet: View {
     private func save() {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        let opening = DecimalCodec.parseLenient(openingText) ?? 0
+        let typed = DecimalCodec.parseLenient(openingText) ?? 0
+        let opening = kind.isLiability ? -typed.magnitudeValue : typed
+        let repository = LedgerRepository(context: context)
         let target: Account
         if let account {
             target = account
         } else {
-            target = Account(name: trimmed, kind: kind, currencyCode: currencyCode, sortOrder: LedgerStore(context: context).nextAccountSortOrder())
+            target = Account(name: trimmed, kind: kind, currencyCode: currencyCode, sortOrder: repository.nextAccountSortOrder())
             context.insert(target)
         }
         target.name = trimmed
         target.kind = kind
         if !hasEntries { target.currencyCode = currencyCode }
         target.openingBalance = opening.rounded(scale: CurrencyInfo.info(for: target.currencyCode).fractionDigits)
+        // Accounts created before opening dates existed count every transaction;
+        // keep that unless the user picks a date explicitly.
+        let legacy = account.map { $0.openingDate <= Date.distantPast.addingTimeInterval(86_400) } ?? false
+        if !legacy || openingDateTouched {
+            target.openingDate = Calendar.ledger.startOfDay(for: openingDate)
+        }
+        target.groupName = group.trimmingCharacters(in: .whitespacesAndNewlines)
+        target.note = note
         target.colorHex = colorHex
         target.symbolName = symbol
         target.includeInTotal = includeInTotal
-        try? context.save()
-
+        do {
+            try repository.commit()
+        } catch {
+            self.error = error.localizedDescription
+            return
+        }
         if isDefault {
             defaultAccountID = target.id.uuidString
         } else if defaultAccountID == target.id.uuidString {

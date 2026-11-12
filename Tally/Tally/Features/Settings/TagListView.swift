@@ -65,7 +65,7 @@ struct TagListView: View {
     }
 
     private func add() {
-        if LedgerStore(context: context).findOrCreateTag(named: newName) != nil {
+        if LedgerRepository(context: context).findOrCreateTag(named: newName) != nil {
             newName = ""
             Haptics.success()
         }

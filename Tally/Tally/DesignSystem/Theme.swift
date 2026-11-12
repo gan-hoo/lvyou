@@ -6,7 +6,9 @@ enum DS {
     // MARK: Colour
 
     enum Colors {
-        static let accent = Color(light: "3E7BFA", dark: "5B8DFF")
+        /// User-selectable accent (Settings › Appearance). The root view is rebuilt when it changes.
+        static var accent: Color { Color(hex: AppSettings.accentHex) }
+        static let accentChoices = ["3E7BFA", "2AABEE", "5856D6", "3BB5A6", "16A06A", "E8932A", "EB5E8C", "8E8E93"]
         static let income = Color(light: "16A06A", dark: "3DD68C")
         static let expense = Color.primary
         static let transfer = Color(light: "5E7BAF", dark: "8FA7D6")
@@ -29,6 +31,8 @@ enum DS {
             case .expense: expense
             case .income: income
             case .transfer: transfer
+            case .refund: income
+            case .adjustment: Color.secondary
             }
         }
 

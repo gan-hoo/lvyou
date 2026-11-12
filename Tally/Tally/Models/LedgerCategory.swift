@@ -19,6 +19,9 @@ final class LedgerCategory {
     @Relationship(deleteRule: .cascade, inverse: \Budget.category)
     var budgets: [Budget]? = []
 
+    @Relationship(deleteRule: .nullify, inverse: \TransactionSplit.category)
+    var splitEntries: [TransactionSplit]? = []
+
     init(name: String, kind: CategoryKind, symbolName: String, colorHex: String, sortOrder: Int) {
         self.id = UUID()
         self.name = name
@@ -67,6 +70,24 @@ final class Budget {
     var alertThreshold: Double = 0.8
     var isDemo: Bool = false
     var createdAt: Date = Date()
+    var periodRaw: String = BudgetPeriodKind.monthly.rawValue
+    /// Length of a custom period in days, counted from `anchorDate`.
+    var customLengthDays: Int = 30
+    var anchorDate: Date = Date()
+    /// Carry the previous period's leftover (or overspending) into the next one.
+    var rollover: Bool = false
+    /// Comma-separated category IDs the overall budget ignores.
+    var excludedCategoryIDsRaw: String = ""
+
+    var periodKind: BudgetPeriodKind {
+        get { BudgetPeriodKind(rawValue: periodRaw) ?? .monthly }
+        set { periodRaw = newValue.rawValue }
+    }
+
+    var excludedCategoryIDs: Set<UUID> {
+        get { Set(excludedCategoryIDsRaw.split(separator: ",").compactMap { UUID(uuidString: String($0)) }) }
+        set { excludedCategoryIDsRaw = newValue.map(\.uuidString).sorted().joined(separator: ",") }
+    }
 
     /// Set `category` after inserting the budget into a context.
     init(amount: Decimal, currencyCode: String, alertThreshold: Double = 0.8, isDemo: Bool = false) {
@@ -96,6 +117,7 @@ final class ExchangeRate {
     var effectiveDate: Date = Date()
     var source: String = "manual"
     var createdAt: Date = Date()
+    var isDemo: Bool = false
 
     init(baseCode: String, quoteCode: String, rate: Decimal, effectiveDate: Date, source: String = "manual") {
         self.id = UUID()

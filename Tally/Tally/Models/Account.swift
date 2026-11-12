@@ -20,6 +20,14 @@ final class Account {
     var note: String = ""
     var isDemo: Bool = false
     var createdAt: Date = Date()
+    /// The opening balance is the balance at the start of this day. Entries dated
+    /// earlier are history already reflected in it, so they do not move the balance.
+    var openingDate: Date = Date.distantPast
+    /// Optional custom group shown on the Assets page (e.g. "Wise" for several currencies).
+    var groupName: String = ""
+    /// Last balance confirmed by the user when reconciling, and when.
+    var reconciledBalanceRaw: String = ""
+    var reconciledAt: Date?
 
     /// Entries whose source account is this account (expense, income, transfer-out).
     @Relationship(deleteRule: .nullify, inverse: \LedgerEntry.account)
@@ -38,6 +46,7 @@ final class Account {
         symbolName: String? = nil,
         sortOrder: Int = 0,
         includeInTotal: Bool = true,
+        openingDate: Date = Date.distantPast,
         isDemo: Bool = false
     ) {
         self.id = UUID()
@@ -49,6 +58,7 @@ final class Account {
         self.symbolName = symbolName ?? kind.defaultSymbol
         self.sortOrder = sortOrder
         self.includeInTotal = includeInTotal
+        self.openingDate = openingDate
         self.isDemo = isDemo
         self.createdAt = Date()
     }
@@ -64,6 +74,10 @@ final class Account {
     }
 
     var currency: CurrencyInfo { CurrencyInfo.info(for: currencyCode) }
+
+    var reconciledBalance: Decimal? {
+        reconciledBalanceRaw.isEmpty ? nil : DecimalCodec.decode(reconciledBalanceRaw)
+    }
 
     var entryCount: Int { (entries?.count ?? 0) + (incomingTransfers?.count ?? 0) }
 }

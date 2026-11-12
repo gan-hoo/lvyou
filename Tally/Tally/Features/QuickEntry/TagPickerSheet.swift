@@ -78,7 +78,7 @@ struct TagPickerSheet: View {
     }
 
     private func create() {
-        guard let tag = LedgerStore(context: context).findOrCreateTag(named: newName) else { return }
+        guard let tag = LedgerRepository(context: context).findOrCreateTag(named: newName) else { return }
         newName = ""
         if !selection.contains(tag.id) { toggle(tag) }
     }

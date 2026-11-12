@@ -209,16 +209,18 @@ jobs:
               echo "NOT RUNNING after $name"
             fi
           }
-          shoot 1-home light zh-Hans home
+          shoot 1-assets light zh-Hans assets
           sleep 2
-          shoot 1-home light zh-Hans home
-          shoot 2-entry light zh-Hans home -TallyOpenEntry
+          shoot 1-assets light zh-Hans assets
+          shoot 2-entry light zh-Hans assets -TallyOpenEntry
           shoot 3-transactions light zh-Hans transactions
-          shoot 4-statistics dark zh-Hans statistics
-          shoot 5-budget dark zh-Hans budget
+          shoot 4-analytics dark zh-Hans analytics
+          shoot 5-budgets light zh-Hans budgets
           shoot 6-settings light en settings
-          shoot 7-transactions-hant light zh-Hant transactions
-          shoot 8-transactions-en light en transactions
+          shoot 7-assets-glass light zh-Hans assets -settings.theme liquidGlass
+          shoot 8-analytics-en light en analytics
+          shoot 9-budgets-hant dark zh-Hant budgets
+          shoot 10-assets-hidden light en assets -settings.hideAmounts YES
           ls -la shots
       - name: OCR screenshots (printed to log)
         run: |

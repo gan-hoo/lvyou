@@ -5,7 +5,7 @@ import SwiftData
 /// Debug-only launch hooks used by CI to capture simulator screenshots:
 ///
 ///     -TallyScreenshotMode            load demo data (first launch) and skip onboarding
-///     -TallyTab statistics            start on a tab (home|transactions|statistics|budget|settings)
+///     -TallyTab analytics             start on a tab (assets|transactions|analytics|budgets|settings)
 ///     -TallyOpenEntry                 open the quick-entry sheet
 enum ScreenshotMode {
     private static var arguments: [String] { ProcessInfo.processInfo.arguments }
@@ -16,10 +16,10 @@ enum ScreenshotMode {
         guard let i = arguments.firstIndex(of: "-TallyTab"), i + 1 < arguments.count else { return nil }
         switch arguments[i + 1] {
         case "transactions": return .transactions
-        case "statistics": return .statistics
-        case "budget": return .budget
+        case "analytics", "statistics": return .analytics
+        case "budgets", "budget": return .budgets
         case "settings": return .settings
-        default: return .home
+        default: return .assets
         }
     }
 

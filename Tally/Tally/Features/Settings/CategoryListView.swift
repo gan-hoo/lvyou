@@ -206,12 +206,12 @@ struct CategoryEditorSheet: View {
                     Button("Delete", role: .destructive) {
                         guard let category = request.category else { return }
                         let target = reassignTargets.first { $0.id == reassignID }
-                        let store = LedgerStore(context: context)
+                        let repository = LedgerRepository(context: context)
                         confirmDelete = false
                         dismiss()
                         Task { @MainActor in
                             try? await Task.sleep(for: .milliseconds(450))
-                            store.deleteCategory(category, reassignTo: target)
+                            try? repository.deleteCategory(category, reassignTo: target)
                             Haptics.success()
                         }
                     }
@@ -230,8 +230,8 @@ struct CategoryEditorSheet: View {
             category.symbolName = symbol
             category.colorHex = colorHex
         } else {
-            let store = LedgerStore(context: context)
-            context.insert(LedgerCategory(name: trimmed, kind: kind, symbolName: symbol, colorHex: colorHex, sortOrder: store.nextCategorySortOrder(kind: kind)))
+            let repository = LedgerRepository(context: context)
+            context.insert(LedgerCategory(name: trimmed, kind: kind, symbolName: symbol, colorHex: colorHex, sortOrder: repository.nextCategorySortOrder(kind: kind)))
         }
         try? context.save()
         Haptics.success()

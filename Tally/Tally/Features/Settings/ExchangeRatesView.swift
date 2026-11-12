@@ -25,7 +25,7 @@ struct ExchangeRatesView: View {
             } header: {
                 Text("1 unit = \(baseCurrency)")
             } footer: {
-                Text("Each transaction uses the most recent rate effective on its own date. Adding a new rate never changes past records.")
+                Text("Each transaction uses the most recent rate effective on its own date. Adding a new rate never changes past records, except that transactions waiting for a rate get one. Currencies with no rate stay pending and are never counted at 1:1.")
             }
 
             Section {
@@ -69,9 +69,9 @@ struct ExchangeRatesView: View {
         defer { isFetching = false }
         do {
             let quotes = try await ExchangeRateFetcher().fetchLatest(base: "USD")
-            let store = LedgerStore(context: context)
+            let repository = LedgerRepository(context: context)
             for q in quotes {
-                store.addRate(base: q.base, quote: q.quote, rate: q.rate, date: q.date, source: ExchangeRate.Source.online)
+                try repository.addRate(base: q.base, quote: q.quote, rate: q.rate, date: q.date, source: ExchangeRate.Source.online)
             }
             Haptics.success()
             toasts.show(ToastMessage(symbol: "checkmark.circle.fill", text: String(localized: "Rates updated"), style: .success))
@@ -116,7 +116,7 @@ enum RateSource {
     static func title(_ source: String) -> String {
         switch source {
         case ExchangeRate.Source.online: String(localized: "ECB")
-        case ExchangeRate.Source.reference: String(localized: "Reference")
+        case ExchangeRate.Source.reference: String(localized: "Demo")
         case ExchangeRate.Source.imported: String(localized: "Imported")
         default: String(localized: "Manual")
         }
@@ -148,7 +148,7 @@ struct RateHistoryView: View {
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Text(rate.source == ExchangeRate.Source.reference ? String(localized: "Default") : rate.effectiveDate.shortDateText)
+                        Text(rate.effectiveDate.shortDateText)
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -159,7 +159,7 @@ struct RateHistoryView: View {
                     try? context.save()
                 }
             } footer: {
-                Text("A rate applies from its date until a newer one is added. The default reference rate covers dates before your first entry.")
+                Text("A rate applies from its date until a newer one is added. Dates before the earliest rate use the earliest rate. Demo rates are approximate and are removed with the demo data.")
             }
         }
         .listStyle(.insetGrouped)
@@ -234,7 +234,7 @@ struct AddRateSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         guard let rate, base != quote else { return }
-                        LedgerStore(context: context).addRate(base: base, quote: quote, rate: rate, date: date)
+                        try? LedgerRepository(context: context).addRate(base: base, quote: quote, rate: rate, date: date)
                         Haptics.success()
                         dismiss()
                     }

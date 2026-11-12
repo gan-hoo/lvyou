@@ -10,35 +10,40 @@ final class QuickEntryViewModel {
     private(set) var account: Account?
     var toAccount: Account?
     /// Manually entered credited amount for cross-currency transfers ("" = automatic).
-    var toAmountText: String = ""
+    var toAmountText: String
+    var feeText: String
     var category: LedgerCategory?
+    var splits: [SplitDraft]
     var date: Date
     var note: String
+    var payee: String
     var tags: [Tag]
+    /// "" = use the stored rate for the date; otherwise 1 account currency = x base.
+    var manualRateText: String
     var errorMessage: String?
 
     let editing: LedgerEntry?
+    let refundOf: LedgerEntry?
 
     init(request: EntryRequest, accounts: [Account], categories: [LedgerCategory]) {
         let editing = request.editing
         let kind = editing?.kind ?? request.kind
-
         let active = accounts.filter { !$0.isArchived }
         let defaultID = AppSettings.uuid(forKey: SettingsKey.defaultAccountID)
+        let destination = editing?.toAccount ?? request.toAccount
         let source = editing?.account
             ?? request.account
-            ?? active.first { $0.id == defaultID }
-            ?? active.first
-        let destination = editing?.toAccount ?? active.first { $0.id != source?.id }
-
-        var toAmountText = ""
-        if let editing, editing.kind == .transfer, !editing.toAmountRaw.isEmpty {
-            toAmountText = DecimalCodec.encode(editing.toAmount)
-        }
+            ?? active.first { $0.id == defaultID && $0.id != destination?.id }
+            ?? active.first { $0.id != destination?.id }
+        let refundOf = request.refundOf
 
         let digits = CurrencyInfo.info(for: source?.currencyCode ?? AppSettings.baseCurrency).fractionDigits
-        let expression = editing.map { AmountExpression(value: $0.amount, maxFractionDigits: digits) }
-            ?? AmountExpression(maxFractionDigits: digits)
+        var expression = AmountExpression(maxFractionDigits: digits)
+        if let editing {
+            expression = AmountExpression(value: editing.amount, maxFractionDigits: digits)
+        } else if let refundOf {
+            expression = AmountExpression(value: refundOf.amount, maxFractionDigits: digits)
+        }
 
         let category: LedgerCategory?
         if let editing {
@@ -50,23 +55,44 @@ final class QuickEntryViewModel {
         }
 
         self.editing = editing
+        self.refundOf = refundOf
         self.kind = kind
         self.expression = expression
         self.account = source
-        self.toAccount = destination
-        self.toAmountText = toAmountText
+        self.toAccount = destination ?? (kind == .transfer ? active.first { $0.id != source?.id } : nil)
+        self.toAmountText = (editing?.kind == .transfer && !(editing?.toAmountRaw.isEmpty ?? true)) ? DecimalCodec.encode(editing!.toAmount) : ""
+        self.feeText = (editing?.fee ?? 0) > 0 ? DecimalCodec.encode(editing!.fee) : ""
         self.category = category
+        self.splits = editing?.splitList.map { SplitDraft(category: $0.category, amount: $0.amount, note: $0.note) } ?? []
         self.date = editing?.date ?? request.date ?? .now
         self.note = editing?.note ?? ""
+        self.payee = editing?.payee ?? refundOf?.payee ?? ""
         self.tags = editing?.tags ?? []
+        self.manualRateText = ""
         self.errorMessage = nil
+        self.initialSignatureStorage = signature
     }
+
+    @ObservationIgnored private var initialSignatureStorage = ""
+
+    private var signature: String {
+        [kind.rawValue, expression.expressionText, account?.id.uuidString ?? "", toAccount?.id.uuidString ?? "",
+         toAmountText, feeText, category?.id.uuidString ?? "", "\(splits.count)", note, payee,
+         "\(tags.count)", manualRateText, "\(date.timeIntervalSince1970)"].joined(separator: "|")
+    }
+
+    /// True once anything differs from how the sheet opened (protects against accidental dismissal).
+    var hasChanges: Bool { signature != initialSignatureStorage }
 
     // MARK: Derived
 
     var currencyCode: String { account?.currencyCode ?? AppSettings.baseCurrency }
-
     var amount: Decimal { expression.value }
+    var fee: Decimal { DecimalCodec.parseLenient(feeText)?.magnitudeValue ?? 0 }
+    var manualRate: Decimal? { DecimalCodec.parseLenient(manualRateText).flatMap { $0 > 0 ? $0 : nil } }
+    var isEditing: Bool { editing != nil }
+    var isRefund: Bool { kind == .refund }
+    var splitTotal: Decimal { splits.sum { $0.amount } }
 
     var isCrossCurrencyTransfer: Bool {
         kind == .transfer && toAccount != nil && toAccount?.currencyCode != account?.currencyCode
@@ -74,13 +100,10 @@ final class QuickEntryViewModel {
 
     var canSave: Bool {
         guard amount > 0, account != nil else { return false }
-        if kind == .transfer {
-            return toAccount != nil && toAccount?.id != account?.id
-        }
+        if kind == .transfer { return toAccount != nil && toAccount?.id != account?.id }
+        if !splits.isEmpty { return splitTotal == amount }
         return true
     }
-
-    var isEditing: Bool { editing != nil }
 
     // MARK: Mutations
 
@@ -90,7 +113,8 @@ final class QuickEntryViewModel {
         if let catKind = newKind.categoryKind, category?.kind != catKind {
             category = Self.defaultCategory(for: newKind, in: categories)
         }
-        if newKind == .transfer, toAccount?.id == account?.id {
+        if newKind != .expense { splits = [] }
+        if newKind == .transfer, toAccount == nil || toAccount?.id == account?.id {
             toAccount = nil
         }
         errorMessage = nil
@@ -100,10 +124,10 @@ final class QuickEntryViewModel {
         account = newAccount
         let digits = newAccount.currency.fractionDigits
         if digits != expression.maxFractionDigits {
-            let current = expression.value
-            expression = AmountExpression(value: current, maxFractionDigits: digits)
+            expression = AmountExpression(value: expression.value, maxFractionDigits: digits)
         }
         if toAccount?.id == newAccount.id { toAccount = nil }
+        manualRateText = ""
     }
 
     func swapTransferAccounts() {
@@ -121,30 +145,26 @@ final class QuickEntryViewModel {
         }
     }
 
-    /// Automatic credited amount preview for cross-currency transfers.
     func estimatedToAmount(converter: CurrencyConverter) -> Decimal? {
         guard isCrossCurrencyTransfer, let dest = toAccount else { return nil }
         return converter.convert(amount, from: currencyCode, to: dest.currencyCode, on: date)
     }
 
-    /// Saves and returns the stored entry, or sets `errorMessage`.
+    /// Saves atomically and returns the stored entry, or sets `errorMessage`.
     func save(context: ModelContext) -> LedgerEntry? {
         if expression.hasPendingOperation { expression.collapse() }
-        let store = LedgerStore(context: context)
-        let manualToAmount = DecimalCodec.parseLenient(toAmountText).flatMap { $0 > 0 ? $0 : nil }
-        let input = EntryInput(
-            kind: kind,
-            amount: amount,
-            date: date,
-            note: note,
-            account: account,
-            toAccount: kind == .transfer ? toAccount : nil,
-            toAmount: isCrossCurrencyTransfer ? manualToAmount : nil,
-            category: kind == .transfer ? nil : category,
-            tags: tags
-        )
+        let service = TransactionService(context: context)
+        var draft = TransactionDraft(kind: kind, amount: amount, date: date, note: note, payee: payee, account: account)
+        draft.toAccount = kind == .transfer ? toAccount : nil
+        draft.toAmount = isCrossCurrencyTransfer ? DecimalCodec.parseLenient(toAmountText).flatMap { $0 > 0 ? $0 : nil } : nil
+        draft.fee = kind == .transfer ? fee : 0
+        draft.category = kind == .transfer ? nil : (splits.isEmpty ? category : nil)
+        draft.splits = kind == .expense ? splits : []
+        draft.tags = tags
+        draft.refundOfID = kind == .refund ? (refundOf?.id ?? UUID(uuidString: editing?.refundOfIDRaw ?? "")) : nil
+        draft.manualRate = kind == .transfer ? nil : manualRate
         do {
-            let entry = try store.save(input, editing: editing)
+            let entry = try service.save(draft, editing: editing)
             rememberDefaults()
             errorMessage = nil
             return entry
@@ -155,7 +175,7 @@ final class QuickEntryViewModel {
     }
 
     private func rememberDefaults() {
-        if let category, kind != .transfer {
+        if let category, kind == .expense || kind == .income {
             AppSettings.setUUID(category.id, forKey: kind == .expense ? SettingsKey.lastExpenseCategoryID : SettingsKey.lastIncomeCategoryID)
         }
     }
@@ -165,7 +185,7 @@ final class QuickEntryViewModel {
         let candidates = categories
             .filter { $0.kind == catKind && !$0.isArchived }
             .sorted { $0.sortOrder < $1.sortOrder }
-        let key = kind == .expense ? SettingsKey.lastExpenseCategoryID : SettingsKey.lastIncomeCategoryID
+        let key = catKind == .expense ? SettingsKey.lastExpenseCategoryID : SettingsKey.lastIncomeCategoryID
         if let last = AppSettings.uuid(forKey: key), let match = candidates.first(where: { $0.id == last }) {
             return match
         }

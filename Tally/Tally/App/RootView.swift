@@ -4,6 +4,7 @@ import SwiftData
 struct RootView: View {
     @Environment(AppLockManager.self) private var lock
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.modelContext) private var context
     @AppStorage(SettingsKey.hasCompletedOnboarding) private var onboarded = false
 
     var body: some View {
@@ -34,6 +35,10 @@ struct RootView: View {
                 lock.didEnterBackground()
             case .inactive, .active:
                 if old == .background { lock.willEnterForeground() }
+                if new == .active {
+                    // Book recurring occurrences that fell due while the app was closed.
+                    RecurringService(context: context).postDueOccurrences()
+                }
             @unknown default:
                 break
             }
@@ -47,18 +52,18 @@ struct MainTabView: View {
     var body: some View {
         @Bindable var router = router
         TabView(selection: $router.selectedTab) {
-            DashboardView()
-                .tabItem { Label("Home", systemImage: "house") }
-                .tag(AppTab.home)
+            AssetsView()
+                .tabItem { Label("Assets", systemImage: "wallet.pass") }
+                .tag(AppTab.assets)
             TransactionsView()
                 .tabItem { Label("Transactions", systemImage: "list.bullet.rectangle") }
                 .tag(AppTab.transactions)
-            StatisticsView()
-                .tabItem { Label("Statistics", systemImage: "chart.pie") }
-                .tag(AppTab.statistics)
-            BudgetView()
-                .tabItem { Label("Budget", systemImage: "gauge.with.dots.needle.33percent") }
-                .tag(AppTab.budget)
+            AnalyticsView()
+                .tabItem { Label("Analytics", systemImage: "chart.pie") }
+                .tag(AppTab.analytics)
+            BudgetsView()
+                .tabItem { Label("Budgets", systemImage: "gauge.with.dots.needle.33percent") }
+                .tag(AppTab.budgets)
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape") }
                 .tag(AppTab.settings)

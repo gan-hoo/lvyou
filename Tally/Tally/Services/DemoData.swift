@@ -25,13 +25,16 @@ enum DemoData {
         "Monthly saving", "Electricity & water", "Card repayment", "Interest", "Local lunch",
         "Ferry & train", "Sightseeing", "Top up travel card", "Flights", "Flat white",
         "Team lunch", "Dinner with friends", "Weekly groceries", "Metro", "Taxi",
-        "Movie night", "Pharmacy", "Freelance project",
+        "Movie night", "Pharmacy", "Freelance project", "Returned item",
     ]
 
     static func load(into context: ModelContext, base: String = AppSettings.baseCurrency, days: Int = 100, now: Date = .now) {
         DefaultData.ensureSeeded(in: context)
-        let store = LedgerStore(context: context)
-        let converter = store.converter()
+        DefaultData.insertDemoRates(in: context)
+        try? context.save()
+        let repository = LedgerRepository(context: context)
+        let service = TransactionService(repository: repository)
+        let converter = repository.converter()
         var rng = SeededGenerator(seed: 20_261_112)
         let cal = Calendar.current
 
@@ -54,9 +57,11 @@ enum DemoData {
         }
 
         // Accounts
-        var order = store.nextAccountSortOrder()
+        var order = repository.nextAccountSortOrder()
+        let openingDay = cal.date(byAdding: .day, value: -(days + 1), to: cal.startOfDay(for: now)) ?? now
         func makeAccount(_ name: String, _ kind: AccountKind, _ currency: String, _ opening: Decimal, _ color: String) -> Account {
-            let a = Account(name: name, kind: kind, currencyCode: currency, openingBalance: opening, colorHex: color, sortOrder: order, isDemo: true)
+            let a = Account(name: name, kind: kind, currencyCode: currency, openingBalance: opening, colorHex: color,
+                            sortOrder: order, openingDate: openingDay, isDemo: true)
             order += 1
             context.insert(a)
             return a
@@ -78,20 +83,28 @@ enum DemoData {
         context.insert(work)
         context.insert(trip)
 
+        let feeCategory = repository.feeCategory()
+        @discardableResult
         func add(_ kind: TransactionKind, _ amount: Decimal, _ day: Date, hour: Int, minute: Int? = nil,
-                 account: Account, to: Account? = nil, toAmount: Decimal? = nil,
-                 category: LedgerCategory? = nil, note: String = "", tags: [Tag] = []) {
-            guard amount > 0 else { return }
+                 account: Account, to: Account? = nil, toAmount: Decimal? = nil, fee: Decimal = 0,
+                 category: LedgerCategory? = nil, note: String = "", payee: String = "", tags: [Tag] = []) -> LedgerEntry? {
+            guard amount > 0 else { return nil }
             let m = minute ?? Int.random(in: 0...59, using: &rng)
-            guard let date = cal.date(bySettingHour: hour, minute: m, second: 0, of: day), date <= now else { return }
+            guard let date = cal.date(bySettingHour: hour, minute: m, second: 0, of: day), date <= now else { return nil }
             let e = LedgerEntry(kind: kind, amount: amount, currencyCode: account.currencyCode, date: date, note: note, isDemo: true)
             context.insert(e)
             e.account = account
             e.toAccount = to
             if let toAmount { e.toAmount = toAmount }
+            if fee > 0 {
+                e.fee = fee
+                e.feeCategoryIDRaw = feeCategory.id.uuidString
+            }
             e.category = category
+            e.payee = payee
             e.tags = tags
-            store.applySnapshot(to: e, base: base, converter: converter)
+            service.applySnapshot(to: e, base: base, converter: converter)
+            return e
         }
 
         let today = cal.startOfDay(for: now)
@@ -120,7 +133,7 @@ enum DemoData {
             if onTrip {
                 let fx = foreign.currencyCode
                 let local = { (cny: Double) -> Decimal in
-                    (converter.convertOrSame(Decimal(cny), from: "CNY", to: fx)).rounded(scale: 1)
+                    (converter.convert(Decimal(cny), from: "CNY", to: fx) ?? 0).rounded(scale: 1)
                 }
                 add(.expense, local(random(120...260)), day, hour: 12, account: foreign, category: cat("fork.knife", .expense), note: String(localized: "Local lunch"), tags: [trip])
                 add(.expense, local(random(40...120)), day, hour: 15, account: foreign, category: cat("tram", .expense), note: String(localized: "Ferry & train"), tags: [trip])
@@ -129,8 +142,9 @@ enum DemoData {
             }
             if day == cal.date(byAdding: .day, value: -2, to: tripStart) {
                 let amount = scaled(5_000)
-                let credited = converter.convertOrSame(amount, from: base, to: foreign.currencyCode)
-                add(.transfer, amount, day, hour: 19, account: debit, to: foreign, toAmount: credited, note: String(localized: "Top up travel card"))
+                let credited = converter.convert(amount, from: base, to: foreign.currencyCode)
+                add(.transfer, amount, day, hour: 19, account: debit, to: foreign, toAmount: credited,
+                    fee: scaled(15), note: String(localized: "Top up travel card"))
                 add(.expense, scaled(2_380), day, hour: 20, account: credit, category: cat("airplane", .expense), note: String(localized: "Flights"), tags: [trip])
             }
 
@@ -182,6 +196,34 @@ enum DemoData {
                 add(.income, scaled(random(600...2_400)), day, hour: 17, account: debit, category: cat("laptopcomputer", .income), note: String(localized: "Freelance project"))
             }
         }
+
+        // A split purchase, a refund linked to it, and a recurring rent plan.
+        let splitDay = cal.date(byAdding: .day, value: -6, to: today) ?? today
+        if let split = add(.expense, scaled(460), splitDay, hour: 18, minute: 20, account: credit,
+                           note: String(localized: "Weekly groceries"), payee: "Costco") {
+            let parts: [(String, Double)] = [("cart", 300), ("pawprint", 110), ("ellipsis.circle", 50)]
+            for (i, part) in parts.enumerated() {
+                let s = TransactionSplit(amount: scaled(part.1), sortOrder: i)
+                context.insert(s)
+                s.category = cat(part.0, .expense)
+                s.entry = split
+            }
+            let refundDay = cal.date(byAdding: .day, value: 2, to: splitDay) ?? splitDay
+            if let refund = add(.refund, scaled(50), refundDay, hour: 11, minute: 5, account: credit,
+                                category: cat("ellipsis.circle", .expense), note: String(localized: "Returned item"), payee: "Costco") {
+                refund.refundOfIDRaw = split.id.uuidString
+            }
+        }
+        var nextFirst = cal.dateComponents([.year, .month], from: now)
+        nextFirst.day = 1
+        let firstOfMonth = cal.date(from: nextFirst) ?? now
+        let rentStart = cal.date(byAdding: .month, value: 1, to: firstOfMonth) ?? now
+        let rent = RecurringRule(name: String(localized: "Rent"), kind: .expense, amount: scaled(4_800), frequency: .monthly, startDate:
+            cal.date(bySettingHour: 9, minute: 5, second: 0, of: rentStart) ?? rentStart)
+        rent.accountID = debit.id
+        rent.categoryID = cat("house", .expense)?.id
+        rent.isDemo = true
+        context.insert(rent)
 
         // Budgets
         context.insert(Budget(amount: scaled(12_000), currencyCode: base, alertThreshold: 0.8, isDemo: true))

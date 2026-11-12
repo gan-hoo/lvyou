@@ -41,7 +41,8 @@ struct CurrencyConverterTests {
         let c = CurrencyConverter(points: [])
         #expect(c.rate(from: "JPY", to: "JPY") == 1)
         #expect(c.rate(from: "JPY", to: "CNY") == nil)
-        #expect(c.convertOrSame(10, from: "JPY", to: "CNY") == 10)
+        // A missing rate must never be treated as 1:1.
+        #expect(c.convert(10, from: "JPY", to: "CNY") == nil)
     }
 
     @Test func roundsToTargetCurrencyDigits() {

@@ -29,6 +29,7 @@ enum DefaultData {
             CategorySeed(key: "Subscriptions", symbol: "repeat", color: "7D8BA6"),
             CategorySeed(key: "Gifts", symbol: "gift", color: "F07FA0"),
             CategorySeed(key: "Pets", symbol: "pawprint", color: "D98E5F"),
+            CategorySeed(key: "Fees", symbol: "percent", color: "7D8BA6"),
             CategorySeed(key: "Other", symbol: "ellipsis.circle", color: "8E8E93"),
         ]
     }()
@@ -45,6 +46,9 @@ enum DefaultData {
         ]
     }()
 
+    /// Built-in category for transfer fees.
+    static let feeCategoryKey = "Fees"
+
     /// Approximate mid-market reference rates (1 USD = x). Users can add dated rates
     /// manually or fetch current ones; these only make conversion work out of the box.
     static let referenceRatesFromUSD: [(String, String)] = [
@@ -57,7 +61,9 @@ enum DefaultData {
         Calendar.current.date(from: DateComponents(year: 2000, month: 1, day: 1)) ?? .distantPast
     }
 
-    /// Inserts default categories and reference rates if the store is empty.
+    /// Inserts default categories if the store is empty. Exchange rates are never
+    /// invented: without user-entered or downloaded rates, foreign amounts stay
+    /// "pending conversion" (demo data brings its own clearly marked demo rates).
     @MainActor
     static func ensureSeeded(in context: ModelContext) {
         let categoryCount = (try? context.fetchCount(FetchDescriptor<LedgerCategory>())) ?? 0
@@ -69,20 +75,23 @@ enum DefaultData {
                 context.insert(LedgerCategory(name: seed.name, kind: .income, symbolName: seed.symbol, colorHex: seed.color, sortOrder: i))
             }
         }
-
-        let rateCount = (try? context.fetchCount(FetchDescriptor<ExchangeRate>())) ?? 0
-        if rateCount == 0 {
-            for (code, value) in referenceRatesFromUSD {
-                context.insert(ExchangeRate(
-                    baseCode: "USD",
-                    quoteCode: code,
-                    rate: Decimal(string: value, locale: Locale(identifier: "en_US_POSIX")) ?? 1,
-                    effectiveDate: referenceDate,
-                    source: ExchangeRate.Source.reference
-                ))
-            }
-        }
         try? context.save()
+    }
+
+    /// Approximate reference rates for demo data (flagged `isDemo`, removed with the demo).
+    @MainActor
+    static func insertDemoRates(in context: ModelContext) {
+        for (code, value) in referenceRatesFromUSD {
+            let rate = ExchangeRate(
+                baseCode: "USD",
+                quoteCode: code,
+                rate: Decimal(string: value, locale: Locale(identifier: "en_US_POSIX")) ?? 0,
+                effectiveDate: referenceDate,
+                source: ExchangeRate.Source.reference
+            )
+            rate.isDemo = true
+            context.insert(rate)
+        }
     }
 
     /// Names Tally itself creates (default accounts, demo accounts and tags).
