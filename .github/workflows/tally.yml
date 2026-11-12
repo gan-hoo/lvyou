@@ -188,6 +188,11 @@ jobs:
               -TallyScreenshotMode -TallyTab "$tab" "$@" -AppleLanguages "($lang)" -AppleLocale "$locale"
             sleep 9
             xcrun simctl io "$UDID" screenshot "shots/$name.png"
+            if xcrun simctl spawn "$UDID" launchctl list | grep -q com.ganhoo.tally; then
+              echo "ALIVE $name"
+            else
+              echo "NOT RUNNING after $name"
+            fi
           }
           shoot 1-home light zh-Hans home
           sleep 2
@@ -198,29 +203,12 @@ jobs:
           shoot 5-budget dark zh-Hans budget
           shoot 6-settings light en settings
           ls -la shots
-      - name: Contact sheets (printed to log)
+      - name: OCR screenshots (printed to log)
         run: |
-          python3 -m venv /tmp/venv && /tmp/venv/bin/pip install --quiet pillow
-          /tmp/venv/bin/python - <<'PY'
-          from PIL import Image
-          import glob, base64
-          files = sorted(glob.glob("shots/*.png"))
-          def sheet(paths, out, width=230):
-              ims = [Image.open(p).convert("RGB") for p in paths]
-              ims = [im.resize((width, int(im.height * width / im.width)), Image.LANCZOS) for im in ims]
-              h = max(im.height for im in ims)
-              canvas = Image.new("RGB", (width * len(ims) + 8 * (len(ims) - 1), h), (128, 128, 128))
-              for i, im in enumerate(ims):
-                  canvas.paste(im, (i * (width + 8), 0))
-              canvas.save(out, quality=50, optimize=True)
-              data = base64.b64encode(open(out, "rb").read()).decode()
-              print(f"{out}-BEGIN")
-              for i in range(0, len(data), 400):
-                  print(data[i:i + 400])
-              print(f"{out}-END")
-          picks = [f for f in files if any(k in f for k in ("1-home", "2-entry", "4-statistics"))]
-          sheet(picks, "sheet.jpg", width=240)
-          PY
+          for f in shots/*.png; do
+            echo "===== $(basename "$f") ====="
+            swift scripts/ocr.swift "$f" || true
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:

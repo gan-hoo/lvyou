@@ -1,5 +1,7 @@
 # 旅行足迹 Travel Footprints
 
+> 本仓库另含 **Tally 记账**（原生 SwiftUI 个人财务 App），工程、构建、签名与真机安装说明见 [Tally/README.md](Tally/README.md)。
+
 原生 iOS 旅行打卡应用：搜索全球景点，到达后通过 GPS 验证打卡，自动记录到访时间与时区，并在地图上展示个人旅行足迹。
 
 - Swift · SwiftUI · SwiftData · MapKit · Core Location
