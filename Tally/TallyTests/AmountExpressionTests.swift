@@ -97,6 +97,22 @@ struct DecimalCodecTests {
         #expect(Decimal(string: "2.345")!.rounded(scale: 2) == Decimal(string: "2.35"))
         #expect(Decimal(string: "2.344")!.rounded(scale: 2) == Decimal(string: "2.34"))
     }
+
+    /// Sums of converted amounts (including converted zeros) must compare equal to
+    /// the same value written directly — split totals and net worth rely on it.
+    @Test func roundedSumsCompareEqual() {
+        let zero = (Decimal(0) * Decimal(string: "4.70")!).rounded(scale: 2)
+        #expect(zero == 0)
+        let parts: [Decimal] = [
+            (Decimal(1_000) * 1).rounded(scale: 2),
+            (Decimal(100) * Decimal(string: "4.70")!).rounded(scale: 2),
+            zero,
+        ]
+        #expect(parts.sum { $0 } == 1_470)
+        let splits = [Decimal(string: "33.33")!, Decimal(string: "66.67")!].map { $0.rounded(scale: 2) }
+        #expect(splits.sum { $0 } == Decimal(100).rounded(scale: 2))
+        #expect(Decimal(string: "1470.00")!.canonical == 1_470)
+    }
 }
 
 struct PeriodTests {

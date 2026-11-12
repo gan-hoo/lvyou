@@ -140,8 +140,9 @@ struct FinanceEngine: Sendable {
         var worth = NetWorth()
         for a in accounts where a.includeInNetWorth && !a.isArchived {
             let native = balances[a.id] ?? a.openingBalance
+            guard native != 0 else { continue }
             guard let converted = converter.convert(native, from: a.currency, to: base, on: date) else {
-                if native != 0 { worth.pendingAccountIDs.insert(a.id) }
+                worth.pendingAccountIDs.insert(a.id)
                 continue
             }
             if converted >= 0 {
@@ -150,6 +151,8 @@ struct FinanceEngine: Sendable {
                 worth.liabilities += -converted
             }
         }
+        worth.assets = worth.assets.canonical
+        worth.liabilities = worth.liabilities.canonical
         return worth
     }
 

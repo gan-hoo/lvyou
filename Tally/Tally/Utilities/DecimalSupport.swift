@@ -50,7 +50,19 @@ extension Decimal {
         var source = self
         var result = Decimal()
         NSDecimalRound(&result, &source, scale, mode)
-        return result
+        return result.canonical
+    }
+
+    /// The same value in compact form (no trailing mantissa zeros, minimal length,
+    /// a plain zero for any zero). Arithmetic on non-compact values — for example
+    /// the zero produced by `0 × rate` — can otherwise yield sums that print the
+    /// same but fail `==`. Every rounded money value goes through here.
+    var canonical: Decimal {
+        if isNaN { return self }
+        if isZero { return 0 }
+        var value = self
+        NSDecimalCompact(&value)
+        return value
     }
 
     var doubleValue: Double { NSDecimalNumber(decimal: self).doubleValue }
@@ -69,6 +81,6 @@ extension Decimal {
 
 extension Sequence {
     func sum(_ value: (Element) -> Decimal) -> Decimal {
-        reduce(Decimal(0)) { $0 + value($1) }
+        reduce(Decimal(0)) { $0 + value($1) }.canonical
     }
 }
