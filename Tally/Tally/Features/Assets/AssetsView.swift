@@ -252,10 +252,10 @@ private struct NetWorthHeader: View {
             }
 
             if !worth.pendingAccountIDs.isEmpty {
-                let names = accounts.filter { worth.pendingAccountIDs.contains($0.id) }.map(\.name)
+                let names = accounts.filter { worth.pendingAccountIDs.contains($0.id) }.map(\.name).joined(separator: ", ")
                 Button(action: onShowRates) {
                     Label {
-                        Text("Pending conversion: \(names.joined(separator: ", ")). Add an exchange rate to include them.")
+                        Text("Pending conversion: \(names). Add an exchange rate to include them.")
                     } icon: {
                         Image(systemName: "exclamationmark.triangle")
                     }

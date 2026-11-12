@@ -156,6 +156,16 @@ enum RecurrenceFrequency: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// "Every 2 weeks", "Every month", …
+    func everyText(_ interval: Int) -> String {
+        switch self {
+        case .daily: interval == 1 ? String(localized: "Every day") : String(localized: "Every \(interval) days")
+        case .weekly: interval == 1 ? String(localized: "Every week") : String(localized: "Every \(interval) weeks")
+        case .monthly: interval == 1 ? String(localized: "Every month") : String(localized: "Every \(interval) months")
+        case .yearly: interval == 1 ? String(localized: "Every year") : String(localized: "Every \(interval) years")
+        }
+    }
+
     var component: Calendar.Component {
         switch self {
         case .daily: .day

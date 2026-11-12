@@ -100,9 +100,7 @@ private struct RuleRow: View {
     }
 
     private var summary: String {
-        rule.interval == 1
-            ? rule.frequency.title
-            : String(localized: "Every \(rule.interval) × \(rule.frequency.title)")
+        rule.frequency.everyText(rule.interval)
     }
 }
 
@@ -180,7 +178,7 @@ struct RecurringEditorSheet: View {
                         ForEach(RecurrenceFrequency.allCases) { Text($0.title).tag($0) }
                     }
                     Stepper(value: $interval, in: 1...52) {
-                        Text("Every \(interval)")
+                        Text(verbatim: frequency.everyText(interval))
                     }
                     DatePicker("First date", selection: $startDate)
                         .disabled(rule != nil && (rule?.generatedCount ?? 0) > 0)

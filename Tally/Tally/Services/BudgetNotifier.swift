@@ -21,21 +21,29 @@ enum BudgetNotifier {
             if let c = b.categoryID { return touched.contains(c) }
             return touched.isEmpty || !touched.isSubset(of: b.excluded)
         }
-        let statuses = relevant
-            .map { engine.status(of: $0, entries: snap.entries, at: now) }
-            .filter { $0.period.contains(entry.date) && $0.level != .normal }
-            .sorted { $0.level == $1.level ? $0.fraction > $1.fraction : $0.level > $1.level }
+        var candidates: [(budget: BudgetValue, status: BudgetStatus)] = []
+        for budget in relevant {
+            let status: BudgetStatus = engine.status(of: budget, entries: snap.entries, at: now)
+            guard status.period.contains(entry.date), status.level != .normal else { continue }
+            candidates.append((budget, status))
+        }
+        candidates.sort { a, b in
+            if a.status.level != b.status.level { return a.status.level > b.status.level }
+            return a.status.fraction > b.status.fraction
+        }
 
         var notified = Set(UserDefaults.standard.stringArray(forKey: SettingsKey.budgetNotified) ?? [])
-        for status in statuses {
+        for candidate in candidates {
+            let status = candidate.status
             let periodKey = String(Int(status.period.start.timeIntervalSince1970))
-            let key = "\(periodKey)|\(status.budgetID.uuidString)|\(status.level.rawValue)"
+            let key = periodKey + "|" + status.budgetID.uuidString + "|" + String(status.level.rawValue)
             guard !notified.contains(key) else { continue }
             notified.insert(key)
             UserDefaults.standard.set(Array(notified.suffix(200)), forKey: SettingsKey.budgetNotified)
-            let title = status.categoryID
-                .flatMap { id in LedgerRepository(context: context).category(id: id)?.name }
-                ?? String(localized: "Monthly Budget")
+            var title = BudgetTitle.overall(candidate.budget.period)
+            if let id = status.categoryID, let name = LedgerRepository(context: context).category(id: id)?.name {
+                title = name
+            }
             return message(for: status, title: title, base: base)
         }
         return nil

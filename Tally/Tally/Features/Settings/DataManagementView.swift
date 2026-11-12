@@ -169,11 +169,7 @@ struct DataManagementView: View {
         .alert("Import Complete", isPresented: Binding(get: { importResult != nil }, set: { if !$0 { importResult = nil } }), presenting: importResult) { _ in
             Button("OK") { importResult = nil }
         } message: { result in
-            if result.failed.isEmpty {
-                Text("Imported \(result.imported), skipped \(result.skippedDuplicates) duplicates. Created \(result.createdAccounts) accounts and \(result.createdCategories) categories.")
-            } else {
-                Text("Imported \(result.imported), skipped \(result.skippedDuplicates) duplicates. \(result.failed.count) rows were not imported: \(result.failed.prefix(3).map { String(localized: "line \($0.line)") + " – " + $0.message }.joined(separator: "; "))")
-            }
+            Text(importMessage(result))
         }
         .alert("Restore Complete", isPresented: Binding(get: { restoreSummary != nil }, set: { if !$0 { restoreSummary = nil } }), presenting: restoreSummary) { _ in
             Button("OK") { restoreSummary = nil }
@@ -211,6 +207,15 @@ struct DataManagementView: View {
         } message: {
             Text("This cannot be undone. Consider creating a backup first.")
         }
+    }
+
+    private func importMessage(_ r: ImportResult) -> String {
+        var text = String(localized: "Imported \(r.imported), skipped \(r.skippedDuplicates) duplicates. Created \(r.createdAccounts) accounts and \(r.createdCategories) categories.")
+        if !r.failed.isEmpty {
+            let lines = r.failed.prefix(3).map { String(localized: "Line \($0.line)") + ": " + $0.message }
+            text += "\n" + String(localized: "\(r.failed.count) rows were not imported:") + "\n" + lines.joined(separator: "\n")
+        }
+        return text
     }
 
     // MARK: Export
