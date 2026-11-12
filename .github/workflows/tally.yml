@@ -16,6 +16,8 @@ jobs:
     name: Archive & unsigned IPA
     runs-on: macos-15
     timeout-minutes: 45
+    permissions:
+      contents: write
     defaults:
       run:
         working-directory: Tally
@@ -55,6 +57,19 @@ jobs:
         with:
           name: Tally-unsigned-ipa
           path: Tally/dist/Tally-unsigned.ipa
+
+      # Commit messages containing [publish-ipa] also store the IPA in the branch
+      # (Tally/release/), for environments that cannot download Actions artifacts.
+      - name: Publish IPA to branch
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-ipa]')
+        run: |
+          mkdir -p release
+          cp dist/Tally-unsigned.ipa release/Tally-unsigned.ipa
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release/Tally-unsigned.ipa
+          git commit -m "Add unsigned Tally IPA from ${GITHUB_SHA::7} [skip ci]" || exit 0
+          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - uses: actions/upload-artifact@v4
         if: always()
