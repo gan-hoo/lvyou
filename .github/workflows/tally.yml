@@ -217,6 +217,8 @@ jobs:
           shoot 4-statistics dark zh-Hans statistics
           shoot 5-budget dark zh-Hans budget
           shoot 6-settings light en settings
+          shoot 7-transactions-hant light zh-Hant transactions
+          shoot 8-transactions-en light en transactions
           ls -la shots
       - name: OCR screenshots (printed to log)
         run: |

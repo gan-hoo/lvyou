@@ -12,6 +12,7 @@ struct TallyApp: App {
     init() {
         container = Persistence.makeContainer()
         DefaultData.ensureSeeded(in: container.mainContext)
+        DefaultData.relocalizeBuiltInNames(in: container.mainContext)
         let router = AppRouter()
         #if DEBUG
         ScreenshotMode.prepare(container.mainContext)

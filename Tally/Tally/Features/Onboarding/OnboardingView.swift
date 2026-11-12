@@ -18,7 +18,22 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
                 VStack(alignment: .leading, spacing: DS.Spacing.l) {
-                    AppGlyph(size: 64)
+                    HStack(alignment: .top) {
+                        AppGlyph(size: 64)
+                        Spacer()
+                        LanguageMenu { language in
+                            HStack(spacing: 6) {
+                                Image(systemName: "globe")
+                                Text(verbatim: language == .system ? "语言 · Language" : language.title)
+                                Image(systemName: "chevron.up.chevron.down").font(.caption2)
+                            }
+                            .font(.subheadline.weight(.medium))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(DS.Colors.fill, in: Capsule())
+                        }
+                        .accessibilityLabel(Text(verbatim: "语言 Language"))
+                    }
                     Text("Welcome to Tally")
                         .font(.largeTitle.weight(.bold))
                     Text("A calm, precise ledger for everyday money.")

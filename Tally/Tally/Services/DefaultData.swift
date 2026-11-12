@@ -3,43 +3,47 @@ import SwiftData
 
 /// Built-in categories and reference exchange rates created on first launch.
 enum DefaultData {
+    /// `key` is the English source string; the stored name is its translation
+    /// in the running language (see `relocalizeBuiltInNames`).
     struct CategorySeed {
-        let name: String
+        let key: String
         let symbol: String
         let color: String
+
+        var name: String { L10n.current(key) }
     }
 
-    static var expenseCategories: [CategorySeed] {
-        [
-            CategorySeed(name: String(localized: "Dining"), symbol: "fork.knife", color: "F2994A"),
-            CategorySeed(name: String(localized: "Groceries"), symbol: "cart", color: "4CB782"),
-            CategorySeed(name: String(localized: "Coffee"), symbol: "cup.and.saucer", color: "B08968"),
-            CategorySeed(name: String(localized: "Transport"), symbol: "tram", color: "4A90E2"),
-            CategorySeed(name: String(localized: "Shopping"), symbol: "bag", color: "EB5E8C"),
-            CategorySeed(name: String(localized: "Housing"), symbol: "house", color: "9B6DD6"),
-            CategorySeed(name: String(localized: "Utilities"), symbol: "bolt", color: "E8B730"),
-            CategorySeed(name: String(localized: "Entertainment"), symbol: "gamecontroller", color: "6C7BF2"),
-            CategorySeed(name: String(localized: "Health"), symbol: "cross.case", color: "EB5757"),
-            CategorySeed(name: String(localized: "Education"), symbol: "book", color: "47B5D9"),
-            CategorySeed(name: String(localized: "Travel"), symbol: "airplane", color: "3BB5A6"),
-            CategorySeed(name: String(localized: "Subscriptions"), symbol: "repeat", color: "7D8BA6"),
-            CategorySeed(name: String(localized: "Gifts"), symbol: "gift", color: "F07FA0"),
-            CategorySeed(name: String(localized: "Pets"), symbol: "pawprint", color: "D98E5F"),
-            CategorySeed(name: String(localized: "Other"), symbol: "ellipsis.circle", color: "8E8E93"),
+    static let expenseCategories: [CategorySeed] = {
+        return [
+            CategorySeed(key: "Dining", symbol: "fork.knife", color: "F2994A"),
+            CategorySeed(key: "Groceries", symbol: "cart", color: "4CB782"),
+            CategorySeed(key: "Coffee", symbol: "cup.and.saucer", color: "B08968"),
+            CategorySeed(key: "Transport", symbol: "tram", color: "4A90E2"),
+            CategorySeed(key: "Shopping", symbol: "bag", color: "EB5E8C"),
+            CategorySeed(key: "Housing", symbol: "house", color: "9B6DD6"),
+            CategorySeed(key: "Utilities", symbol: "bolt", color: "E8B730"),
+            CategorySeed(key: "Entertainment", symbol: "gamecontroller", color: "6C7BF2"),
+            CategorySeed(key: "Health", symbol: "cross.case", color: "EB5757"),
+            CategorySeed(key: "Education", symbol: "book", color: "47B5D9"),
+            CategorySeed(key: "Travel", symbol: "airplane", color: "3BB5A6"),
+            CategorySeed(key: "Subscriptions", symbol: "repeat", color: "7D8BA6"),
+            CategorySeed(key: "Gifts", symbol: "gift", color: "F07FA0"),
+            CategorySeed(key: "Pets", symbol: "pawprint", color: "D98E5F"),
+            CategorySeed(key: "Other", symbol: "ellipsis.circle", color: "8E8E93"),
         ]
-    }
+    }()
 
-    static var incomeCategories: [CategorySeed] {
-        [
-            CategorySeed(name: String(localized: "Salary"), symbol: "briefcase", color: "4CB782"),
-            CategorySeed(name: String(localized: "Bonus"), symbol: "star", color: "E8B730"),
-            CategorySeed(name: String(localized: "Investments"), symbol: "chart.line.uptrend.xyaxis", color: "4A90E2"),
-            CategorySeed(name: String(localized: "Side Income"), symbol: "laptopcomputer", color: "9B6DD6"),
-            CategorySeed(name: String(localized: "Refunds"), symbol: "arrow.uturn.backward", color: "47B5D9"),
-            CategorySeed(name: String(localized: "Gifts Received"), symbol: "gift", color: "F07FA0"),
-            CategorySeed(name: String(localized: "Other Income"), symbol: "ellipsis.circle", color: "8E8E93"),
+    static let incomeCategories: [CategorySeed] = {
+        return [
+            CategorySeed(key: "Salary", symbol: "briefcase", color: "4CB782"),
+            CategorySeed(key: "Bonus", symbol: "star", color: "E8B730"),
+            CategorySeed(key: "Investments", symbol: "chart.line.uptrend.xyaxis", color: "4A90E2"),
+            CategorySeed(key: "Side Income", symbol: "laptopcomputer", color: "9B6DD6"),
+            CategorySeed(key: "Refunds", symbol: "arrow.uturn.backward", color: "47B5D9"),
+            CategorySeed(key: "Gifts Received", symbol: "gift", color: "F07FA0"),
+            CategorySeed(key: "Other Income", symbol: "ellipsis.circle", color: "8E8E93"),
         ]
-    }
+    }()
 
     /// Approximate mid-market reference rates (1 USD = x). Users can add dated rates
     /// manually or fetch current ones; these only make conversion work out of the box.
@@ -79,5 +83,51 @@ enum DefaultData {
             }
         }
         try? context.save()
+    }
+
+    /// Names Tally itself creates (default accounts, demo accounts and tags).
+    static let builtInAccountKeys = [
+        "Cash", "Bank Card", "Everyday Card", "Credit Card", "Savings",
+        "AUD Travel Card", "CNY Wallet", "Imported",
+    ]
+    static let builtInTagKeys = ["Work", "Trip"]
+
+    /// Renames built-in categories, accounts and tags that still carry a default
+    /// name in another language, so switching language also switches the data
+    /// Tally created. Anything the user renamed is left untouched.
+    @MainActor
+    static func relocalizeBuiltInNames(in context: ModelContext) {
+        var changed = false
+
+        func relocalize(_ name: String, keys: [String]) -> String? {
+            for key in keys where L10n.variants(of: key).contains(name) {
+                let target = L10n.current(key)
+                return target == name ? nil : target
+            }
+            return nil
+        }
+
+        let expenseKeys = expenseCategories.map(\.key)
+        let incomeKeys = incomeCategories.map(\.key)
+        for category in (try? context.fetch(FetchDescriptor<LedgerCategory>())) ?? [] {
+            let keys = category.kind == .expense ? expenseKeys : incomeKeys
+            if let name = relocalize(category.name, keys: keys) {
+                category.name = name
+                changed = true
+            }
+        }
+        for account in (try? context.fetch(FetchDescriptor<Account>())) ?? [] {
+            if let name = relocalize(account.name, keys: builtInAccountKeys) {
+                account.name = name
+                changed = true
+            }
+        }
+        for tag in (try? context.fetch(FetchDescriptor<Tag>())) ?? [] {
+            if let name = relocalize(tag.name, keys: builtInTagKeys) {
+                tag.name = name
+                changed = true
+            }
+        }
+        if changed { try? context.save() }
     }
 }

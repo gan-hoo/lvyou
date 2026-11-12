@@ -25,6 +25,7 @@
 | 汇率 | 汇率历史（每条有生效日期）；每笔交易按「交易日期当天生效的最新汇率」折算；原币金额与折算快照分开存储，新增或修改汇率不会改动历史账目；可选一键下载欧洲央行参考汇率 |
 | 数据 | CSV 导出（UTF-8 BOM，Excel / Numbers 直接打开中文）；CSV 导入（识别中英文表头、多种日期格式、GB18030 编码、预览与错误行、自动建账户 / 分类、重复记录自动跳过，重复导入同一文件不会产生重复）；演示数据一键加载 / 移除；清除全部数据（需身份验证） |
 | 安全 | Face ID / Touch ID / Optic ID 解锁，失败可用设备密码；锁定设置存于钥匙串（仅本机）；后台锁定延时；多任务界面隐藏内容 |
+| 语言 | 简体中文 / 繁體中文 / English；默认跟随 iPhone 系统语言，也可在欢迎页右上角或「设置 › 语言」单独指定（重新打开 App 后生效）；内置分类、默认账户和演示数据的名称会随语言自动切换，你改过名的不受影响 |
 | 外观 | 浅色 / 深色 / 跟随系统；SF Pro + SF Symbols；轻量玻璃材质（iOS 26 上自动使用系统 Liquid Glass）；弹簧动画与触感反馈，全部尊重「减弱动态效果」 |
 
 演示数据：首次启动可选「使用演示数据体验」，生成约 100 天的真实感记录（含澳元旅行卡与跨币种转账）。所有演示对象都带 `isDemo` 标记，首页顶部有横幅提示，可随时一键移除且不影响自己的记录。
@@ -140,12 +141,16 @@ Tally/
 
 ## 本地化
 
-源语言英文，简体中文翻译在 `scripts/translations_zh.json`。修改界面文案后运行：
+源语言英文；简体中文翻译在 `scripts/translations_zh.json`，繁體中文由 `scripts/make_zh_hant.py`（OpenCC 转换 + 港台用语修正）生成到 `scripts/translations_zh_hant.json`。修改界面文案后运行：
 
 ```bash
+pip install opencc-python-reimplemented
+python3 Tally/scripts/make_zh_hant.py          # 由简体生成繁体
 python3 Tally/scripts/l10n_extract.py          # 重新生成 Localizable.xcstrings
 python3 Tally/scripts/l10n_extract.py --list   # 列出尚未翻译的候选文案
 ```
+
+> iOS 只在 iPhone 系统语言为对应语言时才自动显示中文；手机是英文时，可在 App 内「设置 › 语言」选择简体中文。
 
 ## CSV 格式
 

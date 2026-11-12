@@ -27,6 +27,18 @@ struct SettingsView: View {
                     } label: {
                         SettingsLabel("Main currency", symbol: "coloncurrencysign.circle", color: "3BB5A6")
                     }
+                    LanguageMenu { language in
+                        HStack {
+                            SettingsLabel("Language", symbol: "globe", color: "4A90E2")
+                            Spacer()
+                            Text(verbatim: language.title).foregroundStyle(.secondary)
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .tint(.primary)
                     Picker(selection: $appearance) {
                         ForEach(AppearanceMode.allCases) { mode in
                             Label(mode.title, systemImage: mode.symbol).tag(mode.rawValue)

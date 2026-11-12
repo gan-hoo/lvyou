@@ -223,3 +223,28 @@ struct LedgerTests {
         #expect(try context.fetchCount(FetchDescriptor<Budget>()) == 0)
     }
 }
+
+@MainActor
+struct LocalizationTests {
+    @Test func bundlesContainBothChineseScripts() {
+        #expect(L10n.string("Dining", language: "zh-Hans") == "餐饮")
+        #expect(L10n.string("Dining", language: "zh-Hant") == "餐飲")
+        #expect(L10n.string("Dining", language: "en") == "Dining")
+        #expect(L10n.variants(of: "Cash").isSuperset(of: ["Cash", "现金", "現金"]))
+    }
+
+    @Test func builtInNamesFollowTheRunningLanguage() throws {
+        let container = try ModelContainer(for: Persistence.schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let seeded = LedgerCategory(name: "餐饮", kind: .expense, symbolName: "fork.knife", colorHex: "F2994A", sortOrder: 0)
+        let custom = LedgerCategory(name: "My Food", kind: .expense, symbolName: "fork.knife", colorHex: "F2994A", sortOrder: 1)
+        let account = Account(name: "現金", kind: .cash, currencyCode: "CNY")
+        context.insert(seeded); context.insert(custom); context.insert(account)
+
+        DefaultData.relocalizeBuiltInNames(in: context)
+
+        #expect(seeded.name == L10n.current("Dining"))
+        #expect(account.name == L10n.current("Cash"))
+        #expect(custom.name == "My Food")
+    }
+}

@@ -8,12 +8,24 @@
             "state": "translated",
             "value": "每日 %@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日 %@"
+          }
         }
       }
     },
     "%@ is over budget by %@": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 已超支 %2$@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ 已超支 %2$@"
@@ -28,6 +40,12 @@
             "state": "translated",
             "value": "剩余 %@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剩餘 %@"
+          }
         }
       }
     },
@@ -38,12 +56,24 @@
             "state": "translated",
             "value": "剩余 %1$@ / 共 %2$@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剩餘 %1$@ / 共 %2$@"
+          }
         }
       }
     },
     "%@ over": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "超出 %@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "超出 %@"
@@ -58,12 +88,24 @@
             "state": "translated",
             "value": "已超支 %@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已超支 %@"
+          }
         }
       }
     },
     "%@ over this month": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月已超支 %@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "本月已超支 %@"
@@ -78,6 +120,12 @@
             "state": "translated",
             "value": "已用 %1$@ · 剩余 %2$@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已用 %1$@ · 剩餘 %2$@"
+          }
         }
       }
     },
@@ -88,6 +136,12 @@
             "state": "translated",
             "value": "%1$@：已使用预算的 %2$@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@：已使用預算的 %2$@"
+          }
         }
       }
     },
@@ -97,6 +151,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已启用 %lld 项"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已啓用 %lld 項"
           }
         }
       }
@@ -126,6 +186,12 @@
             "state": "translated",
             "value": "%lld 笔"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 筆"
+          }
         }
       }
     },
@@ -135,6 +201,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "有 %lld 笔交易使用此分类。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有 %lld 筆交易使用此分類。"
           }
         }
       }
@@ -146,12 +218,24 @@
             "state": "translated",
             "value": "1 单位 = %@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 單位 = %@"
+          }
         }
       }
     },
     "2 days ago": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前天"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "前天"
@@ -166,6 +250,12 @@
             "state": "translated",
             "value": "计算器键盘与智能默认值，日常记账只需两三步。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "計算器鍵盤與智能預設值，日常記帳只需兩三步。"
+          }
         }
       }
     },
@@ -175,6 +265,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "安静、精确的日常账本。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安靜、精確的日常帳本。"
           }
         }
       }
@@ -186,6 +282,12 @@
             "state": "translated",
             "value": "汇率自生效日期起适用，直到添加新的汇率。默认参考汇率覆盖更早的日期。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯率自生效日期起適用，直到添加新的匯率。預設參考匯率覆蓋更早的日期。"
+          }
         }
       }
     },
@@ -196,12 +298,24 @@
             "state": "translated",
             "value": "支出达到预算的此比例时，App 内会安静地提醒一次。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出達到預算的此比例時，App 內會安靜地提醒一次。"
+          }
         }
       }
     },
     "AUD Travel Card": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "澳元旅行卡"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "澳元旅行卡"
@@ -216,6 +330,12 @@
             "state": "translated",
             "value": "关于"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關於"
+          }
         }
       }
     },
@@ -225,6 +345,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "账户"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帳戶"
           }
         }
       }
@@ -236,6 +362,12 @@
             "state": "translated",
             "value": "账户名称"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帳戶名稱"
+          }
         }
       }
     },
@@ -246,12 +378,24 @@
             "state": "translated",
             "value": "账户"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帳戶"
+          }
         }
       }
     },
     "Add": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "添加"
@@ -266,6 +410,12 @@
             "state": "translated",
             "value": "添加账户"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加帳戶"
+          }
         }
       }
     },
@@ -275,6 +425,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加汇率"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加匯率"
           }
         }
       }
@@ -286,6 +442,12 @@
             "state": "translated",
             "value": "记一笔"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記一筆"
+          }
         }
       }
     },
@@ -295,6 +457,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加备注"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加備註"
           }
         }
       }
@@ -306,6 +474,12 @@
             "state": "translated",
             "value": "添加汇率以换算此币种。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加匯率以換算此幣種。"
+          }
         }
       }
     },
@@ -315,6 +489,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加账户以开始追踪余额。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加帳戶以開始追蹤餘額。"
           }
         }
       }
@@ -326,6 +506,12 @@
             "state": "translated",
             "value": "添加预算"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加預算"
+          }
         }
       }
     },
@@ -335,6 +521,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加示例账户和约三个月的交易，均标记为演示数据。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加示例帳戶和約三個月的交易，均標記為演示資料。"
           }
         }
       }
@@ -346,6 +538,12 @@
             "state": "translated",
             "value": "1 分钟后"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 分鐘後"
+          }
         }
       }
     },
@@ -355,6 +553,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "15 分钟后"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "15 分鐘後"
           }
         }
       }
@@ -366,6 +570,12 @@
             "state": "translated",
             "value": "5 分钟后"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 分鐘後"
+          }
         }
       }
     },
@@ -375,6 +585,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "全部时间"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部時間"
           }
         }
       }
@@ -386,6 +602,12 @@
             "state": "translated",
             "value": "已清除所有数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已清除所有資料"
+          }
         }
       }
     },
@@ -395,6 +617,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "金额"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "金額"
           }
         }
       }
@@ -406,6 +634,12 @@
             "state": "translated",
             "value": "金额以主币种（%@）计。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "金額以主幣種（%@）計。"
+          }
         }
       }
     },
@@ -415,6 +649,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已存在总预算，请在「预算」页中编辑。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已存在總預算，請在「預算」頁中編輯。"
           }
         }
       }
@@ -426,6 +666,12 @@
             "state": "translated",
             "value": "外观"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外觀"
+          }
         }
       }
     },
@@ -435,6 +681,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "应用"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "應用"
           }
         }
       }
@@ -446,6 +698,12 @@
             "state": "translated",
             "value": "归档"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歸檔"
+          }
         }
       }
     },
@@ -455,6 +713,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "归档账户"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歸檔帳戶"
           }
         }
       }
@@ -466,6 +730,12 @@
             "state": "translated",
             "value": "改为归档"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "改為歸檔"
+          }
         }
       }
     },
@@ -475,6 +745,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已归档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已歸檔"
           }
         }
       }
@@ -486,6 +762,12 @@
             "state": "translated",
             "value": "归档的账户不会出现在选择列表中，但保留其历史和余额。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歸檔的帳戶不會出現在選擇列表中，但保留其歷史和餘額。"
+          }
         }
       }
     },
@@ -495,6 +777,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "资产 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資產 %@"
           }
         }
       }
@@ -506,6 +794,12 @@
             "state": "translated",
             "value": "结余"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結餘"
+          }
         }
       }
     },
@@ -515,6 +809,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "本月结余"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月結餘"
           }
         }
       }
@@ -526,6 +826,12 @@
             "state": "translated",
             "value": "余额由各账户的期初余额与所有已记录交易计算得出。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "餘額由各帳戶的期初餘額與所有已記錄交易計算得出。"
+          }
         }
       }
     },
@@ -535,6 +841,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "银行卡"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "銀行卡"
           }
         }
       }
@@ -546,6 +858,12 @@
             "state": "translated",
             "value": "奖金"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "獎金"
+          }
         }
       }
     },
@@ -555,6 +873,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "预算"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預算"
           }
         }
       }
@@ -566,6 +890,12 @@
             "state": "translated",
             "value": "预算提醒"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預算提醒"
+          }
         }
       }
     },
@@ -575,6 +905,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "预算类型"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預算類型"
           }
         }
       }
@@ -586,6 +922,12 @@
             "state": "translated",
             "value": "此分类的预算将被移除。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此分類的預算將被移除。"
+          }
         }
       }
     },
@@ -595,6 +937,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "预算每月循环。接近或超出额度时，每项预算只会在 App 内安静提醒一次。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預算每月循環。接近或超出額度時，每項預算只會在 App 內安靜提醒一次。"
           }
         }
       }
@@ -606,6 +954,12 @@
             "state": "translated",
             "value": "分类构成"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分類構成"
+          }
         }
       }
     },
@@ -616,12 +970,24 @@
             "state": "translated",
             "value": "人民币钱包"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "人民幣錢包"
+          }
         }
       }
     },
     "Cancel": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "取消"
@@ -636,6 +1002,12 @@
             "state": "translated",
             "value": "信用卡还款"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "信用卡還款"
+          }
         }
       }
     },
@@ -645,6 +1017,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "现金"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現金"
           }
         }
       }
@@ -656,6 +1034,12 @@
             "state": "translated",
             "value": "分类"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分類"
+          }
         }
       }
     },
@@ -665,6 +1049,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "分类"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分類"
           }
         }
       }
@@ -676,6 +1066,12 @@
             "state": "translated",
             "value": "分类名称"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分類名稱"
+          }
         }
       }
     },
@@ -685,6 +1081,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "选择"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇"
           }
         }
       }
@@ -696,6 +1098,12 @@
             "state": "translated",
             "value": "选择账户"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇帳戶"
+          }
         }
       }
     },
@@ -705,6 +1113,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请选择账户。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請選擇帳戶。"
           }
         }
       }
@@ -716,6 +1130,12 @@
             "state": "translated",
             "value": "请选择转入账户。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請選擇轉入帳戶。"
+          }
         }
       }
     },
@@ -725,6 +1145,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请选择两个不同的账户。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請選擇兩個不同的帳戶。"
           }
         }
       }
@@ -736,6 +1162,12 @@
             "state": "translated",
             "value": "清除筛选"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除篩選"
+          }
         }
       }
     },
@@ -745,6 +1177,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉"
           }
         }
       }
@@ -756,12 +1194,24 @@
             "state": "translated",
             "value": "云存储"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "雲存儲"
+          }
         }
       }
     },
     "Coffee": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "咖啡"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "咖啡"
@@ -776,6 +1226,12 @@
             "state": "translated",
             "value": "颜色"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顏色"
+          }
         }
       }
     },
@@ -785,6 +1241,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "识别的列"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "識別的列"
           }
         }
       }
@@ -796,6 +1258,12 @@
             "state": "translated",
             "value": "确认以清除所有数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確認以清除所有資料"
+          }
         }
       }
     },
@@ -805,6 +1273,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "确认以关闭应用锁"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確認以關閉應用鎖"
           }
         }
       }
@@ -816,6 +1290,12 @@
             "state": "translated",
             "value": "确认以开启应用锁"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確認以開啓應用鎖"
+          }
         }
       }
     },
@@ -825,6 +1305,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "记账时折算"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記帳時折算"
           }
         }
       }
@@ -836,6 +1322,12 @@
             "state": "translated",
             "value": "无法导入"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法匯入"
+          }
         }
       }
     },
@@ -845,6 +1337,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "创建预算"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "創建預算"
           }
         }
       }
@@ -856,12 +1354,24 @@
             "state": "translated",
             "value": "创建于 %1$@ · 更新于 %2$@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "創建於 %1$@ · 更新於 %2$@"
+          }
         }
       }
     },
     "Credit Card": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "信用卡"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "信用卡"
@@ -876,6 +1386,12 @@
             "state": "translated",
             "value": "转入"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉入"
+          }
         }
       }
     },
@@ -886,12 +1402,24 @@
             "state": "translated",
             "value": "币种"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "幣種"
+          }
         }
       }
     },
     "Daily": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "每日"
@@ -906,12 +1434,24 @@
             "state": "translated",
             "value": "日均"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日均"
+          }
         }
       }
     },
     "Dark": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深色"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "深色"
@@ -926,12 +1466,24 @@
             "state": "translated",
             "value": "数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料"
+          }
         }
       }
     },
     "Date": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日期"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "日期"
@@ -946,12 +1498,24 @@
             "state": "translated",
             "value": "日"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日"
+          }
         }
       }
     },
     "Day %lld: %@": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 日：%@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "%lld 日：%@"
@@ -966,6 +1530,12 @@
             "state": "translated",
             "value": "天数"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "天數"
+          }
         }
       }
     },
@@ -975,6 +1545,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "储蓄卡"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲蓄卡"
           }
         }
       }
@@ -986,6 +1562,12 @@
             "state": "translated",
             "value": "小数点"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小數點"
+          }
         }
       }
     },
@@ -995,6 +1577,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "默认"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預設"
           }
         }
       }
@@ -1006,6 +1594,12 @@
             "state": "translated",
             "value": "设为记账默认账户"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設為記帳預設帳戶"
+          }
         }
       }
     },
@@ -1015,6 +1609,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "删除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除"
           }
         }
       }
@@ -1026,6 +1626,12 @@
             "state": "translated",
             "value": "删除账户"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除帳戶"
+          }
         }
       }
     },
@@ -1035,6 +1641,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "删除账户及 %lld 笔交易"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除帳戶及 %lld 筆交易"
           }
         }
       }
@@ -1046,6 +1658,12 @@
             "state": "translated",
             "value": "删除预算"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除預算"
+          }
         }
       }
     },
@@ -1055,6 +1673,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "删除分类"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除分類"
           }
         }
       }
@@ -1066,6 +1690,12 @@
             "state": "translated",
             "value": "删除账户？"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除帳戶？"
+          }
         }
       }
     },
@@ -1075,6 +1705,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "删除此预算？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除此預算？"
           }
         }
       }
@@ -1086,6 +1722,12 @@
             "state": "translated",
             "value": "删除这笔交易？"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除這筆交易？"
+          }
         }
       }
     },
@@ -1095,6 +1737,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "删除标签会将其从交易中移除，交易本身会保留。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除標籤會將其從交易中移除，交易本身會保留。"
           }
         }
       }
@@ -1106,12 +1754,24 @@
             "state": "translated",
             "value": "删除会移除使用此账户的所有交易；归档则仅隐藏账户并保留历史。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除會移除使用此帳戶的所有交易；歸檔則僅隱藏帳戶並保留歷史。"
+          }
         }
       }
     },
     "Demo": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "演示"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "演示"
@@ -1126,6 +1786,12 @@
             "state": "translated",
             "value": "将删除演示账户及其交易、演示标签和预算。你自己的记录会保留。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將刪除演示帳戶及其交易、演示標籤和預算。你自己的記錄會保留。"
+          }
         }
       }
     },
@@ -1135,6 +1801,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "演示数据"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "演示資料"
           }
         }
       }
@@ -1146,6 +1818,12 @@
             "state": "translated",
             "value": "已加载演示数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已加載演示資料"
+          }
         }
       }
     },
@@ -1155,6 +1833,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "演示记录有明确标记，可随时移除，不影响你自己的数据。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "演示記錄有明確標記，可隨時移除，不影響你自己的資料。"
           }
         }
       }
@@ -1166,6 +1850,12 @@
             "state": "translated",
             "value": "详情"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "詳情"
+          }
         }
       }
     },
@@ -1176,12 +1866,24 @@
             "state": "translated",
             "value": "餐饮"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "餐飲"
+          }
         }
       }
     },
     "Dinner with friends": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "和朋友聚餐"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "和朋友聚餐"
@@ -1196,6 +1898,12 @@
             "state": "translated",
             "value": "完成"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
         }
       }
     },
@@ -1205,6 +1913,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "下载今日汇率"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下載今日匯率"
           }
         }
       }
@@ -1216,6 +1930,12 @@
             "state": "translated",
             "value": "拖动以排序，此顺序即快速记账中的顺序。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拖動以排序，此順序即快速記帳中的順序。"
+          }
         }
       }
     },
@@ -1225,6 +1945,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "复制"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "複製"
           }
         }
       }
@@ -1236,6 +1962,12 @@
             "state": "translated",
             "value": "复制到今天"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "複製到今天"
+          }
         }
       }
     },
@@ -1245,6 +1977,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已复制到今天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已複製到今天"
           }
         }
       }
@@ -1256,6 +1994,12 @@
             "state": "translated",
             "value": "欧洲央行"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歐洲央行"
+          }
         }
       }
     },
@@ -1266,12 +2010,24 @@
             "state": "translated",
             "value": "每笔交易使用其日期当天生效的最新汇率。添加新汇率不会改变历史记录。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每筆交易使用其日期當天生效的最新匯率。添加新匯率不會改變歷史記錄。"
+          }
         }
       }
     },
     "Earned": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收入"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "收入"
@@ -1286,6 +2042,12 @@
             "state": "translated",
             "value": "编辑"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯"
+          }
         }
       }
     },
@@ -1295,6 +2057,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "编辑账户"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯帳戶"
           }
         }
       }
@@ -1306,6 +2074,12 @@
             "state": "translated",
             "value": "编辑预算"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯預算"
+          }
         }
       }
     },
@@ -1316,12 +2090,24 @@
             "state": "translated",
             "value": "编辑分类"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯分類"
+          }
         }
       }
     },
     "Education": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教育"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "教育"
@@ -1336,6 +2122,12 @@
             "state": "translated",
             "value": "生效日期"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生效日期"
+          }
         }
       }
     },
@@ -1345,6 +2137,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "水电费"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "水電費"
           }
         }
       }
@@ -1356,6 +2154,12 @@
             "state": "translated",
             "value": "请输入名称。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入名稱。"
+          }
         }
       }
     },
@@ -1365,6 +2169,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请输入大于零的金额。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入大於零的金額。"
           }
         }
       }
@@ -1376,6 +2186,12 @@
             "state": "translated",
             "value": "娱乐"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "娛樂"
+          }
         }
       }
     },
@@ -1385,6 +2201,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "笔数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "筆數"
           }
         }
       }
@@ -1396,6 +2218,12 @@
             "state": "translated",
             "value": "等于"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等於"
+          }
         }
       }
     },
@@ -1406,12 +2234,24 @@
             "state": "translated",
             "value": "清除所有数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除所有資料"
+          }
         }
       }
     },
     "Erase Everything": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部清除"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "全部清除"
@@ -1426,6 +2266,12 @@
             "state": "translated",
             "value": "清除所有数据？"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除所有資料？"
+          }
         }
       }
     },
@@ -1435,6 +2281,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "多币种，历史汇率"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "多幣種，歷史匯率"
           }
         }
       }
@@ -1446,12 +2298,24 @@
             "state": "translated",
             "value": "所有支出分类都已设置预算。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有支出分類都已設定預算。"
+          }
         }
       }
     },
     "Everyday Card": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日常卡"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "日常卡"
@@ -1466,6 +2330,12 @@
             "state": "translated",
             "value": "所有数据仅保存在这台 iPhone 上，并由面容 ID 保护。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有資料僅保存在這台 iPhone 上，並由 Face ID 保護。"
+          }
         }
       }
     },
@@ -1475,6 +2345,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "汇率"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯率"
           }
         }
       }
@@ -1486,12 +2362,24 @@
             "state": "translated",
             "value": "汇率"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯率"
+          }
         }
       }
     },
     "Expense": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "支出"
@@ -1506,12 +2394,24 @@
             "state": "translated",
             "value": "支出分类"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出分類"
+          }
         }
       }
     },
     "Expenses": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "支出"
@@ -1526,6 +2426,12 @@
             "state": "translated",
             "value": "使用演示数据体验"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用演示資料體驗"
+          }
         }
       }
     },
@@ -1535,6 +2441,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "导出"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯出"
           }
         }
       }
@@ -1546,6 +2458,12 @@
             "state": "translated",
             "value": "导出 CSV"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯出 CSV"
+          }
         }
       }
     },
@@ -1555,6 +2473,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "面容 ID"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID"
           }
         }
       }
@@ -1566,6 +2490,12 @@
             "state": "translated",
             "value": "渡轮和火车"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "渡輪和火車"
+          }
         }
       }
     },
@@ -1576,12 +2506,24 @@
             "state": "translated",
             "value": "筛选"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "篩選"
+          }
         }
       }
     },
     "Flat white": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "馥芮白"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "馥芮白"
@@ -1596,6 +2538,12 @@
             "state": "translated",
             "value": "机票"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "機票"
+          }
         }
       }
     },
@@ -1605,6 +2553,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "信用卡请将欠款填写为负数，例如 -1200。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "信用卡請將欠款填寫為負數，例如 -1200。"
           }
         }
       }
@@ -1616,6 +2570,12 @@
             "state": "translated",
             "value": "自由职业项目"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自由職業項目"
+          }
         }
       }
     },
@@ -1626,12 +2586,24 @@
             "state": "translated",
             "value": "转出"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉出"
+          }
         }
       }
     },
     "General": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通用"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "通用"
@@ -1646,6 +2618,12 @@
             "state": "translated",
             "value": "开始使用"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始使用"
+          }
         }
       }
     },
@@ -1655,6 +2633,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "礼物"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "禮物"
           }
         }
       }
@@ -1666,6 +2650,12 @@
             "state": "translated",
             "value": "收到礼金"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收到禮金"
+          }
         }
       }
     },
@@ -1676,12 +2666,24 @@
             "state": "translated",
             "value": "为分类单独设置额度，随时关注。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "為分類單獨設定額度，隨時關注。"
+          }
         }
       }
     },
     "Groceries": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日用超市"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "日用超市"
@@ -1696,12 +2698,24 @@
             "state": "translated",
             "value": "触感反馈"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "觸感反饋"
+          }
         }
       }
     },
     "Heads up: %@": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "留意：%@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "留意：%@"
@@ -1716,6 +2730,12 @@
             "state": "translated",
             "value": "医疗健康"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "醫療健康"
+          }
         }
       }
     },
@@ -1725,6 +2745,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已隐藏"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已隱藏"
           }
         }
       }
@@ -1736,6 +2762,12 @@
             "state": "translated",
             "value": "隐藏"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱藏"
+          }
         }
       }
     },
@@ -1745,6 +2777,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "在多任务中隐藏内容"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在多任務中隱藏內容"
           }
         }
       }
@@ -1756,12 +2794,24 @@
             "state": "translated",
             "value": "首页"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首頁"
+          }
         }
       }
     },
     "Housing": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "住房"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "住房"
@@ -1776,12 +2826,24 @@
             "state": "translated",
             "value": "图标"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "圖標"
+          }
         }
       }
     },
     "Immediately": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "立即"
@@ -1796,6 +2858,12 @@
             "state": "translated",
             "value": "导入"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯入"
+          }
         }
       }
     },
@@ -1805,6 +2873,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "导入与导出"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯入與匯出"
           }
         }
       }
@@ -1816,6 +2890,12 @@
             "state": "translated",
             "value": "导入 CSV"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯入 CSV"
+          }
         }
       }
     },
@@ -1825,6 +2905,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "导入完成"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯入完成"
           }
         }
       }
@@ -1836,6 +2922,12 @@
             "state": "translated",
             "value": "导入预览"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯入預覽"
+          }
         }
       }
     },
@@ -1845,6 +2937,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "导入"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯入"
           }
         }
       }
@@ -1856,12 +2954,24 @@
             "state": "translated",
             "value": "已导入 %1$lld 笔，跳过 %2$lld 笔重复记录。新建 %3$lld 个账户和 %4$lld 个分类。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已匯入 %1$lld 筆，跳過 %2$lld 筆重複記錄。新建 %3$lld 個帳戶和 %4$lld 個分類。"
+          }
         }
       }
     },
     "In this month": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月流入"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "本月流入"
@@ -1876,6 +2986,12 @@
             "state": "translated",
             "value": "计入总资产"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "計入總資產"
+          }
         }
       }
     },
@@ -1886,12 +3002,24 @@
             "state": "translated",
             "value": "计入总资产"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "計入總資產"
+          }
         }
       }
     },
     "Income": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收入"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "收入"
@@ -1906,6 +3034,12 @@
             "state": "translated",
             "value": "收支趋势"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收支趨勢"
+          }
         }
       }
     },
@@ -1916,12 +3050,24 @@
             "state": "translated",
             "value": "收入分类"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收入分類"
+          }
         }
       }
     },
     "Interest": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "利息"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "利息"
@@ -1936,6 +3082,12 @@
             "state": "translated",
             "value": "金额无效"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "金額無效"
+          }
         }
       }
     },
@@ -1945,6 +3097,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "投资"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "投資"
           }
         }
       }
@@ -1956,6 +3114,28 @@
             "state": "translated",
             "value": "投资收益"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "投資收益"
+          }
+        }
+      }
+    },
+    "Language": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语言"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語言"
+          }
         }
       }
     },
@@ -1965,6 +3145,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "金额从高到低"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "金額從高到低"
           }
         }
       }
@@ -1976,6 +3162,12 @@
             "state": "translated",
             "value": "近 3 个月"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "近 3 個月"
+          }
         }
       }
     },
@@ -1986,12 +3178,24 @@
             "state": "translated",
             "value": "近 6 个月"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "近 6 個月"
+          }
         }
       }
     },
     "Last Month": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上月"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "上月"
@@ -2006,6 +3210,12 @@
             "state": "translated",
             "value": "上月"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上月"
+          }
         }
       }
     },
@@ -2015,6 +3225,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "账本"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帳本"
           }
         }
       }
@@ -2026,6 +3242,12 @@
             "state": "translated",
             "value": "剩余"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剩餘"
+          }
         }
       }
     },
@@ -2035,6 +3257,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "负债 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "負債 %@"
           }
         }
       }
@@ -2046,12 +3274,24 @@
             "state": "translated",
             "value": "浅色"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "淺色"
+          }
         }
       }
     },
     "Line %lld": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 行"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "第 %lld 行"
@@ -2066,6 +3306,12 @@
             "state": "translated",
             "value": "加载演示数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加載演示資料"
+          }
         }
       }
     },
@@ -2075,6 +3321,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "加载演示数据？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加載演示資料？"
           }
         }
       }
@@ -2086,6 +3338,12 @@
             "state": "translated",
             "value": "当地午餐"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "當地午餐"
+          }
         }
       }
     },
@@ -2095,6 +3353,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "锁定设置保存在钥匙串中。生物识别失败时，可使用设备密码解锁。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "鎖定設定保存在鑰匙串中。生物識別失敗時，可使用設備密碼解鎖。"
           }
         }
       }
@@ -2106,6 +3370,12 @@
             "state": "translated",
             "value": "使用%@锁定"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用%@鎖定"
+          }
         }
       }
     },
@@ -2115,6 +3385,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "长按清空"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "長按清空"
           }
         }
       }
@@ -2126,6 +3402,12 @@
             "state": "translated",
             "value": "主币种"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主幣種"
+          }
         }
       }
     },
@@ -2135,6 +3417,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "管理分类"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理分類"
           }
         }
       }
@@ -2146,12 +3434,24 @@
             "state": "translated",
             "value": "手动"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手動"
+          }
         }
       }
     },
     "Max": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最高"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "最高"
@@ -2166,12 +3466,24 @@
             "state": "translated",
             "value": "地铁"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地鐵"
+          }
         }
       }
     },
     "Min": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最低"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "最低"
@@ -2186,6 +3498,12 @@
             "state": "translated",
             "value": "减"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "減"
+          }
         }
       }
     },
@@ -2196,12 +3514,24 @@
             "state": "translated",
             "value": "缺少汇率：%@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缺少匯率：%@"
+          }
         }
       }
     },
     "Month": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "月"
@@ -2216,12 +3546,24 @@
             "state": "translated",
             "value": "月度总预算"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月度總預算"
+          }
         }
       }
     },
     "Monthly average": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月均"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "月均"
@@ -2236,6 +3578,12 @@
             "state": "translated",
             "value": "月度预算"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月度預算"
+          }
         }
       }
     },
@@ -2246,12 +3594,24 @@
             "state": "translated",
             "value": "每月额度"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每月額度"
+          }
         }
       }
     },
     "Monthly salary": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月薪"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "月薪"
@@ -2266,6 +3626,12 @@
             "state": "translated",
             "value": "每月储蓄"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每月儲蓄"
+          }
         }
       }
     },
@@ -2275,6 +3641,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "将交易移至"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將交易移至"
           }
         }
       }
@@ -2286,6 +3658,12 @@
             "state": "translated",
             "value": "电影之夜"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "電影之夜"
+          }
         }
       }
     },
@@ -2295,6 +3673,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "音乐会员"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音樂會員"
           }
         }
       }
@@ -2306,6 +3690,12 @@
             "state": "translated",
             "value": "名称"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名稱"
+          }
         }
       }
     },
@@ -2315,6 +3705,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "净额"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "淨額"
           }
         }
       }
@@ -2326,6 +3722,12 @@
             "state": "translated",
             "value": "净资产"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "淨資產"
+          }
         }
       }
     },
@@ -2335,6 +3737,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "新建账户"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建帳戶"
           }
         }
       }
@@ -2346,6 +3754,12 @@
             "state": "translated",
             "value": "新建预算"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建預算"
+          }
         }
       }
     },
@@ -2355,6 +3769,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "新建分类"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建分類"
           }
         }
       }
@@ -2366,12 +3786,24 @@
             "state": "translated",
             "value": "新标签"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新標籤"
+          }
         }
       }
     },
     "Newest First": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最新在前"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "最新在前"
@@ -2386,6 +3818,12 @@
             "state": "translated",
             "value": "下个月"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下個月"
+          }
         }
       }
     },
@@ -2396,12 +3834,24 @@
             "state": "translated",
             "value": "下一周期"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一週期"
+          }
         }
       }
     },
     "No": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "否"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "否"
@@ -2416,6 +3866,12 @@
             "state": "translated",
             "value": "无匹配结果"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無匹配結果"
+          }
         }
       }
     },
@@ -2425,6 +3881,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "暂无汇率"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫無匯率"
           }
         }
       }
@@ -2436,6 +3898,12 @@
             "state": "translated",
             "value": "暂无标签"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫無標籤"
+          }
         }
       }
     },
@@ -2445,6 +3913,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "暂无交易"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫無交易"
           }
         }
       }
@@ -2456,6 +3930,12 @@
             "state": "translated",
             "value": "还没有交易"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "還沒有交易"
+          }
         }
       }
     },
@@ -2465,6 +3945,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "此期间暂无数据"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此期間暫無資料"
           }
         }
       }
@@ -2476,6 +3962,12 @@
             "state": "translated",
             "value": "无汇率"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無匯率"
+          }
         }
       }
     },
@@ -2485,6 +3977,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "未获取到汇率。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未獲取到匯率。"
           }
         }
       }
@@ -2496,6 +3994,12 @@
             "state": "translated",
             "value": "没有符合当前筛选条件的交易。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有符合當前篩選條件的交易。"
+          }
         }
       }
     },
@@ -2505,6 +4009,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "本月暂无交易"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月暫無交易"
           }
         }
       }
@@ -2516,6 +4026,12 @@
             "state": "translated",
             "value": "暂无交易。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫無交易。"
+          }
         }
       }
     },
@@ -2525,6 +4041,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "文件中没有可导入的有效行。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "檔案中沒有可匯入的有效行。"
           }
         }
       }
@@ -2536,6 +4058,12 @@
             "state": "translated",
             "value": "备注"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "備註"
+          }
         }
       }
     },
@@ -2545,6 +4073,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "备注、分类、标签、金额"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "備註、分類、標籤、金額"
           }
         }
       }
@@ -2556,6 +4090,12 @@
             "state": "translated",
             "value": "所选期间此分类下没有交易。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所選期間此分類下沒有交易。"
+          }
         }
       }
     },
@@ -2565,6 +4105,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "暂无记录。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫無記錄。"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
           }
         }
       }
@@ -2576,12 +4138,24 @@
             "state": "translated",
             "value": "关闭"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉"
+          }
         }
       }
     },
     "Oldest First": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最早在前"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "最早在前"
@@ -2596,6 +4170,12 @@
             "state": "translated",
             "value": "期初余额"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "期初餘額"
+          }
         }
       }
     },
@@ -2605,6 +4185,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开快速记账"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打開快速記帳"
           }
         }
       }
@@ -2616,6 +4202,12 @@
             "state": "translated",
             "value": "光学 ID"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optic ID"
+          }
         }
       }
     },
@@ -2625,6 +4217,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "可选。通过 frankfurter.app 下载欧洲央行参考汇率。不使用此功能 Tally 也可完全离线运行。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可選。通過 frankfurter.app 下載歐洲央行參考匯率。不使用此功能 Tally 也可完全離線運行。"
           }
         }
       }
@@ -2636,6 +4234,12 @@
             "state": "translated",
             "value": "原币金额"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原幣金額"
+          }
         }
       }
     },
@@ -2646,12 +4250,24 @@
             "state": "translated",
             "value": "原币金额与历史汇率分开存储，历史账目不会因汇率变化而改变。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原幣金額與歷史匯率分開存儲，歷史帳目不會因匯率變化而改變。"
+          }
         }
       }
     },
     "Other": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "其他"
@@ -2666,12 +4282,24 @@
             "state": "translated",
             "value": "其他收入"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他收入"
+          }
         }
       }
     },
     "Out this month": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月流出"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "本月流出"
@@ -2686,12 +4314,24 @@
             "state": "translated",
             "value": "超出"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "超出"
+          }
         }
       }
     },
     "Over budget: %@": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已超支：%@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "已超支：%@"
@@ -2706,6 +4346,12 @@
             "state": "translated",
             "value": "总预算"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "總預算"
+          }
         }
       }
     },
@@ -2716,12 +4362,24 @@
             "state": "translated",
             "value": "密码"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密碼"
+          }
         }
       }
     },
     "Per day": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日可用"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "每日可用"
@@ -2736,6 +4394,12 @@
             "state": "translated",
             "value": "周期"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週期"
+          }
         }
       }
     },
@@ -2745,6 +4409,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "永久删除这台 iPhone 上的所有账户、交易、预算、标签和自定义分类。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久刪除這台 iPhone 上的所有帳戶、交易、預算、標籤和自定義分類。"
           }
         }
       }
@@ -2756,6 +4426,12 @@
             "state": "translated",
             "value": "宠物"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "寵物"
+          }
         }
       }
     },
@@ -2766,12 +4442,24 @@
             "state": "translated",
             "value": "药店"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "藥店"
+          }
         }
       }
     },
     "Plus": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "加"
@@ -2786,6 +4474,12 @@
             "state": "translated",
             "value": "预览"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預覽"
+          }
         }
       }
     },
@@ -2795,6 +4489,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "上个月"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上個月"
           }
         }
       }
@@ -2806,6 +4506,12 @@
             "state": "translated",
             "value": "上一周期"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上一週期"
+          }
         }
       }
     },
@@ -2815,6 +4521,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "隐私与安全"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱私與安全"
           }
         }
       }
@@ -2826,6 +4538,12 @@
             "state": "translated",
             "value": "隐私优先"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱私優先"
+          }
         }
       }
     },
@@ -2835,6 +4553,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "范围"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "範圍"
           }
         }
       }
@@ -2846,6 +4570,12 @@
             "state": "translated",
             "value": "分类排行"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分類排行"
+          }
         }
       }
     },
@@ -2855,6 +4585,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "汇率"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯率"
           }
         }
       }
@@ -2866,12 +4602,24 @@
             "state": "translated",
             "value": "汇率已更新"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯率已更新"
+          }
         }
       }
     },
     "Recent": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近交易"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "最近交易"
@@ -2886,6 +4634,12 @@
             "state": "translated",
             "value": "记一笔"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記一筆"
+          }
         }
       }
     },
@@ -2895,6 +4649,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "几秒完成记账"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "幾秒完成記帳"
           }
         }
       }
@@ -2906,6 +4666,12 @@
             "state": "translated",
             "value": "记账汇率"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記帳匯率"
+          }
         }
       }
     },
@@ -2916,12 +4682,24 @@
             "state": "translated",
             "value": "参考"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "參考"
+          }
         }
       }
     },
     "Refunds": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退款"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "退款"
@@ -2936,12 +4714,24 @@
             "state": "translated",
             "value": "提醒阈值"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提醒閾值"
+          }
         }
       }
     },
     "Remove": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "移除"
@@ -2956,6 +4746,12 @@
             "state": "translated",
             "value": "移除演示数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除演示資料"
+          }
         }
       }
     },
@@ -2965,6 +4761,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "移除演示数据？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除演示資料？"
           }
         }
       }
@@ -2976,12 +4778,24 @@
             "state": "translated",
             "value": "重命名标签"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重命名標籤"
+          }
         }
       }
     },
     "Rent": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "房租"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "房租"
@@ -2996,6 +4810,12 @@
             "state": "translated",
             "value": "需要解锁"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要解鎖"
+          }
         }
       }
     },
@@ -3006,12 +4826,24 @@
             "state": "translated",
             "value": "必需列：Date（日期）和 Amount（金额）。可选列：Type、Currency、Account、To Account、Category、Tags、Note。可识别「日期」「金额」「分类」等中文表头。缺少的账户和分类会自动创建，重复记录会跳过。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "必需列：Date（日期）和 Amount（金額）。可選列：Type、Currency、Account、To Account、Category、Tags、Note。可識別「日期」「金額」「分類」等中文表頭。缺少的帳戶和分類會自動創建，重複記錄會跳過。"
+          }
         }
       }
     },
     "Reset": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "重置"
@@ -3026,6 +4858,12 @@
             "state": "translated",
             "value": "恢复"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢復"
+          }
         }
       }
     },
@@ -3035,6 +4873,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "恢复账户"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢復帳戶"
           }
         }
       }
@@ -3046,6 +4890,12 @@
             "state": "translated",
             "value": "可导入行数"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可匯入行數"
+          }
         }
       }
     },
@@ -3055,6 +4905,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "有问题的行"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有問題的行"
           }
         }
       }
@@ -3066,6 +4922,12 @@
             "state": "translated",
             "value": "工资"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "工資"
+          }
         }
       }
     },
@@ -3076,12 +4938,24 @@
             "state": "translated",
             "value": "用于体验 Tally 的示例记录。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用於體驗 Tally 的示例記錄。"
+          }
         }
       }
     },
     "Save": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "保存"
@@ -3096,6 +4970,12 @@
             "state": "translated",
             "value": "已保存"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已保存"
+          }
         }
       }
     },
@@ -3106,12 +4986,24 @@
             "state": "translated",
             "value": "储蓄"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲蓄"
+          }
         }
       }
     },
     "See All": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看全部"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "查看全部"
@@ -3126,6 +5018,12 @@
             "state": "translated",
             "value": "系列"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系列"
+          }
         }
       }
     },
@@ -3135,6 +5033,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "设置月度预算"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定月度預算"
           }
         }
       }
@@ -3146,6 +5050,12 @@
             "state": "translated",
             "value": "请先在 iOS 设置中设置设备密码或面容 ID。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請先在 iOS 設定中設定設備密碼或 Face ID。"
+          }
         }
       }
     },
@@ -3155,6 +5065,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定"
           }
         }
       }
@@ -3166,6 +5082,12 @@
             "state": "translated",
             "value": "购物"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購物"
+          }
         }
       }
     },
@@ -3175,6 +5097,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "显示"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示"
           }
         }
       }
@@ -3186,6 +5114,12 @@
             "state": "translated",
             "value": "副业收入"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "副業收入"
+          }
         }
       }
     },
@@ -3195,6 +5129,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "观光游览"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "觀光遊覽"
           }
         }
       }
@@ -3206,6 +5146,12 @@
             "state": "translated",
             "value": "跳过的行"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳過的行"
+          }
         }
       }
     },
@@ -3216,12 +5162,24 @@
             "state": "translated",
             "value": "金额从低到高"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "金額從低到高"
+          }
         }
       }
     },
     "Sort": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "排序"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "排序"
@@ -3236,12 +5194,24 @@
             "state": "translated",
             "value": "支出比上月同期少 %@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出比上月同期少 %@"
+          }
         }
       }
     },
     "Spending %@ more than this time last month": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出比上月同期多 %@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "支出比上月同期多 %@"
@@ -3256,12 +5226,24 @@
             "state": "translated",
             "value": "支出趋势"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出趨勢"
+          }
         }
       }
     },
     "Spent": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "支出"
@@ -3276,6 +5258,12 @@
             "state": "translated",
             "value": "统计"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "統計"
+          }
         }
       }
     },
@@ -3285,6 +5273,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "订阅"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訂閱"
           }
         }
       }
@@ -3296,6 +5290,12 @@
             "state": "translated",
             "value": "交换账户"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交換帳戶"
+          }
         }
       }
     },
@@ -3305,6 +5305,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "跟随系统"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跟隨系統"
           }
         }
       }
@@ -3316,6 +5322,12 @@
             "state": "translated",
             "value": "标签"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "標籤"
+          }
         }
       }
     },
@@ -3325,6 +5337,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "标签可跨分类归组交易，例如一次旅行或一个项目。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "標籤可跨分類歸組交易，例如一次旅行或一個項目。"
           }
         }
       }
@@ -3336,6 +5354,12 @@
             "state": "translated",
             "value": "标签可跨分类归组交易，例如一次旅行或一个项目。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "標籤可跨分類歸組交易，例如一次旅行或一個項目。"
+          }
         }
       }
     },
@@ -3345,6 +5369,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tally 已锁定"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tally 已鎖定"
           }
         }
       }
@@ -3356,6 +5386,12 @@
             "state": "translated",
             "value": "Tally 的所有数据都保存在这台 iPhone 上。除非你导出数据或主动下载汇率，否则不会发送任何内容。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tally 的所有資料都保存在這台 iPhone 上。除非你匯出資料或主動下載匯率，否則不會發送任何內容。"
+          }
         }
       }
     },
@@ -3365,6 +5401,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tally 会实时追踪，并在接近额度时温和提醒。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tally 會實時追蹤，並在接近額度時溫和提醒。"
           }
         }
       }
@@ -3376,6 +5418,12 @@
             "state": "translated",
             "value": "轻点 + 记录第一笔支出或收入。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輕點 + 記錄第一筆支出或收入。"
+          }
         }
       }
     },
@@ -3385,6 +5433,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "打车"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打車"
           }
         }
       }
@@ -3396,6 +5450,12 @@
             "state": "translated",
             "value": "团队午餐"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "團隊午餐"
+          }
         }
       }
     },
@@ -3405,6 +5465,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "账户已有交易后无法更改币种，以确保历史金额准确。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帳戶已有交易後無法更改幣種，以確保歷史金額準確。"
           }
         }
       }
@@ -3416,6 +5482,12 @@
             "state": "translated",
             "value": "无法以 UTF-8 文本读取此文件。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法以 UTF-8 文本讀取此檔案。"
+          }
         }
       }
     },
@@ -3425,6 +5497,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "文件至少需要「日期」和「金额」两列。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "檔案至少需要「日期」和「金額」兩列。"
           }
         }
       }
@@ -3436,6 +5514,12 @@
             "state": "translated",
             "value": "交易日期当天生效的汇率会与记录一同保存，之后的汇率变化不会改变历史。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交易日期當天生效的匯率會與記錄一同保存，之後的匯率變化不會改變歷史。"
+          }
         }
       }
     },
@@ -3446,12 +5530,24 @@
             "state": "translated",
             "value": "汇率服务暂不可用，请稍后再试。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯率服務暫不可用，請稍後再試。"
+          }
         }
       }
     },
     "This Month": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "本月"
@@ -3466,6 +5562,12 @@
             "state": "translated",
             "value": "今年"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今年"
+          }
         }
       }
     },
@@ -3475,6 +5577,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "这也会删除使用此账户的 %lld 笔交易。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這也會刪除使用此帳戶的 %lld 筆交易。"
           }
         }
       }
@@ -3486,6 +5594,12 @@
             "state": "translated",
             "value": "此操作无法撤销。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此操作無法撤銷。"
+          }
         }
       }
     },
@@ -3496,12 +5610,24 @@
             "state": "translated",
             "value": "此操作无法撤销，建议先导出 CSV。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此操作無法撤銷，建議先匯出 CSV。"
+          }
         }
       }
     },
     "This month": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "本月"
@@ -3516,6 +5642,12 @@
             "state": "translated",
             "value": "时间"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時間"
+          }
         }
       }
     },
@@ -3526,12 +5658,24 @@
             "state": "translated",
             "value": "转入"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉入"
+          }
         }
       }
     },
     "Today": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "今天"
@@ -3546,6 +5690,12 @@
             "state": "translated",
             "value": "旅行卡充值"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "旅行卡充值"
+          }
         }
       }
     },
@@ -3555,6 +5705,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "总资产"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "總資產"
           }
         }
       }
@@ -3566,6 +5722,12 @@
             "state": "translated",
             "value": "总收入"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "總收入"
+          }
         }
       }
     },
@@ -3575,6 +5737,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "总支出"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "總支出"
           }
         }
       }
@@ -3586,6 +5754,12 @@
             "state": "translated",
             "value": "总额、统计和预算将以此币种显示，之后可随时更改。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "總額、統計和預算將以此幣種顯示，之後可隨時更改。"
+          }
         }
       }
     },
@@ -3595,6 +5769,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "总额、统计和预算使用主币种。每笔交易保留原币金额及当日使用的汇率。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "總額、統計和預算使用主幣種。每筆交易保留原幣金額及當日使用的匯率。"
           }
         }
       }
@@ -3606,6 +5786,12 @@
             "state": "translated",
             "value": "触控 ID"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touch ID"
+          }
         }
       }
     },
@@ -3616,12 +5802,24 @@
             "state": "translated",
             "value": "交易已删除"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交易已刪除"
+          }
         }
       }
     },
     "Transaction updated": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交易已更新"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "交易已更新"
@@ -3636,6 +5834,12 @@
             "state": "translated",
             "value": "流水"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "流水"
+          }
         }
       }
     },
@@ -3645,6 +5849,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "转账"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉帳"
           }
         }
       }
@@ -3656,12 +5866,24 @@
             "state": "translated",
             "value": "转账缺少转入账户"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉帳缺少轉入帳戶"
+          }
         }
       }
     },
     "Transport": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交通"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "交通"
@@ -3676,12 +5898,24 @@
             "state": "translated",
             "value": "旅行"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "旅行"
+          }
         }
       }
     },
     "Trip": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "旅行"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "旅行"
@@ -3696,6 +5930,12 @@
             "state": "translated",
             "value": "类型"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "類型"
+          }
         }
       }
     },
@@ -3705,6 +5945,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "UTF-8 编码的 CSV，包含原币金额、币种、记账汇率与折算金额，可在 Numbers、Excel 和 Google 表格中打开。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UTF-8 編碼的 CSV，包含原幣金額、幣種、記帳匯率與折算金額，可在 Numbers、Excel 和 Google 表格中打開。"
           }
         }
       }
@@ -3716,6 +5962,12 @@
             "state": "translated",
             "value": "未分类"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未分類"
+          }
         }
       }
     },
@@ -3725,6 +5977,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "使用%@解锁"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用%@解鎖"
           }
         }
       }
@@ -3736,6 +5994,12 @@
             "state": "translated",
             "value": "解锁你的账本"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解鎖你的帳本"
+          }
         }
       }
     },
@@ -3746,12 +6010,24 @@
             "state": "translated",
             "value": "无法识别的日期"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法識別的日期"
+          }
         }
       }
     },
     "Update": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "更新"
@@ -3766,6 +6042,12 @@
             "state": "translated",
             "value": "使用近 3 个月平均值：%@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用近 3 個月平均值：%@"
+          }
         }
       }
     },
@@ -3776,12 +6058,24 @@
             "state": "translated",
             "value": "生活缴费"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生活繳費"
+          }
         }
       }
     },
     "Version": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "版本"
@@ -3796,6 +6090,12 @@
             "state": "translated",
             "value": "视频会员"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "影片會員"
+          }
         }
       }
     },
@@ -3805,6 +6105,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "每周采购"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每週採購"
           }
         }
       }
@@ -3816,12 +6122,24 @@
             "state": "translated",
             "value": "欢迎使用 Tally"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歡迎使用 Tally"
+          }
         }
       }
     },
     "Work": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "工作"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "工作"
@@ -3836,6 +6154,12 @@
             "state": "translated",
             "value": "年"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "年"
+          }
         }
       }
     },
@@ -3846,12 +6170,24 @@
             "state": "translated",
             "value": "年度对比"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "年度對比"
+          }
         }
       }
     },
     "Yes": {
       "localizations": {
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "是"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "是"
@@ -3866,6 +6202,12 @@
             "state": "translated",
             "value": "昨天"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "昨天"
+          }
         }
       }
     },
@@ -3875,6 +6217,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "本月预算即将用完，稍加克制就好。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月預算即將用完，稍加剋制就好。"
           }
         }
       }
@@ -3886,6 +6234,12 @@
             "state": "translated",
             "value": "本月预算已超出，下月 1 日将重置。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月預算已超出，下月 1 日將重置。"
+          }
         }
       }
     },
@@ -3896,6 +6250,12 @@
             "state": "translated",
             "value": "你的账本受%@保护。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的帳本受%@保護。"
+          }
         }
       }
     },
@@ -3905,6 +6265,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "环比"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "環比"
           }
         }
       }
