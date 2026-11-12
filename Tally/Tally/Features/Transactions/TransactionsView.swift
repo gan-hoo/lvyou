@@ -55,29 +55,7 @@ struct TransactionsView: View {
             .animation(DS.Motion.adaptive(DS.Motion.spring), value: results.map(\.id))
             .searchable(text: $searchText, prompt: Text("Notes, categories, tags, amounts"))
             .navigationTitle("Transactions")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Picker("Sort", selection: $filter.sort) {
-                            ForEach(TransactionFilter.Sort.allCases) { sort in
-                                Label(sort.title, systemImage: sort.symbol).tag(sort)
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "arrow.up.arrow.down")
-                    }
-                    .accessibilityLabel(Text("Sort"))
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showFilter = true
-                    } label: {
-                        Image(systemName: filter.isActive ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
-                    }
-                    .accessibilityLabel(Text("Filter"))
-                    .accessibilityValue(filter.isActive ? Text("\(filter.activeCount) active") : Text("Off"))
-                }
-            }
+            .toolbar { toolbarContent }
             .overlay {
                 if results.isEmpty {
                     emptyState
@@ -107,6 +85,31 @@ struct TransactionsView: View {
             } message: { _ in
                 Text("This can't be undone.")
             }
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Picker("Sort", selection: $filter.sort) {
+                    ForEach(TransactionFilter.Sort.allCases) { sort in
+                        Label(sort.title, systemImage: sort.symbol).tag(sort)
+                    }
+                }
+            } label: {
+                Image(systemName: "arrow.up.arrow.down")
+            }
+            .accessibilityLabel(Text("Sort"))
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                showFilter = true
+            } label: {
+                Image(systemName: filter.isActive ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+            }
+            .accessibilityLabel(Text("Filter"))
+            .accessibilityValue(filter.isActive ? Text("\(filter.activeCount) active") : Text("Off"))
         }
     }
 

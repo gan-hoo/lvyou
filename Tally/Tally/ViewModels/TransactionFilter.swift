@@ -116,16 +116,13 @@ struct TransactionFilter: Equatable {
     static func matchesSearch(_ e: LedgerEntry, query: String) -> Bool {
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !q.isEmpty else { return true }
-        let haystack: [String] = [
-            e.note,
-            e.category?.name ?? "",
-            e.account?.name ?? "",
-            e.toAccount?.name ?? "",
-            e.currencyCode,
-            e.kind.title,
-            DecimalCodec.encode(e.amount),
-            MoneyFormat.plain(e.amount),
-        ] + (e.tags ?? []).map { "#" + $0.name }
+        var haystack: [String] = [e.note, e.currencyCode, e.kind.title]
+        haystack.append(e.category?.name ?? "")
+        haystack.append(e.account?.name ?? "")
+        haystack.append(e.toAccount?.name ?? "")
+        haystack.append(DecimalCodec.encode(e.amount))
+        haystack.append(MoneyFormat.plain(e.amount))
+        for tag in e.tags ?? [] { haystack.append("#" + tag.name) }
         return haystack.contains { $0.localizedCaseInsensitiveContains(q) }
     }
 

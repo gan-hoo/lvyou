@@ -88,7 +88,16 @@ cd Tally
 
 ### 未签名 IPA（CI 自动产出）
 
-每次推送 `Tally/` 都会运行 **Tally iOS** 工作流：Release Archive → 打包 `Tally-unsigned.ipa`（Artifacts 中下载）+ 单元测试。未签名 IPA 不能直接安装，需要用你自己的 Apple ID 重新签名，例如 Sideloadly、AltStore，或 `codesign` + 描述文件手动重签。
+每次推送 `Tally/` 都会运行 **Tally iOS** 工作流（`.github/workflows/tally.yml`）：
+
+1. **Archive & unsigned IPA**：默认 Xcode（当前为 Xcode 26 / iOS 26 SDK）Release Archive → 打包 `Tally-unsigned.ipa`，在运行页面 Artifacts 中下载；
+2. **Unit tests**：在 iPhone 模拟器上跑全部单元测试；
+3. **Xcode 16**：用 iOS 18 SDK 再编译一次，确保旧工具链（非 Liquid Glass 分支）也能编译；
+4. **Simulator screenshots**：以调试截图模式启动 App 并截取各页面（Artifacts › `tally-screenshots`）。
+
+未签名 IPA 不能直接安装，需要用你自己的 Apple ID 重新签名，例如 Sideloadly、AltStore，或 `codesign` + 描述文件手动重签。
+
+> 调试截图模式仅存在于 Debug 构建：启动参数 `-TallyScreenshotMode`（首次自动加载演示数据并跳过引导）、`-TallyTab statistics`、`-TallyOpenEntry`。
 
 ---
 

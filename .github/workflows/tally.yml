@@ -22,10 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Toolchain
+      - name: Select newest Xcode 26
         run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
           xcodebuild -version
-          ls -d /Applications/Xcode*.app || true
 
       - name: Archive (Release, generic iOS device, unsigned)
         run: |
@@ -62,7 +63,7 @@ jobs:
           path: Tally/build.log
 
   xcode16:
-    name: Build with Xcode 16 (iOS 18 SDK compatibility)
+    name: Build with Xcode 16.0 (oldest supported toolchain)
     needs: archive
     runs-on: macos-15
     timeout-minutes: 40
@@ -72,9 +73,9 @@ jobs:
         working-directory: Tally
     steps:
       - uses: actions/checkout@v4
-      - name: Select Xcode 16
+      - name: Select Xcode 16.0
         run: |
-          OLDEST=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | tail -1)
+          OLDEST=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | head -1)
           if [ -z "$OLDEST" ]; then echo "No Xcode 16 installed; skipping"; echo "SKIP=1" >> "$GITHUB_ENV"; exit 0; fi
           echo "Using $OLDEST"
           sudo xcode-select -s "$OLDEST"
@@ -108,6 +109,11 @@ jobs:
         working-directory: Tally
     steps:
       - uses: actions/checkout@v4
+      - name: Select newest Xcode 26
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          xcodebuild -version
       - name: Run tests on an available iPhone simulator
         run: |
           set -o pipefail
@@ -125,6 +131,7 @@ jobs:
             -project Tally.xcodeproj \
             -scheme Tally \
             -destination "id=$DEVICE_ID" \
+            -parallel-testing-enabled NO \
             -test-timeouts-enabled YES \
             -maximum-test-execution-time-allowance 180 \
             CODE_SIGNING_ALLOWED=NO \
@@ -147,6 +154,11 @@ jobs:
         working-directory: Tally
     steps:
       - uses: actions/checkout@v4
+      - name: Select newest Xcode 26
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          xcodebuild -version
       - name: Build for simulator and capture screens
         run: |
           set -o pipefail
