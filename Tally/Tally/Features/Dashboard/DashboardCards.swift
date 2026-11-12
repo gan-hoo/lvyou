@@ -35,9 +35,9 @@ struct HeroBalanceCard: View {
                     HStack(spacing: 4) {
                         Image(systemName: delta >= 0 ? "arrow.up.right" : "arrow.down.right")
                         if delta >= 0 {
-                            Text("Spending \(MoneyFormat.percent(abs(delta))) more than last month")
+                            Text("Spending \(MoneyFormat.percent(abs(delta))) more than this time last month")
                         } else {
-                            Text("Spending \(MoneyFormat.percent(abs(delta))) less than last month")
+                            Text("Spending \(MoneyFormat.percent(abs(delta))) less than this time last month")
                         }
                     }
                     .font(.footnote)

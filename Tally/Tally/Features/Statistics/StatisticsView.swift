@@ -120,7 +120,8 @@ struct StatisticsView: View {
             else if previous.contains(e.date) { prior.append(e) }
         }
         s.summary = math.summary(current)
-        s.previousSummary = math.summary(prior)
+        let comparableEnd = period.comparableEnd(in: previous)
+        s.previousSummary = math.summary(prior.filter { $0.date < comparableEnd })
         s.slices = math.categoryBreakdown(current, kind: kind.transactionKind)
         if unit == .month {
             s.daily = math.dailySeries(current, period: period, kind: kind.transactionKind)

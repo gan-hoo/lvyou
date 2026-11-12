@@ -3229,22 +3229,22 @@
         }
       }
     },
-    "Spending %@ less than last month": {
+    "Spending %@ less than this time last month": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "支出比上月少 %@"
+            "value": "支出比上月同期少 %@"
           }
         }
       }
     },
-    "Spending %@ more than last month": {
+    "Spending %@ more than this time last month": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "支出比上月多 %@"
+            "value": "支出比上月同期多 %@"
           }
         }
       }

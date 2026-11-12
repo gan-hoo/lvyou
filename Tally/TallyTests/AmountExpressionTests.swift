@@ -117,3 +117,17 @@ struct PeriodTests {
         #expect(p.months.first?.start == p.start)
     }
 }
+
+struct ComparablePeriodTests {
+    @Test func inProgressMonthComparesSameSpanOfPreviousMonth() {
+        let cal = Calendar.current
+        let now = cal.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 10))!
+        let november = Period.month(now)
+        let october = november.previous
+        let end = november.comparableEnd(in: october, now: now)
+        #expect(cal.component(.day, from: end) == 12)
+        #expect(cal.component(.month, from: end) == 10)
+        // A finished period compares against the whole previous period.
+        #expect(october.comparableEnd(in: october.previous, now: now) == october.previous.end)
+    }
+}

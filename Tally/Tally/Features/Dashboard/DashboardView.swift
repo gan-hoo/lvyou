@@ -156,7 +156,8 @@ struct DashboardView: View {
             else if previous.contains(e.date) { previousEntries.append(e) }
         }
         s.summary = math.summary(monthEntries)
-        s.previousSummary = math.summary(previousEntries)
+        let comparableEnd = period.comparableEnd(in: previous)
+        s.previousSummary = math.summary(previousEntries.filter { $0.date < comparableEnd })
         s.balances = math.balances(accounts: accounts, entries: entries)
         s.netWorth = math.netWorth(accounts: accounts, balances: s.balances)
         s.thisMonthSeries = math.cumulativeSeries(monthEntries, period: period, kind: .expense)

@@ -74,6 +74,15 @@ struct Period: Hashable, Sendable {
 
     var remainingDayCount: Int { max(0, dayCount - elapsedDayCount) }
 
+    /// End of the comparable span in `other` (usually the previous period): for a
+    /// period still in progress, only as much of `other` as has elapsed in `self`,
+    /// so "vs. last month" compares like with like.
+    func comparableEnd(in other: Period, now: Date = .now) -> Date {
+        guard contains(now) else { return other.end }
+        let elapsed = now.timeIntervalSince(start)
+        return min(other.end, other.start.addingTimeInterval(elapsed))
+    }
+
     /// Months contained in a yearly period (or the month itself).
     var months: [Period] {
         switch unit {
