@@ -4,20 +4,24 @@
 
 ## 1. 构建记录
 
-构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `794f920`（工作流运行 #16）。
+构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `cfa4769`（工作流运行 #17，第 2 次尝试；第 1 次因 GitHub 没有分配到 macOS 运行器、排队 15 分钟后被取消，未执行任何构建）。
 
 | 项目 | 结果 |
 |---|---|
 | Release Archive（Xcode 26.3 / Build 17C529，iOS 26.2 SDK，`generic/platform=iOS`，未签名） | ✅ `ARCHIVE SUCCEEDED`，无 Swift 警告 |
-| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,612,189 字节，SHA-256 `f87076ac53b4d96d750adf25a1603a9cbef33d1cb94a3b746271213675a2f601` |
+| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,619,560 字节，SHA-256 `e150eee22e327a148382517ca093292926b9ea68c64145c3d768222a96002cd9` |
 | IPA 内容核对 | `CFBundleIdentifier = com.ganhoo.tally`，版本 `3.0 (3)`，`MinimumOSVersion = 17.0`，`DTSDKName = iphoneos26.2`；含 zh-Hans / zh-Hant / en 本地化；无 `_CodeSignature`、无描述文件（未签名） |
 | Xcode 16（iOS 18 SDK，非 Liquid Glass 编译分支）Release 编译 | ✅ `BUILD SUCCEEDED` |
-| 单元测试（iPhone 17 Pro 模拟器，iOS 26.2） | ✅ 62 个测试 / 12 个套件全部通过（`TEST SUCCEEDED`） |
+| 单元测试（iPhone 17 Pro 模拟器，iOS 26.2） | ✅ 63 个测试 / 12 个套件全部通过（`TEST SUCCEEDED`） |
 | 模拟器截图 + OCR 文本校验 | ✅ 见第 3 节 |
 
 开发过程中 CI 发现并修复的问题：
 - 预算提醒中一个表达式类型检查超时（编译错误）→ 拆分表达式。
 - **iOS 26.2 运行时上 `Decimal ==` 对内部表示不同的相等数值返回 false**（净资产合计 1470 与 1470 比较不相等）。算术本身正确，但拆分合计校验、对账、完整性检查等依赖相等判断。已改为按数值比较（`isSameAmount(as:)`，相减判零），并让舍入结果使用紧凑表示；新增回归测试 `roundedSumsCompareEqual`。
+
+真机反馈后修复（iOS 26 iPhone，App 语言为中文、手机为英文（澳大利亚））：
+- **日期显示为英文（「November 2026」）**：界面文字跟随 App 语言，但日期 / 金额 / 数字格式跟随手机地区语言。新增 `AppLocale`（App 运行语言 + 手机地区），所有日期、金额、数字、图表坐标与系统日期选择器统一使用；新增测试 `formattingFollowsTheAppLanguageNotThePhone`。截图 11、12 在「中文 App + en_AU 手机」组合下显示「2026年11月」「下午 6:34」「¥」。
+- **液态玻璃模式下净资产卡片底部出现灰色条**：卡片使用的是系统 `glassEffect`，但它位于 List 行内，玻璃自带的阴影被行边界裁切成一条灰带。内容卡片的玻璃现在限制在卡片自身形状内（标签栏、工具栏按钮、提示条仍使用系统玻璃）；截图 7、13 已确认灰带消失。
 
 ## 2. 单元测试清单（全部通过）
 
@@ -31,11 +35,11 @@
 | CurrencyConverterTests | 按日期取生效汇率 · 反向汇率 · 经中间币种交叉 · 同币种为 1、未知为 nil · 按目标币种小数位舍入 · 正反向取最近的一条 |
 | AmountExpressionTests / DecimalCodecTests | 计算器键盘输入、小数位限制、加减、退格、合并结果 · Decimal 字符串往返、宽松解析、四舍五入、**相等比较与表示无关** |
 | PeriodTests / ComparablePeriodTests | 月 / 年边界 · 进行中的月份与上月同期对比 |
-| LocalizationTests | 简繁中文资源存在 · 内置名称随运行语言切换、用户改名不受影响 |
+| LocalizationTests | 简繁中文资源存在 · 内置名称随运行语言切换、用户改名不受影响 · 日期 / 金额格式跟随 App 语言而非手机语言 |
 
 ## 3. 模拟器截图与 OCR 校验
 
-调试构建以截图模式（自动加载演示数据）在 iPhone 模拟器（iOS 26.2）上启动，截图后用 Vision 文字识别读出页面文字，打印在 CI 日志中（运行 #16，产物 `tally-screenshots`）。
+调试构建以截图模式（自动加载演示数据）在 iPhone 模拟器（iOS 26.2）上启动，截图后用 Vision 文字识别读出页面文字，打印在 CI 日志中；缩小后的截图也提交在 `release/shots/`，可直接查看（运行 #17）。
 
 | 截图 | 识别到的关键内容 |
 |---|---|
@@ -48,6 +52,8 @@
 | 液态玻璃主题 | 资产页在液态玻璃主题下数据与经典主题一致 |
 | 统计（英文）/ 预算（繁體） | 英文与繁體中文文案正确（「預算」「剩餘天數」「分類預算」「設定」） |
 | 隐藏金额 | 净资产、总资产、账户余额均显示为 `••••` |
+| 中文 App + 英文（澳大利亚）手机 | 流水、统计页日期为「2026年11月」，时间「下午 6:34」，金额「¥」，澳元「AU$」 |
+| 液态玻璃（资产、流水、统计） | 系统玻璃卡片，卡片下方无灰带（`7-assets-glass`、`13-transactions-glass`、`12-analytics-glass-zh-enAU`） |
 
 所有截图的金额互相一致（流水 = 统计；预算已用 = 统计支出）。修复后的存活检查在取回的日志段中（第 4–10 张）均为 `ALIVE`；之前一次运行中出现的「NOT RUNNING」经确认是检查脚本自身的问题（`grep -q` 提前关闭管道），已修复。
 
