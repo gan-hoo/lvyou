@@ -36,30 +36,15 @@ final class LedgerEntry {
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 
-    init(
-        kind: TransactionKind,
-        amount: Decimal,
-        currencyCode: String,
-        date: Date,
-        note: String = "",
-        account: Account?,
-        toAccount: Account? = nil,
-        toAmount: Decimal? = nil,
-        category: LedgerCategory? = nil,
-        tags: [Tag] = [],
-        isDemo: Bool = false
-    ) {
+    /// Relationships (account, category, tags…) are attached after the entry has been
+    /// inserted into a context — the safest order for SwiftData on every iOS 17 release.
+    init(kind: TransactionKind, amount: Decimal, currencyCode: String, date: Date, note: String = "", isDemo: Bool = false) {
         self.id = UUID()
         self.kindRaw = kind.rawValue
         self.amountRaw = DecimalCodec.encode(amount.magnitudeValue)
         self.currencyCode = currencyCode
         self.date = date
         self.note = note
-        self.account = account
-        self.toAccount = toAccount
-        self.toAmountRaw = toAmount.map { DecimalCodec.encode($0.magnitudeValue) } ?? ""
-        self.category = category
-        self.tags = tags
         self.isDemo = isDemo
         self.createdAt = Date()
         self.updatedAt = Date()

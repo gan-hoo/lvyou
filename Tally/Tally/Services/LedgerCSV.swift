@@ -280,17 +280,12 @@ enum LedgerCSVImporter {
                 continue
             }
 
-            let entry = LedgerEntry(
-                kind: row.kind,
-                amount: amount,
-                currencyCode: source.currencyCode,
-                date: row.date,
-                note: row.note,
-                account: source,
-                category: category(named: row.category, kind: row.kind),
-                tags: row.tags.map(tag(named:))
-            )
+            let entry = LedgerEntry(kind: row.kind, amount: amount, currencyCode: source.currencyCode, date: row.date, note: row.note)
             if let id = row.id { entry.id = id }
+            context.insert(entry)
+            entry.account = source
+            entry.category = category(named: row.category, kind: row.kind)
+            entry.tags = row.tags.map(tag(named:))
             if row.kind == .transfer, let toName = row.toAccount {
                 let dest = account(named: toName, currency: row.toCurrency)
                 entry.toAccount = dest
@@ -299,7 +294,6 @@ enum LedgerCSVImporter {
                         ?? converter.convertOrSame(amount, from: source.currencyCode, to: dest.currencyCode, on: row.date)
                 }
             }
-            context.insert(entry)
             store.applySnapshot(to: entry, base: baseCurrency, converter: converter)
             knownIDs.insert(entry.id)
             signatures.insert(sig)

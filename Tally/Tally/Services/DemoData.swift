@@ -75,9 +75,13 @@ enum DemoData {
             guard amount > 0 else { return }
             let m = minute ?? Int.random(in: 0...59, using: &rng)
             guard let date = cal.date(bySettingHour: hour, minute: m, second: 0, of: day), date <= now else { return }
-            let e = LedgerEntry(kind: kind, amount: amount, currencyCode: account.currencyCode, date: date, note: note,
-                                account: account, toAccount: to, toAmount: toAmount, category: category, tags: tags, isDemo: true)
+            let e = LedgerEntry(kind: kind, amount: amount, currencyCode: account.currencyCode, date: date, note: note, isDemo: true)
             context.insert(e)
+            e.account = account
+            e.toAccount = to
+            if let toAmount { e.toAmount = toAmount }
+            e.category = category
+            e.tags = tags
             store.applySnapshot(to: e, base: base, converter: converter)
         }
 
@@ -171,11 +175,13 @@ enum DemoData {
         }
 
         // Budgets
-        context.insert(Budget(amount: scaled(12_000), currencyCode: base, category: nil, alertThreshold: 0.8, isDemo: true))
+        context.insert(Budget(amount: scaled(12_000), currencyCode: base, alertThreshold: 0.8, isDemo: true))
         let budgetSeeds: [(String, Double)] = [("fork.knife", 1_800), ("cart", 1_500), ("cup.and.saucer", 600), ("bag", 1_200)]
         for (symbol, amount) in budgetSeeds {
             if let c = cat(symbol, .expense) {
-                context.insert(Budget(amount: scaled(amount), currencyCode: base, category: c, alertThreshold: 0.8, isDemo: true))
+                let budget = Budget(amount: scaled(amount), currencyCode: base, alertThreshold: 0.8, isDemo: true)
+                context.insert(budget)
+                budget.category = c
             }
         }
         try? context.save()

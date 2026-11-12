@@ -61,8 +61,8 @@ jobs:
           name: tally-build-log
           path: Tally/build.log
 
-  latest-sdk:
-    name: Build with newest installed Xcode (Liquid Glass path)
+  xcode16:
+    name: Build with Xcode 16 (iOS 18 SDK compatibility)
     needs: archive
     runs-on: macos-15
     timeout-minutes: 40
@@ -72,13 +72,15 @@ jobs:
         working-directory: Tally
     steps:
       - uses: actions/checkout@v4
-      - name: Select newest Xcode
+      - name: Select Xcode 16
         run: |
-          NEWEST=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
-          echo "Using $NEWEST"
-          sudo xcode-select -s "$NEWEST"
+          OLDEST=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$OLDEST" ]; then echo "No Xcode 16 installed; skipping"; echo "SKIP=1" >> "$GITHUB_ENV"; exit 0; fi
+          echo "Using $OLDEST"
+          sudo xcode-select -s "$OLDEST"
           xcodebuild -version
       - name: Build
+        if: env.SKIP != '1'
         run: |
           set -o pipefail
           xcodebuild build \
@@ -88,13 +90,13 @@ jobs:
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
-            | tee build-latest.log | grep -E "error:|BUILD" || true
-          grep -q "BUILD SUCCEEDED" build-latest.log
+            | tee build-xcode16.log | grep -E "error:|BUILD" || true
+          grep -q "BUILD SUCCEEDED" build-xcode16.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: tally-build-latest-log
-          path: Tally/build-latest.log
+          name: tally-build-xcode16-log
+          path: Tally/build-xcode16.log
 
   test:
     name: Unit tests

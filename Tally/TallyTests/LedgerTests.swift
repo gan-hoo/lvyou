@@ -166,8 +166,10 @@ struct LedgerTests {
         let food = makeCategory()
         let cash = Account(name: "Cash", kind: .cash, currencyCode: "CNY")
         context.insert(cash)
-        context.insert(Budget(amount: 1000, currencyCode: "CNY", category: nil, alertThreshold: 0.8))
-        context.insert(Budget(amount: 100, currencyCode: "CNY", category: food, alertThreshold: 0.8))
+        context.insert(Budget(amount: 1000, currencyCode: "CNY", alertThreshold: 0.8))
+        let foodBudget = Budget(amount: 100, currencyCode: "CNY", alertThreshold: 0.8)
+        context.insert(foodBudget)
+        foodBudget.category = food
         try store.save(EntryInput(kind: .expense, amount: 120, date: .now, note: "", account: cash, category: food, tags: []), baseCurrency: "CNY")
         try store.save(EntryInput(kind: .expense, amount: 700, date: .now, note: "", account: cash, tags: []), baseCurrency: "CNY")
 

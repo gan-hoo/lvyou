@@ -66,7 +66,7 @@ struct LedgerStore {
         if let existing {
             entry = existing
         } else {
-            entry = LedgerEntry(kind: input.kind, amount: amount, currencyCode: currency, date: input.date, account: account)
+            entry = LedgerEntry(kind: input.kind, amount: amount, currencyCode: currency, date: input.date)
             context.insert(entry)
         }
 
@@ -210,7 +210,9 @@ struct LedgerStore {
             editing.category = category
             editing.alertThreshold = threshold
         } else {
-            context.insert(Budget(amount: amount, currencyCode: base, category: category, alertThreshold: threshold))
+            let budget = Budget(amount: amount, currencyCode: base, alertThreshold: threshold)
+            context.insert(budget)
+            budget.category = category
         }
         try? context.save()
     }

@@ -68,11 +68,11 @@ final class Budget {
     var isDemo: Bool = false
     var createdAt: Date = Date()
 
-    init(amount: Decimal, currencyCode: String, category: LedgerCategory?, alertThreshold: Double = 0.8, isDemo: Bool = false) {
+    /// Set `category` after inserting the budget into a context.
+    init(amount: Decimal, currencyCode: String, alertThreshold: Double = 0.8, isDemo: Bool = false) {
         self.id = UUID()
         self.amountRaw = DecimalCodec.encode(amount)
         self.currencyCode = currencyCode
-        self.category = category
         self.alertThreshold = alertThreshold
         self.isDemo = isDemo
         self.createdAt = Date()
