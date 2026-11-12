@@ -3731,6 +3731,22 @@
         }
       }
     },
+    "Expenses include transfer fees of %@.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出含转账手续费 %@。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出含轉帳手續費 %@。"
+          }
+        }
+      }
+    },
     "Explore with demo data": {
       "localizations": {
         "zh-Hans": {
@@ -4495,22 +4511,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "含之前週期結餘 %@。"
-          }
-        }
-      }
-    },
-    "Includes refunds −%@ and fees %@.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已扣除退款 %@，含手续费 %@。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已扣除退款 %@，含手續費 %@。"
           }
         }
       }
@@ -6799,6 +6799,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "退款"
+          }
+        }
+      }
+    },
+    "Refunds of %@ are subtracted from expenses.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出已扣除退款 %@。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支出已扣除退款 %@。"
           }
         }
       }

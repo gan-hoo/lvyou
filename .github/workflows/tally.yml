@@ -203,7 +203,11 @@ jobs:
               -TallyScreenshotMode -TallyTab "$tab" "$@" -AppleLanguages "($lang)" -AppleLocale "$locale"
             sleep 9
             xcrun simctl io "$UDID" screenshot "shots/$name.png"
-            if xcrun simctl spawn "$UDID" launchctl list | grep -q com.ganhoo.tally; then
+            # Read the whole list first: grep -q would close the pipe early and,
+            # under pipefail, report a running app as stopped.
+            local running
+            running=$(xcrun simctl spawn "$UDID" launchctl list 2>/dev/null || true)
+            if grep -q com.ganhoo.tally <<<"$running"; then
               echo "ALIVE $name"
             else
               echo "NOT RUNNING after $name"

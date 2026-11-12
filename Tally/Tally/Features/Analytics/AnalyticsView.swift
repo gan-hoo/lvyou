@@ -161,8 +161,11 @@ private struct OverviewCard: View {
                 metric("Net", result.report.net, result.previous.net, color: result.report.net < 0 ? DS.Colors.danger : .primary, higherIsGood: true)
             }
             VStack(alignment: .leading, spacing: 4) {
-                if result.report.refunds > 0 || result.report.fees > 0 {
-                    Text("Includes refunds −\(MoneyFormat.string(result.report.refunds, code: base)) and fees \(MoneyFormat.string(result.report.fees, code: base)).")
+                if result.report.refunds > 0 {
+                    Text("Refunds of \(MoneyFormat.string(result.report.refunds, code: base)) are subtracted from expenses.")
+                }
+                if result.report.fees > 0 {
+                    Text("Expenses include transfer fees of \(MoneyFormat.string(result.report.fees, code: base)).")
                 }
                 Text("Net = income − expenses for this period (cash flow). Transfers, card repayments and balance adjustments are excluded; this is not the change in net worth.")
                 if result.report.pendingCount > 0 {
