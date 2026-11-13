@@ -3011,6 +3011,38 @@
         }
       }
     },
+    "Discount": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折扣"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折扣"
+          }
+        }
+      }
+    },
+    "Discounts of %@ are not counted as spending.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折扣 %@ 不计入支出。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折扣 %@ 不計入支出。"
+          }
+        }
+      }
+    },
     "Done": {
       "localizations": {
         "zh-Hans": {
@@ -3779,18 +3811,18 @@
         }
       }
     },
-    "Expenses include transfer fees of %@.": {
+    "Expenses include fees of %@.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "支出含转账手续费 %@。"
+            "value": "支出含手续费 %@。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "支出含轉帳手續費 %@。"
+            "value": "支出含手續費 %@。"
           }
         }
       }
@@ -6227,6 +6259,22 @@
         }
       }
     },
+    "Paid": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "实付"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "實付"
+          }
+        }
+      }
+    },
     "Parts add up to %@, but the total is %@.": {
       "localizations": {
         "zh-Hans": {
@@ -6463,6 +6511,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "上一週期"
+          }
+        }
+      }
+    },
+    "Price": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原价"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原價"
           }
         }
       }
@@ -8207,6 +8271,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "帳戶已有交易後無法更改幣種，以確保歷史金額準確。"
+          }
+        }
+      }
+    },
+    "The discount can't be negative or more than the amount.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折扣不能为负数，也不能大于金额。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折扣不能為負數，也不能大於金額。"
+          }
+        }
+      }
+    },
+    "The discount lowers the spending in this purchase's categories; the fee is counted under Fees.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折扣会减少这笔消费所属分类的支出；手续费计入「手续费」分类。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "折扣會減少這筆消費所屬分類的支出；手續費計入「手續費」分類。"
           }
         }
       }

@@ -50,7 +50,7 @@ struct IntegrityService {
             if e.account == nil {
                 report.issues.append(Issue(kind: .missingAccount, entryID: e.id, detail: label))
             }
-            if e.kind != .adjustment && e.amount <= 0 {
+            if e.kind != .adjustment && (e.amount <= 0 || e.discount > e.amount) {
                 report.issues.append(Issue(kind: .invalidAmount, entryID: e.id, detail: label))
             }
             if e.kind == .transfer {

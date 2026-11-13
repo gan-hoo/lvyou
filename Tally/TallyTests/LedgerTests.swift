@@ -112,6 +112,37 @@ struct LedgerServiceTests {
         #expect(m.baseAmount == dec("72.5"))
     }
 
+    @Test func expenseDiscountAndFeeAreValidatedSavedAndBackedUp() throws {
+        let cash = account("Cash", opening: 1_000)
+        let food = category()
+        var d = TransactionDraft(kind: .expense, amount: 85, date: day(2025, 3, 1), account: cash, category: food)
+        d.discount = 90
+        #expect(throws: LedgerError.discountTooLarge) { try service.save(d, baseCurrency: "CNY") }
+        #expect(try context.fetchCount(FetchDescriptor<LedgerEntry>()) == 0)
+
+        d.discount = 10
+        d.fee = 2
+        let e = try service.save(d, baseCurrency: "CNY")
+        #expect(e.paidAmount.isSameAmount(as: 77))
+        #expect(!e.feeCategoryIDRaw.isEmpty)
+        #expect(balances()[cash.id]?.isSameAmount(as: 923) == true)
+
+        // Editing keeps them; duplicating copies them.
+        var edit = service.draft(from: e)
+        #expect(edit.discount.isSameAmount(as: 10) && edit.fee.isSameAmount(as: 2))
+        edit.note = "lunch"
+        try service.save(edit, editing: e, baseCurrency: "CNY")
+        #expect(e.discount.isSameAmount(as: 10))
+
+        // Backups carry the discount.
+        let file = try BackupService.read(try BackupService(context: context).exportData())
+        let other = try ModelContainer(for: Persistence.schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        try BackupService(context: other.mainContext).restore(file, mode: .merge)
+        let restored = try #require(try other.mainContext.fetch(FetchDescriptor<LedgerEntry>()).first)
+        #expect(restored.discount.isSameAmount(as: 10))
+        #expect(restored.paidAmount.isSameAmount(as: 77))
+    }
+
     @Test func refundLinksOriginalAndReducesSpending() throws {
         let card = account("Card", kind: .creditCard)
         let food = category()

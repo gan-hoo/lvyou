@@ -76,6 +76,7 @@ enum LedgerCSVColumn: String, CaseIterable {
     case splits = "Splits"
     case payee = "Payee"
     case fee = "Fee"
+    case discount = "Discount"
     case tags = "Tags"
     case note = "Note"
     case baseCurrency = "Base Currency"
@@ -97,7 +98,8 @@ enum LedgerCSVColumn: String, CaseIterable {
         case .category: ["category", "分类", "类别"]
         case .splits: ["splits", "拆分"]
         case .payee: ["payee", "merchant", "商家", "交易对象", "对方"]
-        case .fee: ["fee", "手续费"]
+        case .fee: ["fee", "手续费", "手續費"]
+        case .discount: ["discount", "折扣", "优惠", "優惠", "优惠金额"]
         case .tags: ["tags", "tag", "标签"]
         case .note: ["note", "notes", "memo", "description", "备注", "说明"]
         case .baseCurrency: ["base currency", "本位币"]

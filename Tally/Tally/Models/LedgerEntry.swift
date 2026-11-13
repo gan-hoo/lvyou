@@ -38,9 +38,12 @@ final class LedgerEntry {
 
     /// Merchant or counterparty (optional).
     var payee: String = ""
-    /// Transfer fee in the source currency, booked as an expense under `feeCategoryIDRaw`.
+    /// Fee (transfer or expense) in the source currency, booked as spending under `feeCategoryIDRaw`.
     var feeRaw: String = ""
     var feeCategoryIDRaw: String = ""
+    /// Discount on an expense: the account pays `amount − discount + fee`; the discount
+    /// lowers the spending counted in the expense's categories (it is never income).
+    var discountRaw: String = ""
     /// Refunds: the original transaction (kept as an ID so deleting it never loses the refund).
     var refundOfIDRaw: String = ""
     /// Balance adjustments: signed change and the balance before the adjustment (audit trail).
@@ -96,6 +99,20 @@ final class LedgerEntry {
     var currency: CurrencyInfo { CurrencyInfo.info(for: currencyCode) }
 
     var tagList: [Tag] { (tags ?? []).sorted { $0.name < $1.name } }
+
+    var discount: Decimal {
+        get { DecimalCodec.decode(discountRaw) }
+        set { discountRaw = newValue.isZero ? "" : DecimalCodec.encode(newValue.magnitudeValue) }
+    }
+
+    /// What left (or entered) the account for this entry, in its currency.
+    var paidAmount: Decimal {
+        switch kind {
+        case .expense: amount - discount + fee
+        case .transfer: amount + fee
+        default: amount
+        }
+    }
 
     var fee: Decimal {
         get { DecimalCodec.decode(feeRaw) }

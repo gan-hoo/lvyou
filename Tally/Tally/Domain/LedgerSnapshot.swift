@@ -39,6 +39,7 @@ struct EntryValue: Sendable, Identifiable, Hashable {
     let toAmount: Decimal
     let fee: Decimal
     let feeCategoryID: UUID?
+    let discount: Decimal
     let categoryID: UUID?
     let splits: [SplitValue]
     let tagIDs: [UUID]
@@ -58,6 +59,7 @@ struct EntryValue: Sendable, Identifiable, Hashable {
         toAmount: Decimal? = nil,
         fee: Decimal = 0,
         feeCategoryID: UUID? = nil,
+        discount: Decimal = 0,
         categoryID: UUID? = nil,
         splits: [SplitValue] = [],
         tagIDs: [UUID] = [],
@@ -75,6 +77,7 @@ struct EntryValue: Sendable, Identifiable, Hashable {
         self.toAmount = toAmount ?? amount
         self.fee = fee
         self.feeCategoryID = feeCategoryID
+        self.discount = discount
         self.categoryID = categoryID
         self.splits = splits
         self.tagIDs = tagIDs
@@ -166,6 +169,7 @@ extension EntryValue {
             toAmount: e.toAmountRaw.isEmpty ? nil : e.toAmount,
             fee: e.fee,
             feeCategoryID: UUID(uuidString: e.feeCategoryIDRaw),
+            discount: e.discount,
             categoryID: e.category?.id,
             splits: e.splitList.map { SplitValue(categoryID: $0.category?.id, amount: $0.amount) },
             tagIDs: (e.tags ?? []).map(\.id),

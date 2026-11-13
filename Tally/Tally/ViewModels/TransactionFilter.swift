@@ -87,6 +87,7 @@ struct TransactionFilter: Equatable {
         haystack.append(e.toAccount?.name ?? "")
         haystack.append(DecimalCodec.encode(e.amount))
         haystack.append(MoneyFormat.plain(e.amount))
+        if e.paidAmount != e.amount { haystack.append(MoneyFormat.plain(e.paidAmount)) }
         for s in e.splitList { haystack.append(s.category?.name ?? "") }
         for tag in e.tags ?? [] { haystack.append("#" + tag.name) }
         return haystack.contains { $0.localizedCaseInsensitiveContains(q) }
@@ -96,7 +97,8 @@ struct TransactionFilter: Equatable {
         var values: [UUID: Decimal] = [:]
         let filtered = entries.filter { e in
             if let period, !period.contains(e.date) { return false }
-            let v = engine.baseValue(EntryValue(e))
+            let snapshot = EntryValue(e)
+            let v = e.kind == .expense ? engine.baseValue(e.paidAmount, of: snapshot) : engine.baseValue(snapshot)
             if let v { values[e.id] = v }
             return matches(e, value: v) && Self.matchesSearch(e, query: search)
         }

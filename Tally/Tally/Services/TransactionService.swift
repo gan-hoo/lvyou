@@ -24,6 +24,8 @@ struct TransactionDraft {
     /// Credited amount for cross-currency transfers (nil = converted automatically).
     var toAmount: Decimal?
     var fee: Decimal = 0
+    /// Expenses only: subtracted from what the account pays.
+    var discount: Decimal = 0
     var category: LedgerCategory?
     var splits: [SplitDraft] = []
     var tags: [Tag] = []
@@ -56,6 +58,7 @@ struct TransactionService {
         guard d.amount > 0 else { throw LedgerError.amountMustBePositive }
         guard let account = d.account else { throw LedgerError.accountRequired }
         guard d.fee >= 0 else { throw LedgerError.invalidFee }
+        guard d.discount >= 0, d.discount <= d.amount else { throw LedgerError.discountTooLarge }
         if d.kind == .transfer {
             guard let dest = d.toAccount else { throw LedgerError.destinationRequired }
             guard dest.id != account.id else { throw LedgerError.sameAccountTransfer }
@@ -133,6 +136,7 @@ struct TransactionService {
             entry.toAccount = d.toAccount
             entry.fee = d.fee.rounded(scale: digits)
             entry.feeCategoryIDRaw = d.fee > 0 ? repository.feeCategory().id.uuidString : ""
+            entry.discountRaw = ""
             if let credited {
                 entry.toAmount = credited
             } else {
@@ -141,8 +145,15 @@ struct TransactionService {
         case .expense, .income, .refund:
             entry.toAccount = nil
             entry.toAmountRaw = ""
-            entry.feeRaw = ""
-            entry.feeCategoryIDRaw = ""
+            if d.kind == .expense {
+                entry.fee = d.fee.rounded(scale: digits)
+                entry.feeCategoryIDRaw = d.fee > 0 ? repository.feeCategory().id.uuidString : ""
+                entry.discount = d.discount.rounded(scale: digits)
+            } else {
+                entry.feeRaw = ""
+                entry.feeCategoryIDRaw = ""
+                entry.discountRaw = ""
+            }
             if splits.isEmpty {
                 entry.category = d.category
             } else {
@@ -274,6 +285,7 @@ struct TransactionService {
             toAccount: e.toAccount,
             toAmount: e.toAmountRaw.isEmpty ? nil : e.toAmount,
             fee: e.fee,
+            discount: e.discount,
             category: e.category,
             splits: e.splitList.map { SplitDraft(category: $0.category, amount: $0.amount, note: $0.note) },
             tags: e.tags ?? [],

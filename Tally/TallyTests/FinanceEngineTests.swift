@@ -79,6 +79,32 @@ struct FinanceEngineTests {
         #expect(engine.balances(accounts: accounts, entries: [buy, refund])[cardID] == -60)
     }
 
+    /// Price 85, discount 10, fee 2: the account pays 77; food counts 75, fees 2.
+    @Test func expenseDiscountAndFeeChangeWhatIsPaidAndCounted() {
+        let e = EntryValue(kind: .expense, amount: 85, currency: "CNY", date: day(2025, 3, 12), accountID: cashID,
+                           fee: 2, feeCategoryID: fees, discount: 10, categoryID: food)
+        #expect(engine.balances(accounts: accounts, entries: [e])[cashID]?.isSameAmount(as: 923) == true)
+        let r = engine.report([e], in: march)
+        #expect(r.expense.isSameAmount(as: 77))
+        #expect(r.fees.isSameAmount(as: 2))
+        #expect(r.discounts.isSameAmount(as: 10))
+        #expect(r.income == 0)
+        let shares = Dictionary(uniqueKeysWithValues: engine.categoryShares([e], in: march, kind: .expense).map { ($0.categoryID, $0.amount) })
+        #expect(shares[food]?.isSameAmount(as: 75) == true)
+        #expect(shares[fees]?.isSameAmount(as: 2) == true)
+    }
+
+    @Test func discountIsSharedAcrossSplitsAndAddsUpExactly() {
+        let e = EntryValue(kind: .expense, amount: 100, currency: "CNY", date: day(2025, 3, 13), accountID: cashID,
+                           discount: Decimal(string: "10.01")!,
+                           splits: [SplitValue(categoryID: food, amount: 60), SplitValue(categoryID: pets, amount: 40)])
+        let parts = engine.expenseContributions(e) ?? []
+        #expect(parts.sum { $0.amount }.isSameAmount(as: Decimal(string: "89.99")!))
+        #expect(parts.first { $0.categoryID == food }?.amount.isSameAmount(as: Decimal(string: "53.99")!) == true)
+        #expect(parts.first { $0.categoryID == pets }?.amount.isSameAmount(as: 36) == true)
+        #expect(engine.balances(accounts: accounts, entries: [e])[cashID]?.isSameAmount(as: Decimal(string: "910.01")!) == true)
+    }
+
     @Test func splitsDriveCategoriesWhileBalanceMovesOnce() {
         let split = EntryValue(kind: .expense, amount: 100, currency: "CNY", date: day(2025, 3, 7), accountID: cashID,
                                splits: [SplitValue(categoryID: food, amount: 60), SplitValue(categoryID: pets, amount: 40)])

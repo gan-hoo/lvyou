@@ -12,6 +12,7 @@ final class QuickEntryViewModel {
     /// Manually entered credited amount for cross-currency transfers ("" = automatic).
     var toAmountText: String
     var feeText: String
+    var discountText: String
     var category: LedgerCategory?
     var splits: [SplitDraft]
     var date: Date
@@ -42,7 +43,8 @@ final class QuickEntryViewModel {
         if let editing {
             expression = AmountExpression(value: editing.amount, maxFractionDigits: digits)
         } else if let refundOf {
-            expression = AmountExpression(value: refundOf.amount, maxFractionDigits: digits)
+            // A refund returns what was paid for the goods: the price less any discount.
+            expression = AmountExpression(value: refundOf.amount - refundOf.discount, maxFractionDigits: digits)
         }
 
         let category: LedgerCategory?
@@ -62,6 +64,7 @@ final class QuickEntryViewModel {
         self.toAccount = destination ?? (kind == .transfer ? active.first { $0.id != source?.id } : nil)
         self.toAmountText = (editing?.kind == .transfer && !(editing?.toAmountRaw.isEmpty ?? true)) ? DecimalCodec.encode(editing!.toAmount) : ""
         self.feeText = (editing?.fee ?? 0) > 0 ? DecimalCodec.encode(editing!.fee) : ""
+        self.discountText = (editing?.discount ?? 0) > 0 ? DecimalCodec.encode(editing!.discount) : ""
         self.category = category
         self.splits = editing?.splitList.map { SplitDraft(category: $0.category, amount: $0.amount, note: $0.note) } ?? []
         self.date = editing?.date ?? request.date ?? .now
@@ -77,7 +80,7 @@ final class QuickEntryViewModel {
 
     private var signature: String {
         [kind.rawValue, expression.expressionText, account?.id.uuidString ?? "", toAccount?.id.uuidString ?? "",
-         toAmountText, feeText, category?.id.uuidString ?? "", "\(splits.count)", note, payee,
+         toAmountText, feeText, discountText, category?.id.uuidString ?? "", "\(splits.count)", note, payee,
          "\(tags.count)", manualRateText, "\(date.timeIntervalSince1970)"].joined(separator: "|")
     }
 
@@ -94,6 +97,10 @@ final class QuickEntryViewModel {
         expression = AmountExpression(value: value, maxFractionDigits: expression.maxFractionDigits)
     }
     var fee: Decimal { DecimalCodec.parseLenient(feeText)?.magnitudeValue ?? 0 }
+    var discount: Decimal { DecimalCodec.parseLenient(discountText)?.magnitudeValue ?? 0 }
+    /// Expense paid from the account: price − discount + fee.
+    var paidAmount: Decimal { amount - discount + fee }
+    var hasPriceAdjustments: Bool { kind == .expense && (discount > 0 || fee > 0) }
     var manualRate: Decimal? { DecimalCodec.parseLenient(manualRateText).flatMap { $0 > 0 ? $0 : nil } }
     var isEditing: Bool { editing != nil }
     var isRefund: Bool { kind == .refund }
@@ -105,6 +112,7 @@ final class QuickEntryViewModel {
 
     var canSave: Bool {
         guard amount > 0, account != nil else { return false }
+        if kind == .expense && discount > amount { return false }
         if kind == .transfer { return toAccount != nil && toAccount?.id != account?.id }
         if !splits.isEmpty { return splitTotal.isSameAmount(as: amount) }
         return true
@@ -162,7 +170,8 @@ final class QuickEntryViewModel {
         var draft = TransactionDraft(kind: kind, amount: amount, date: date, note: note, payee: payee, account: account)
         draft.toAccount = kind == .transfer ? toAccount : nil
         draft.toAmount = isCrossCurrencyTransfer ? DecimalCodec.parseLenient(toAmountText).flatMap { $0 > 0 ? $0 : nil } : nil
-        draft.fee = kind == .transfer ? fee : 0
+        draft.fee = (kind == .transfer || kind == .expense) ? fee : 0
+        draft.discount = kind == .expense ? discount : 0
         draft.category = kind == .transfer ? nil : (splits.isEmpty ? category : nil)
         draft.splits = kind == .expense ? splits : []
         draft.tags = tags

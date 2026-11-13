@@ -164,8 +164,11 @@ private struct OverviewCard: View {
                 if result.report.refunds > 0 {
                     Text("Refunds of \(MoneyFormat.string(result.report.refunds, code: base)) are subtracted from expenses.")
                 }
+                if result.report.discounts > 0 {
+                    Text("Discounts of \(MoneyFormat.string(result.report.discounts, code: base)) are not counted as spending.")
+                }
                 if result.report.fees > 0 {
-                    Text("Expenses include transfer fees of \(MoneyFormat.string(result.report.fees, code: base)).")
+                    Text("Expenses include fees of \(MoneyFormat.string(result.report.fees, code: base)).")
                 }
                 Text("Net = income − expenses for this period (cash flow). Transfers, card repayments and balance adjustments are excluded; this is not the change in net worth.")
                 if result.report.pendingCount > 0 {

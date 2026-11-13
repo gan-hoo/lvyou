@@ -35,6 +35,7 @@ enum LedgerCSVExporter {
         fields.append(splits)
         fields.append(e.payee)
         fields.append(e.feeRaw)
+        fields.append(e.kind == .expense ? e.discountRaw : "")
         fields.append(tags)
         fields.append(e.note)
         fields.append(e.baseCurrencyCode)
@@ -76,6 +77,7 @@ struct ImportRow {
     var splits: [(category: String, amount: Decimal)] = []
     var payee: String = ""
     var fee: Decimal = 0
+    var discount: Decimal = 0
     var tags: [String]
     var note: String
     var id: UUID?
@@ -188,6 +190,7 @@ enum LedgerCSVImporter {
                 splits: parseSplits(value(.splits)),
                 payee: value(.payee),
                 fee: DecimalCodec.parseLenient(value(.fee))?.magnitudeValue ?? 0,
+                discount: DecimalCodec.parseLenient(value(.discount))?.magnitudeValue ?? 0,
                 tags: tags,
                 note: value(.note),
                 id: UUID(uuidString: value(.id))
@@ -326,9 +329,12 @@ enum LedgerCSVImporter {
                 }
             }
             entry.payee = row.payee
-            if row.kind == .transfer, row.fee > 0 {
+            if row.kind == .transfer || row.kind == .expense, row.fee > 0 {
                 entry.fee = row.fee
                 entry.feeCategoryIDRaw = repository.feeCategory().id.uuidString
+            }
+            if row.kind == .expense, row.discount > 0, row.discount <= row.amount {
+                entry.discount = row.discount
             }
             if row.kind == .expense, !row.splits.isEmpty {
                 entry.category = nil

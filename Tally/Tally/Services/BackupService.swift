@@ -6,7 +6,8 @@ import CryptoKit
 @MainActor
 struct BackupService {
     static let format = "tally-backup"
-    static let schemaVersion = 3
+    /// 4: expense discounts (and fees on expenses).
+    static let schemaVersion = 4
 
     struct File: Codable {
         var format: String
@@ -56,6 +57,8 @@ struct BackupService {
         var refundOf: String; var adjustmentDelta: String; var adjustmentPrevious: String
         var recurringRuleID: String; var occurrenceDate: Date?
         var createdAt: Date; var updatedAt: Date
+        /// Added in schema 4; absent (nil) in older backups and when there is no discount.
+        var discount: String? = nil
     }
 
     struct BudgetDTO: Codable, Equatable {
@@ -153,7 +156,8 @@ struct BackupService {
                      baseCurrency: e.baseCurrencyCode, rateToBase: e.rateToBaseRaw, baseAmount: e.baseAmountRaw,
                      refundOf: e.refundOfIDRaw, adjustmentDelta: e.adjustmentDeltaRaw,
                      adjustmentPrevious: e.adjustmentPreviousBalanceRaw, recurringRuleID: e.recurringRuleIDRaw,
-                     occurrenceDate: e.occurrenceDate, createdAt: e.createdAt, updatedAt: e.updatedAt)
+                     occurrenceDate: e.occurrenceDate, createdAt: e.createdAt, updatedAt: e.updatedAt,
+                     discount: e.discountRaw.isEmpty ? nil : e.discountRaw)
         }
         p.budgets = repository.all(Budget.self).map {
             BudgetDTO(id: $0.id, amount: $0.amountRaw, currency: $0.currencyCode, categoryID: $0.category?.id,
@@ -274,6 +278,7 @@ struct BackupService {
             e.toAmountRaw = d.toAmount
             e.feeRaw = d.fee
             e.feeCategoryIDRaw = d.feeCategoryID
+            e.discountRaw = d.discount ?? ""
             e.category = d.categoryID.flatMap { categories[$0] }
             e.tags = d.tagIDs.compactMap { tags[$0] }
             e.baseCurrencyCode = d.baseCurrency

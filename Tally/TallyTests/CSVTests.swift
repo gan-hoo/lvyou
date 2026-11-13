@@ -71,6 +71,8 @@ struct CSVRoundTripTests {
         var expense = TransactionDraft(kind: .expense, amount: Decimal(string: "12.34")!, date: .now,
                                        note: "Note with \"quotes\", commas\nand newline", account: cash, category: food)
         expense.payee = "Market"
+        expense.discount = Decimal(string: "2.34")!
+        expense.fee = Decimal(string: "0.50")!
         try service.save(expense, baseCurrency: "CNY")
         var split = TransactionDraft(kind: .expense, amount: 10, date: .now, account: cash)
         split.splits = [SplitDraft(category: food, amount: 6), SplitDraft(category: pets, amount: 4)]
@@ -96,6 +98,10 @@ struct CSVRoundTripTests {
         #expect(plain.amount == Decimal(string: "12.34"))
         #expect(plain.note == "Note with \"quotes\", commas\nand newline")
         #expect(plain.payee == "Market")
+        #expect(plain.discount.isSameAmount(as: Decimal(string: "2.34")!))
+        #expect(plain.fee.isSameAmount(as: Decimal(string: "0.5")!))
+        #expect(plain.paidAmount.isSameAmount(as: Decimal(string: "10.5")!))
+        #expect(!plain.feeCategoryIDRaw.isEmpty)
         #expect(plain.account?.name == "Cash, Wallet")
         let splitBack = try #require(imported.first { $0.isSplit })
         #expect(splitBack.splitList.map(\.amount) == [6, 4])

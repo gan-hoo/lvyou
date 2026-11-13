@@ -13,6 +13,8 @@ struct PeriodReport: Equatable, Sendable {
     var expense: Decimal = 0
     var refunds: Decimal = 0
     var fees: Decimal = 0
+    /// Expense discounts (already netted out of `expense`).
+    var discounts: Decimal = 0
     /// Entries in the period, transfers and adjustments included.
     var count: Int = 0
     var pendingCount: Int = 0
@@ -121,7 +123,7 @@ struct FinanceEngine: Sendable {
         for e in entries {
             if let source = e.accountID, let opening = openings[source], e.date >= opening {
                 switch e.kind {
-                case .expense: result[source, default: 0] -= e.amount
+                case .expense: result[source, default: 0] -= (e.amount - e.discount + e.fee)
                 case .income, .refund: result[source, default: 0] += e.amount
                 case .transfer: result[source, default: 0] -= (e.amount + e.fee)
                 case .adjustment: result[source, default: 0] += e.adjustmentDelta
@@ -164,10 +166,24 @@ struct FinanceEngine: Sendable {
     func expenseContributions(_ e: EntryValue) -> [(categoryID: UUID?, amount: Decimal)]? {
         switch e.kind {
         case .expense:
-            guard let total = baseValue(e) else { return nil }
-            if e.splits.isEmpty { return [(e.categoryID, total)] }
-            let parts = Self.allocate(total, across: e.splits.map(\.amount), scale: baseDigits)
-            return zip(e.splits, parts).map { ($0.categoryID, $1) }
+            guard var goods = baseValue(e) else { return nil }
+            if e.discount > 0 {
+                guard let discount = baseValue(e.discount, of: e) else { return nil }
+                goods -= discount
+            }
+            var parts: [(categoryID: UUID?, amount: Decimal)]
+            if e.splits.isEmpty {
+                parts = [(e.categoryID, goods)]
+            } else {
+                // The discount is shared across the parts in proportion to their amounts.
+                let shares = Self.allocate(goods, across: e.splits.map(\.amount), scale: baseDigits)
+                parts = zip(e.splits, shares).map { ($0.categoryID, $1) }
+            }
+            if e.fee > 0 {
+                guard let fee = baseValue(e.fee, of: e) else { return nil }
+                parts.append((e.feeCategoryID, fee))
+            }
+            return parts
         case .refund:
             guard let total = baseValue(e) else { return nil }
             return [(e.categoryID, -total)]
@@ -197,7 +213,8 @@ struct FinanceEngine: Sendable {
                 let total = parts.sum { $0.amount }
                 r.expense += total
                 if e.kind == .refund { r.refunds += -total }
-                if e.kind == .transfer { r.fees += total }
+                if e.fee > 0, let fee = baseValue(e.fee, of: e) { r.fees += fee }
+                if e.kind == .expense, e.discount > 0, let discount = baseValue(e.discount, of: e) { r.discounts += discount }
             case .adjustment:
                 break
             }

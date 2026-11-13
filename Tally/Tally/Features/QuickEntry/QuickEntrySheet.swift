@@ -53,7 +53,7 @@ private struct QuickEntryContent: View {
     @State private var shakeAmount = 0
     @FocusState private var focus: Field?
 
-    private enum Field { case note, payee, credited, fee, rate }
+    private enum Field { case note, payee, credited, fee, rate, discount }
 
     private var tint: Color {
         switch model.kind {
@@ -83,6 +83,13 @@ private struct QuickEntryContent: View {
             textFields
                 .padding(.horizontal, DS.Spacing.screen)
                 .padding(.top, DS.Spacing.s)
+
+            if model.kind == .expense {
+                priceAdjustmentFields
+                    .padding(.horizontal, DS.Spacing.screen)
+                    .padding(.top, DS.Spacing.s)
+                    .transition(.opacity)
+            }
 
             ScrollView {
                 Group {
@@ -255,7 +262,55 @@ private struct QuickEntryContent: View {
             }
 
             conversionRow
+
+            if model.hasPriceAdjustments {
+                paidRow
+            }
         }
+    }
+
+    /// "Paid ¥77.00 = 85.00 − 10.00 + 2.00" for expenses with a discount or fee.
+    private var paidRow: some View {
+        HStack(spacing: 6) {
+            if model.discount > model.amount {
+                Text("The discount can't be negative or more than the amount.")
+                    .foregroundStyle(DS.Colors.danger)
+            } else {
+                Text("Paid")
+                Text(MoneyFormat.string(model.paidAmount, code: model.currencyCode, reveal: true))
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+                    .contentTransition(.numericText(value: model.paidAmount.doubleValue))
+            }
+        }
+        .font(.footnote.monospacedDigit())
+        .foregroundStyle(.secondary)
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .accessibilityElement(children: .combine)
+    }
+
+    // MARK: Discount and fee
+
+    private var priceAdjustmentFields: some View {
+        HStack(spacing: DS.Spacing.s) {
+            adjustmentField(title: "Discount", symbol: "tag", text: $model.discountText, field: .discount)
+            adjustmentField(title: "Fee", symbol: "percent", text: $model.feeText, field: .fee)
+        }
+    }
+
+    private func adjustmentField(title: LocalizedStringKey, symbol: String, text: Binding<String>, field: Field) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: symbol).foregroundStyle(.secondary).font(.subheadline)
+            Text(title).foregroundStyle(.secondary).font(.subheadline)
+            TextField("0", text: text)
+                .keyboardType(.decimalPad)
+                .multilineTextAlignment(.trailing)
+                .monospacedDigit()
+                .focused($focus, equals: field)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 9)
+        .background(DS.Colors.card, in: RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous))
     }
 
     /// Exchange-rate line for foreign-currency entries; the rate can be typed in.

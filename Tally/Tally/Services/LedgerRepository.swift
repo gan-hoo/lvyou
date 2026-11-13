@@ -10,6 +10,7 @@ enum LedgerError: LocalizedError, Equatable {
     case splitNeedsCategory
     case nameRequired
     case invalidFee
+    case discountTooLarge
     case saveFailed(String)
 
     var errorDescription: String? {
@@ -22,6 +23,7 @@ enum LedgerError: LocalizedError, Equatable {
         case .splitNeedsCategory: String(localized: "Choose a category for every split.")
         case .nameRequired: String(localized: "Enter a name.")
         case .invalidFee: String(localized: "The fee can't be negative.")
+        case .discountTooLarge: String(localized: "The discount can't be negative or more than the amount.")
         case .saveFailed(let message): message
         }
     }

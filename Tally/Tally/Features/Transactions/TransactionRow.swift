@@ -74,6 +74,12 @@ struct TransactionRow: View {
             if entry.fee > 0 { parts.append(String(localized: "Fee") + " " + MoneyFormat.string(entry.fee, code: entry.currencyCode)) }
         default:
             if let account = entry.account?.name { parts.append(account) }
+            if entry.kind == .expense && entry.discount > 0 {
+                parts.append(String(localized: "Discount") + " " + MoneyFormat.string(entry.discount, code: entry.currencyCode))
+            }
+            if entry.kind == .expense && entry.fee > 0 {
+                parts.append(String(localized: "Fee") + " " + MoneyFormat.string(entry.fee, code: entry.currencyCode))
+            }
         }
         parts.append(entry.date.timeText)
         return parts.joined(separator: " · ")
@@ -92,7 +98,7 @@ struct TransactionRow: View {
         case .adjustment:
             return MoneyFormat.string(entry.adjustmentDelta, code: entry.currencyCode, showPlusSign: true)
         default:
-            return MoneyFormat.signed(entry.amount, code: entry.currencyCode, kind: entry.kind)
+            return MoneyFormat.signed(entry.paidAmount, code: entry.currencyCode, kind: entry.kind)
         }
     }
 
@@ -111,7 +117,8 @@ struct TransactionRow: View {
             return nil
         }
         guard entry.kind != .adjustment, entry.currencyCode != baseCurrency else { return nil }
-        if let value = engine.baseValue(EntryValue(entry)) {
+        let snapshot = EntryValue(entry)
+        if let value = entry.kind == .expense ? engine.baseValue(entry.paidAmount, of: snapshot) : engine.baseValue(snapshot) {
             return ("≈ " + MoneyFormat.string(value, code: baseCurrency), false)
         }
         return (String(localized: "Pending conversion"), true)

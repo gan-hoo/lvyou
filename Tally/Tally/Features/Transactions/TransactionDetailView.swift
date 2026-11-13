@@ -31,7 +31,9 @@ struct TransactionDetailView: View {
 
     private var content: some View {
         let engine = cache.engine(base: baseCurrency)
-        let value = engine.baseValue(EntryValue(entry))
+        let value = entry.kind == .expense
+            ? engine.baseValue(entry.paidAmount, of: EntryValue(entry))
+            : engine.baseValue(EntryValue(entry))
         return List {
             Section {
                 VStack(spacing: DS.Spacing.m) {
@@ -41,7 +43,7 @@ struct TransactionDetailView: View {
                         .multilineTextAlignment(.center)
                     Text(entry.kind == .adjustment
                          ? MoneyFormat.string(entry.adjustmentDelta, code: entry.currencyCode, showPlusSign: true)
-                         : MoneyFormat.signed(entry.amount, code: entry.currencyCode, kind: entry.kind))
+                         : MoneyFormat.signed(entry.paidAmount, code: entry.currencyCode, kind: entry.kind))
                         .font(DS.Typography.heroAmount)
                         .monospacedDigit()
                         .foregroundStyle(DS.Colors.amount(for: entry.kind))
@@ -94,6 +96,19 @@ struct TransactionDetailView: View {
                         LabeledContent("Category", value: entry.category?.name ?? String(localized: "Uncategorized"))
                     }
                     accountLink("Account", entry.account)
+                    if entry.kind == .expense && (entry.discount > 0 || entry.fee > 0) {
+                        LabeledContent("Price", value: MoneyFormat.string(entry.amount, code: entry.currencyCode))
+                        if entry.discount > 0 {
+                            LabeledContent("Discount", value: MoneyFormat.string(-entry.discount, code: entry.currencyCode))
+                        }
+                        if entry.fee > 0 {
+                            LabeledContent("Fee", value: MoneyFormat.string(entry.fee, code: entry.currencyCode, showPlusSign: true))
+                        }
+                        LabeledContent("Paid", value: MoneyFormat.string(entry.paidAmount, code: entry.currencyCode))
+                            .fontWeight(.semibold)
+                        Text("The discount lowers the spending in this purchase's categories; the fee is counted under Fees.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    }
                 }
                 if !entry.payee.isEmpty {
                     LabeledContent("Payee", value: entry.payee)
