@@ -53,7 +53,37 @@ private struct QuickEntryContent: View {
     @State private var shakeAmount = 0
     @FocusState private var focus: Field?
 
-    private enum Field { case note, payee, credited, fee, rate, discount }
+    /// Only text uses the system keyboard; numbers are typed on the app's keypad.
+    private enum Field { case note, payee }
+
+    /// While payee or note is being typed, the app keypad steps aside for the system keyboard.
+    private var isTypingText: Bool { focus != nil }
+
+    /// Points the app keypad at a number field (and closes the system keyboard).
+    private func target(_ t: KeypadTarget) {
+        focus = nil
+        Haptics.selection()
+        withMotion(DS.Motion.snappy) { model.focus(t) }
+    }
+
+    /// A number field typed on the app keypad: shows its value and highlights when active.
+    private func keypadField(_ t: KeypadTarget, input: AmountExpression, placeholder: String = "0") -> some View {
+        let active = model.keypadTarget == t && !isTypingText
+        return Text(verbatim: input.isEmpty ? placeholder : input.expressionText)
+            .monospacedDigit()
+            .foregroundStyle(input.isEmpty ? Color.secondary : Color.primary)
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(active ? tint.opacity(0.14) : Color.clear, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+            .overlay(alignment: .trailing) {
+                if active {
+                    Rectangle().fill(tint).frame(width: 2, height: 18).offset(x: 2)
+                }
+            }
+            .accessibilityAddTraits(active ? .isSelected : [])
+    }
 
     private var tint: Color {
         switch model.kind {
@@ -115,7 +145,10 @@ private struct QuickEntryContent: View {
             .scrollDismissesKeyboard(.immediately)
             .frame(maxHeight: .infinity)
 
-            metaBar.padding(.vertical, DS.Spacing.s)
+            if !isTypingText {
+                metaBar.padding(.vertical, DS.Spacing.s)
+                    .transition(.opacity)
+            }
 
             if let error = model.errorMessage {
                 Text(error)
@@ -127,16 +160,21 @@ private struct QuickEntryContent: View {
                     .transition(.opacity)
             }
 
-            CalculatorKeypad(
-                commitTitle: model.isEditing ? "Update" : "Save",
-                showsEquals: model.expression.hasPendingOperation,
-                commitEnabled: model.canSave,
-                tint: tint,
-                onKey: handle
-            )
-            .padding(.horizontal, DS.Spacing.screen - 4)
-            .padding(.bottom, DS.Spacing.s)
+            // Typing text uses the system keyboard; the app keypad hides until it is done.
+            if !isTypingText {
+                CalculatorKeypad(
+                    commitTitle: model.isEditing ? "Update" : "Save",
+                    showsEquals: model.activeInput.hasPendingOperation,
+                    commitEnabled: model.canSave,
+                    tint: tint,
+                    onKey: handle
+                )
+                .padding(.horizontal, DS.Spacing.screen - 4)
+                .padding(.bottom, DS.Spacing.s)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
+        .animation(DS.Motion.adaptive(DS.Motion.snappy), value: isTypingText)
         .sheet(isPresented: $showTags) {
             TagPickerSheet(selected: model.tags) { model.toggle($0) }
         }
@@ -222,7 +260,7 @@ private struct QuickEntryContent: View {
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            Text(model.expression.hasPendingOperation ? model.expression.expressionText : " ")
+            Text(model.keypadTarget == .amount && model.expression.hasPendingOperation ? model.expression.expressionText : " ")
                 .font(.callout.monospacedDigit())
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
@@ -251,12 +289,14 @@ private struct QuickEntryContent: View {
                 Text(MoneyFormat.string(model.amount, code: model.currencyCode, reveal: true))
                     .font(DS.Typography.entryAmount)
                     .monospacedDigit()
-                    .foregroundStyle(model.amount < 0 ? DS.Colors.danger : Color.primary)
+                    .foregroundStyle(model.amount < 0 ? DS.Colors.danger : (model.keypadTarget == .amount ? Color.primary : Color.secondary))
                     .lineLimit(1)
                     .minimumScaleFactor(0.45)
                     .contentTransition(.numericText(value: model.amount.doubleValue))
                     .animation(reduceMotion ? nil : DS.Motion.snappy, value: model.amount)
                     .modifier(ShakeEffect(shakes: CGFloat(shakeAmount)))
+                    .contentShape(Rectangle())
+                    .onTapGesture { target(.amount) }
                     .accessibilityLabel(Text("Amount"))
                     .accessibilityValue(Text(MoneyFormat.string(model.amount, code: model.currencyCode, reveal: true)))
             }
@@ -293,24 +333,32 @@ private struct QuickEntryContent: View {
 
     private var priceAdjustmentFields: some View {
         HStack(spacing: DS.Spacing.s) {
-            adjustmentField(title: "Discount", symbol: "tag", text: $model.discountText, field: .discount)
-            adjustmentField(title: "Fee", symbol: "percent", text: $model.feeText, field: .fee)
+            adjustmentField(title: "Discount", symbol: "tag", target: .discount, input: model.discountInput)
+            adjustmentField(title: "Fee", symbol: "percent", target: .fee, input: model.feeInput)
         }
     }
 
-    private func adjustmentField(title: LocalizedStringKey, symbol: String, text: Binding<String>, field: Field) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: symbol).foregroundStyle(.secondary).font(.subheadline)
-            Text(title).foregroundStyle(.secondary).font(.subheadline)
-            TextField("0", text: text)
-                .keyboardType(.decimalPad)
-                .multilineTextAlignment(.trailing)
-                .monospacedDigit()
-                .focused($focus, equals: field)
+    private func adjustmentField(title: LocalizedStringKey, symbol: String, target t: KeypadTarget, input: AmountExpression) -> some View {
+        let active = model.keypadTarget == t && !isTypingText
+        return Button { target(t) } label: {
+            HStack(spacing: 8) {
+                Image(systemName: symbol).foregroundStyle(active ? tint : .secondary).font(.subheadline)
+                Text(title).foregroundStyle(.secondary).font(.subheadline)
+                Spacer(minLength: 4)
+                keypadField(t, input: input)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .background(DS.Colors.card, in: RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                    .strokeBorder(active ? tint.opacity(0.6) : Color.clear, lineWidth: 1.5)
+            )
+            .contentShape(Rectangle())
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 9)
-        .background(DS.Colors.card, in: RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous))
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(Text(verbatim: input.isEmpty ? "0" : input.expressionText))
     }
 
     /// Exchange-rate line for foreign-currency entries; the rate can be typed in.
@@ -320,11 +368,12 @@ private struct QuickEntryContent: View {
             let stored = cache.converter.rate(from: model.currencyCode, to: base, on: model.date)
             HStack(spacing: 6) {
                 Text(verbatim: "1 \(model.currencyCode) =")
-                TextField(stored.map { MoneyFormat.rate($0) } ?? String(localized: "rate"), text: $model.manualRateText)
-                    .keyboardType(.decimalPad)
-                    .multilineTextAlignment(.trailing)
-                    .frame(maxWidth: 90)
-                    .focused($focus, equals: .rate)
+                Button { target(.rate) } label: {
+                    keypadField(.rate, input: model.rateInput, placeholder: stored.map { MoneyFormat.rate($0) } ?? String(localized: "rate"))
+                        .frame(minWidth: 60, alignment: .trailing)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Exchange Rates"))
                 Text(verbatim: base)
                 Spacer()
                 if let rate = model.manualRate ?? stored, model.amount > 0 {
@@ -386,22 +435,22 @@ private struct QuickEntryContent: View {
                 if model.isCrossCurrencyTransfer, let dest = model.toAccount {
                     let estimate = model.estimatedToAmount(converter: cache.converter)
                     fieldRow(title: "Received", symbol: "arrow.down.to.line") {
-                        TextField(estimate.map { MoneyFormat.plain($0, fractionDigits: dest.currency.fractionDigits) } ?? String(localized: "Required"),
-                                  text: $model.toAmountText)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .focused($focus, equals: .credited)
+                        Spacer(minLength: 4)
+                        keypadField(.received, input: model.receivedInput,
+                                    placeholder: estimate.map { MoneyFormat.plain($0, fractionDigits: dest.currency.fractionDigits) } ?? String(localized: "Required"))
                         Text(dest.currencyCode).foregroundStyle(.secondary)
                     }
+                    .contentShape(Rectangle())
+                    .onTapGesture { target(.received) }
                     Divider().padding(.leading, 44)
                 }
                 fieldRow(title: "Fee", symbol: "percent") {
-                    TextField("0", text: $model.feeText)
-                        .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.trailing)
-                        .focused($focus, equals: .fee)
+                    Spacer(minLength: 4)
+                    keypadField(.fee, input: model.feeInput)
                     Text(model.currencyCode).foregroundStyle(.secondary)
                 }
+                .contentShape(Rectangle())
+                .onTapGesture { target(.fee) }
             }
             .background(DS.Colors.card, in: RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous))
             if model.toAccount?.kind.isLiability == true {
@@ -529,17 +578,14 @@ private struct QuickEntryContent: View {
     private func handle(_ key: KeypadKey) {
         model.errorMessage = nil
         switch key {
-        case .digit(let n): model.expression.input(digit: n)
-        case .decimal: model.expression.inputDecimalPoint()
-        case .op(let op): model.expression.input(op)
-        case .backspace: model.expression.backspace()
-        case .clear: model.expression.clear()
         case .commit:
-            if model.expression.hasPendingOperation {
-                model.expression.collapse()
+            if model.activeInput.hasPendingOperation {
+                model.apply(.commit)
             } else {
                 commit()
             }
+        default:
+            model.apply(key)
         }
     }
 

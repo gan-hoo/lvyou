@@ -143,6 +143,26 @@ struct LedgerServiceTests {
         #expect(restored.paidAmount.isSameAmount(as: 77))
     }
 
+    /// The app keypad types into whichever number is selected: amount, discount or fee.
+    @Test func keypadTypesIntoTheSelectedNumber() {
+        let cash = account("Cash")
+        let food = category()
+        let vm = QuickEntryViewModel(request: .new(.expense, account: cash), accounts: [cash], categories: [food])
+        vm.apply(.digit(8)); vm.apply(.digit(5))
+        vm.focus(.discount); vm.apply(.digit(1)); vm.apply(.digit(0))
+        vm.focus(.fee); vm.apply(.digit(2))
+        #expect(vm.amount.isSameAmount(as: 85))
+        #expect(vm.discount.isSameAmount(as: 10))
+        #expect(vm.fee.isSameAmount(as: 2))
+        #expect(vm.paidAmount.isSameAmount(as: 77))
+
+        vm.apply(.op(.plus)); vm.apply(.digit(1)); vm.apply(.commit)
+        #expect(vm.fee.isSameAmount(as: 3))
+        vm.focus(.amount); vm.apply(.backspace)
+        #expect(vm.amount.isSameAmount(as: 8))
+        #expect(vm.discount.isSameAmount(as: 10))
+    }
+
     @Test func refundLinksOriginalAndReducesSpending() throws {
         let card = account("Card", kind: .creditCard)
         let food = category()

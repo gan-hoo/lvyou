@@ -2,6 +2,10 @@ import Foundation
 import SwiftData
 import Observation
 
+enum KeypadTarget: Hashable {
+    case amount, discount, fee, rate, received
+}
+
 @Observable
 @MainActor
 final class QuickEntryViewModel {
@@ -9,18 +13,21 @@ final class QuickEntryViewModel {
     var expression: AmountExpression
     private(set) var account: Account?
     var toAccount: Account?
-    /// Manually entered credited amount for cross-currency transfers ("" = automatic).
-    var toAmountText: String
-    var feeText: String
-    var discountText: String
+    /// Number fields typed on the app's keypad (never the system keyboard).
+    /// Credited amount for cross-currency transfers (empty = automatic).
+    var receivedInput: AmountExpression
+    var feeInput: AmountExpression
+    var discountInput: AmountExpression
+    /// Empty = use the stored rate for the date; otherwise 1 account currency = x base.
+    var rateInput: AmountExpression
+    /// Which number the keypad is typing into.
+    var keypadTarget: KeypadTarget = .amount
     var category: LedgerCategory?
     var splits: [SplitDraft]
     var date: Date
     var note: String
     var payee: String
     var tags: [Tag]
-    /// "" = use the stored rate for the date; otherwise 1 account currency = x base.
-    var manualRateText: String
     var errorMessage: String?
 
     let editing: LedgerEntry?
@@ -62,21 +69,91 @@ final class QuickEntryViewModel {
         self.expression = expression
         self.account = source
         self.toAccount = destination ?? (kind == .transfer ? active.first { $0.id != source?.id } : nil)
-        self.toAmountText = (editing?.kind == .transfer && !(editing?.toAmountRaw.isEmpty ?? true)) ? DecimalCodec.encode(editing!.toAmount) : ""
-        self.feeText = (editing?.fee ?? 0) > 0 ? DecimalCodec.encode(editing!.fee) : ""
-        self.discountText = (editing?.discount ?? 0) > 0 ? DecimalCodec.encode(editing!.discount) : ""
+        let toDigits = (destination?.currency.fractionDigits) ?? 2
+        let received = (editing?.kind == .transfer && !(editing?.toAmountRaw.isEmpty ?? true)) ? editing!.toAmount : 0
+        self.receivedInput = Self.input(received, digits: toDigits)
+        self.feeInput = Self.input(editing?.fee ?? 0, digits: digits)
+        self.discountInput = Self.input(editing?.discount ?? 0, digits: digits)
+        self.rateInput = AmountExpression(maxFractionDigits: Self.rateDigits)
         self.category = category
         self.splits = editing?.splitList.map { SplitDraft(category: $0.category, amount: $0.amount, note: $0.note) } ?? []
         self.date = editing?.date ?? request.date ?? .now
         self.note = editing?.note ?? ""
         self.payee = editing?.payee ?? refundOf?.payee ?? ""
         self.tags = editing?.tags ?? []
-        self.manualRateText = ""
         self.errorMessage = nil
         self.initialSignatureStorage = signature
     }
 
     @ObservationIgnored private var initialSignatureStorage = ""
+
+    static let rateDigits = 6
+
+    private static func input(_ value: Decimal, digits: Int) -> AmountExpression {
+        value > 0 ? AmountExpression(value: value, maxFractionDigits: digits) : AmountExpression(maxFractionDigits: digits)
+    }
+
+    // Text forms of the number fields (signature, tests and older call sites).
+    var toAmountText: String {
+        get { receivedInput.expressionText }
+        set { receivedInput = Self.input(DecimalCodec.parseLenient(newValue) ?? 0, digits: receivedInput.maxFractionDigits) }
+    }
+    var feeText: String {
+        get { feeInput.expressionText }
+        set { feeInput = Self.input(DecimalCodec.parseLenient(newValue) ?? 0, digits: feeInput.maxFractionDigits) }
+    }
+    var discountText: String {
+        get { discountInput.expressionText }
+        set { discountInput = Self.input(DecimalCodec.parseLenient(newValue) ?? 0, digits: discountInput.maxFractionDigits) }
+    }
+    var manualRateText: String {
+        get { rateInput.expressionText }
+        set { rateInput = Self.input(DecimalCodec.parseLenient(newValue) ?? 0, digits: Self.rateDigits) }
+    }
+
+    // MARK: Keypad
+
+    /// The number the keypad is currently editing.
+    var activeInput: AmountExpression {
+        get {
+            switch keypadTarget {
+            case .amount: expression
+            case .discount: discountInput
+            case .fee: feeInput
+            case .rate: rateInput
+            case .received: receivedInput
+            }
+        }
+        set {
+            switch keypadTarget {
+            case .amount: expression = newValue
+            case .discount: discountInput = newValue
+            case .fee: feeInput = newValue
+            case .rate: rateInput = newValue
+            case .received: receivedInput = newValue
+            }
+        }
+    }
+
+    func focus(_ target: KeypadTarget) {
+        if keypadTarget != target, activeInput.hasPendingOperation { activeInput.collapse() }
+        keypadTarget = target
+        if target == .received, let digits = toAccount?.currency.fractionDigits, receivedInput.maxFractionDigits != digits {
+            receivedInput = Self.input(receivedInput.value, digits: digits)
+        }
+    }
+
+    /// Applies a keypad key (other than Save) to the targeted number.
+    func apply(_ key: KeypadKey) {
+        switch key {
+        case .digit(let n): activeInput.input(digit: n)
+        case .decimal: activeInput.inputDecimalPoint()
+        case .op(let op): activeInput.input(op)
+        case .backspace: activeInput.backspace()
+        case .clear: activeInput.clear()
+        case .commit: if activeInput.hasPendingOperation { activeInput.collapse() }
+        }
+    }
 
     private var signature: String {
         [kind.rawValue, expression.expressionText, account?.id.uuidString ?? "", toAccount?.id.uuidString ?? "",
@@ -96,12 +173,14 @@ final class QuickEntryViewModel {
     func setAmount(_ value: Decimal) {
         expression = AmountExpression(value: value, maxFractionDigits: expression.maxFractionDigits)
     }
-    var fee: Decimal { DecimalCodec.parseLenient(feeText)?.magnitudeValue ?? 0 }
-    var discount: Decimal { DecimalCodec.parseLenient(discountText)?.magnitudeValue ?? 0 }
+    var fee: Decimal { feeInput.value.magnitudeValue }
+    var discount: Decimal { discountInput.value.magnitudeValue }
     /// Expense paid from the account: price − discount + fee.
     var paidAmount: Decimal { amount - discount + fee }
     var hasPriceAdjustments: Bool { kind == .expense && (discount > 0 || fee > 0) }
-    var manualRate: Decimal? { DecimalCodec.parseLenient(manualRateText).flatMap { $0 > 0 ? $0 : nil } }
+    var manualRate: Decimal? { rateInput.value > 0 ? rateInput.value : nil }
+    /// Credited amount typed for a cross-currency transfer, if any.
+    var typedReceived: Decimal? { receivedInput.value > 0 ? receivedInput.value : nil }
     var isEditing: Bool { editing != nil }
     var isRefund: Bool { kind == .refund }
     var splitTotal: Decimal { splits.sum { $0.amount } }
@@ -127,6 +206,7 @@ final class QuickEntryViewModel {
             category = Self.defaultCategory(for: newKind, in: categories)
         }
         if newKind != .expense { splits = [] }
+        keypadTarget = .amount
         if newKind == .transfer, toAccount == nil || toAccount?.id == account?.id {
             toAccount = nil
         }
@@ -138,6 +218,8 @@ final class QuickEntryViewModel {
         let digits = newAccount.currency.fractionDigits
         if digits != expression.maxFractionDigits {
             expression = AmountExpression(value: expression.value, maxFractionDigits: digits)
+            feeInput = Self.input(feeInput.value, digits: digits)
+            discountInput = Self.input(discountInput.value, digits: digits)
         }
         if toAccount?.id == newAccount.id { toAccount = nil }
         manualRateText = ""
@@ -169,7 +251,7 @@ final class QuickEntryViewModel {
         let service = TransactionService(context: context)
         var draft = TransactionDraft(kind: kind, amount: amount, date: date, note: note, payee: payee, account: account)
         draft.toAccount = kind == .transfer ? toAccount : nil
-        draft.toAmount = isCrossCurrencyTransfer ? DecimalCodec.parseLenient(toAmountText).flatMap { $0 > 0 ? $0 : nil } : nil
+        draft.toAmount = isCrossCurrencyTransfer ? typedReceived : nil
         draft.fee = (kind == .transfer || kind == .expense) ? fee : 0
         draft.discount = kind == .expense ? discount : 0
         draft.category = kind == .transfer ? nil : (splits.isEmpty ? category : nil)
