@@ -17,11 +17,25 @@ struct TransactionsView: View {
     @State private var showFilter = false
     @State private var showCustomRange = false
     @State private var pendingDelete: LedgerEntry?
+    /// Day picked in the calendar; nil shows the whole period.
+    @State private var selectedDay: Date?
+    @AppStorage("transactions.showCalendar") private var showCalendar = true
+
+    /// The calendar is shown for calendar months.
+    private var calendarVisible: Bool { showCalendar && period?.unit == .month }
+
+    private func onSelectedDay<T>(_ items: [T], date: (T) -> Date) -> [T] {
+        guard let day = selectedDay else { return items }
+        return items.filter { Calendar.ledger.isDate(date($0), inSameDayAs: day) }
+    }
 
     var body: some View {
         let engine = cache.engine(base: baseCurrency)
         let results = filter.apply(to: entries, period: period, search: searchText, engine: engine)
         let report = engine.report(results.map(EntryValue.init))
+        let groups = DayGroup.group(results, engine: engine)
+        let dayGroups = onSelectedDay(groups) { $0.day }
+        let dayResults = onSelectedDay(results) { $0.date }
 
         NavigationStack {
             List {
@@ -30,12 +44,38 @@ struct TransactionsView: View {
                     if !results.isEmpty {
                         ResultsSummary(count: results.count, report: report, base: baseCurrency)
                     }
+                    if calendarVisible, let month = period {
+                        MonthCalendar(month: month, groups: groups, base: baseCurrency, selected: $selectedDay)
+                            .padding(.top, 4)
+                    }
+                    if let day = selectedDay {
+                        SelectedDayBar(day: day) { withMotion(DS.Motion.snappy) { selectedDay = nil } }
+                    }
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 2, leading: 4, bottom: 2, trailing: 4))
 
+                if let day = selectedDay, dayResults.isEmpty {
+                    Section {
+                        VStack(spacing: DS.Spacing.s) {
+                            Text("No transactions on this day.").font(.subheadline).foregroundStyle(.secondary)
+                            Button("Add on This Day") {
+                                router.entryRequest = EntryRequest(date: day.combining(timeOf: .now))
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .buttonBorderShape(.capsule)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, DS.Spacing.m)
+                    }
+                    .listRowBackground(Color.clear)
+                } else if calendarVisible && results.isEmpty {
+                    Section { emptyState }
+                        .listRowBackground(Color.clear)
+                }
+
                 if filter.sort.groupsByDay {
-                    ForEach(DayGroup.group(results, engine: engine)) { group in
+                    ForEach(dayGroups) { group in
                         Section {
                             ForEach(group.entries) { entry in
                                 row(entry, engine: engine)
@@ -46,7 +86,7 @@ struct TransactionsView: View {
                     }
                 } else {
                     Section(filter.sort.title) {
-                        ForEach(results) { entry in
+                        ForEach(dayResults) { entry in
                             row(entry, engine: engine, showsDate: true)
                         }
                     }
@@ -60,7 +100,7 @@ struct TransactionsView: View {
             .navigationTitle("Transactions")
             .toolbar { toolbarContent }
             .overlay {
-                if results.isEmpty { emptyState }
+                if results.isEmpty && !calendarVisible { emptyState }
             }
             .navigationDestination(for: LedgerEntry.self) { TransactionDetailView(entry: $0) }
             .navigationDestination(for: Account.self) { AccountDetailView(account: $0) }
@@ -78,12 +118,14 @@ struct TransactionsView: View {
             }
             .onAppear(perform: applyPendingQuery)
             .onChange(of: router.pendingQuery) { _, _ in applyPendingQuery() }
+            .onChange(of: period) { _, _ in selectedDay = nil }
         }
     }
 
     private func applyPendingQuery() {
         guard let q = router.pendingQuery else { return }
         router.pendingQuery = nil
+        selectedDay = nil
         withMotion {
             period = q.period
             filter.reset()
@@ -113,6 +155,21 @@ struct TransactionsView: View {
                 Image(systemName: "ellipsis.circle")
             }
             .accessibilityLabel(Text("More"))
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                Haptics.selection()
+                withMotion(DS.Motion.snappy) {
+                    showCalendar.toggle()
+                    if showCalendar, period?.unit != .month {
+                        period = .month(period?.start ?? .now)
+                    }
+                    if !showCalendar { selectedDay = nil }
+                }
+            } label: {
+                Image(systemName: calendarVisible ? "calendar.circle.fill" : "calendar.circle")
+            }
+            .accessibilityLabel(calendarVisible ? Text("Hide Calendar") : Text("Show Calendar"))
         }
         ToolbarItem(placement: .topBarTrailing) {
             Button {

@@ -755,6 +755,22 @@
         }
       }
     },
+    "Add on This Day": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在这天记一笔"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在這天記一筆"
+          }
+        }
+      }
+    },
     "Add rent, salary, subscriptions or regular transfers.": {
       "localizations": {
         "zh-Hans": {
@@ -4339,6 +4355,22 @@
         }
       }
     },
+    "Hide Calendar": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏日历"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱藏日曆"
+          }
+        }
+      }
+    },
     "Hide in App Switcher": {
       "localizations": {
         "zh-Hans": {
@@ -5839,6 +5871,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "沒有符合當前篩選條件的交易。"
+          }
+        }
+      }
+    },
+    "No transactions on this day.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这一天没有记录。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這一天沒有記錄。"
           }
         }
       }
@@ -7747,6 +7795,22 @@
         }
       }
     },
+    "Show Calendar": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示日历"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示日曆"
+          }
+        }
+      }
+    },
     "Show More": {
       "localizations": {
         "zh-Hans": {
@@ -7775,6 +7839,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "查看交易"
+          }
+        }
+      }
+    },
+    "Show Whole Month": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示整月"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示整月"
           }
         }
       }
