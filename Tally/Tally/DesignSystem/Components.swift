@@ -299,7 +299,7 @@ struct ToastView: View {
         HStack(spacing: 14) {
             leading
             Text(message.text)
-                .font(.system(size: 16, weight: .medium))
+                .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -310,7 +310,7 @@ struct ToastView: View {
                     onAction()
                 } label: {
                     Text(verbatim: title)
-                        .font(.system(size: 18, weight: .regular))
+                        .font(.system(size: 16, weight: .regular))
                         .foregroundStyle(Self.actionBlue)
                         .frame(maxHeight: .infinity)
                         .padding(.leading, 10)
@@ -339,7 +339,7 @@ struct ToastView: View {
             .accessibilityHidden(true)
         } else {
             Image(systemName: message.symbol)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(iconTint)
                 .frame(width: 28, height: 28)
         }
@@ -357,7 +357,7 @@ private struct CountdownRing: View {
                 .stroke(Color.white, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .rotationEffect(.degrees(-90))
             Text(verbatim: String(seconds))
-                .font(.system(size: 14, weight: .medium).monospacedDigit())
+                .font(.system(size: 13, weight: .medium).monospacedDigit())
                 .foregroundStyle(.white)
         }
         .frame(width: 26, height: 26)
