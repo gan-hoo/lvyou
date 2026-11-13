@@ -228,6 +228,7 @@ struct LedgerRepository {
         remove(Tag.self) { $0.isDemo }
         remove(RecurringRule.self) { $0.isDemo }
         remove(ExchangeRate.self) { $0.isDemo }
+        remove(TrashedEntry.self) { $0.isDemo }
         try commit()
         for a in all(Account.self) where a.isDemo { try deleteAccount(a) }
         try commit()
@@ -247,6 +248,7 @@ struct LedgerRepository {
         wipe(LedgerCategory.self)
         wipe(ExchangeRate.self)
         wipe(AuditRecord.self)
+        wipe(TrashedEntry.self)
         try commit()
         for key in [SettingsKey.defaultAccountID, SettingsKey.lastExpenseCategoryID, SettingsKey.lastIncomeCategoryID, SettingsKey.budgetNotified] {
             UserDefaults.standard.removeObject(forKey: key)

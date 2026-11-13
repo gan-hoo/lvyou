@@ -48,7 +48,6 @@ private struct QuickEntryContent: View {
     @State private var showTags = false
     @State private var showCategories = false
     @State private var showSplits = false
-    @State private var confirmDelete = false
     @State private var confirmDiscard = false
     @State private var shakeAmount = 0
     @FocusState private var focus: Field?
@@ -191,17 +190,7 @@ private struct QuickEntryContent: View {
                     }
             }
         }
-        .confirmationDialog("Delete this transaction?", isPresented: $confirmDelete, titleVisibility: .visible) {
-            Button("Delete", role: .destructive) {
-                if let entry = model.editing {
-                    try? TransactionService(context: context).delete(entry)
-                    Haptics.success()
-                    toasts.show(ToastMessage(symbol: "trash", text: String(localized: "Transaction deleted")))
-                    dismiss()
-                }
-            }
-        }
-        .confirmationDialog("Discard this entry?", isPresented: $confirmDiscard, titleVisibility: .visible) {
+        .alert("Discard this entry?", isPresented: $confirmDiscard) {
             Button("Discard", role: .destructive) { dismiss() }
             Button("Keep Editing", role: .cancel) {}
         }
@@ -235,7 +224,12 @@ private struct QuickEntryContent: View {
             Spacer()
 
             if model.isEditing {
-                Button { confirmDelete = true } label: {
+                Button {
+                    if let entry = model.editing {
+                        TrashActions.moveToTrash([entry], context: context, toasts: toasts)
+                        dismiss()
+                    }
+                } label: {
                     Image(systemName: "trash")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(DS.Colors.danger)

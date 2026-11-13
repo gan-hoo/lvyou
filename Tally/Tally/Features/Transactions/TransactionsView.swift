@@ -16,7 +16,6 @@ struct TransactionsView: View {
     @State private var searchText = ""
     @State private var showFilter = false
     @State private var showCustomRange = false
-    @State private var pendingDelete: LedgerEntry?
     /// Day picked in the calendar; nil shows the whole period.
     @State private var selectedDay: Date?
     @AppStorage("transactions.showCalendar") private var showCalendar = true
@@ -109,16 +108,6 @@ struct TransactionsView: View {
             .navigationDestination(for: Account.self) { AccountDetailView(account: $0) }
             .sheet(isPresented: $showFilter) { TransactionFilterSheet(filter: $filter) }
             .sheet(isPresented: $showCustomRange) { DateRangeSheet(period: $period) }
-            .confirmationDialog(
-                "Delete this transaction?",
-                isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
-                titleVisibility: .visible,
-                presenting: pendingDelete
-            ) { entry in
-                Button("Delete", role: .destructive) { delete(entry) }
-            } message: { _ in
-                Text("This can't be undone. The deletion is kept in the change log.")
-            }
             .onAppear(perform: applyPendingQuery)
             .onChange(of: router.pendingQuery) { _, _ in applyPendingQuery() }
             .onChange(of: period) { _, _ in selectedDay = nil }
@@ -218,7 +207,7 @@ struct TransactionsView: View {
             TransactionRow(entry: entry, baseCurrency: baseCurrency, engine: engine, showsDate: showsDate)
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button(role: .destructive) { pendingDelete = entry } label: { Label("Delete", systemImage: "trash") }
+            Button(role: .destructive) { delete(entry) } label: { Label("Delete", systemImage: "trash") }
             if entry.kind != .adjustment {
                 Button { router.edit(entry) } label: { Label("Edit", systemImage: "pencil") }
                     .tint(DS.Colors.accent)
@@ -239,7 +228,7 @@ struct TransactionsView: View {
                 Button { router.refund(entry) } label: { Label("Record Refund", systemImage: "arrow.uturn.backward") }
             }
             Divider()
-            Button(role: .destructive) { pendingDelete = entry } label: { Label("Delete", systemImage: "trash") }
+            Button(role: .destructive) { delete(entry) } label: { Label("Delete", systemImage: "trash") }
         }
     }
 
@@ -253,14 +242,9 @@ struct TransactionsView: View {
         }
     }
 
+    /// Deleting moves the entry to the trash right away (restorable), with Undo in the toast.
     private func delete(_ entry: LedgerEntry) {
-        do {
-            try withMotion { try TransactionService(context: context).delete(entry) }
-            Haptics.success()
-        } catch {
-            toasts.show(ToastMessage(symbol: "exclamationmark.triangle", text: error.localizedDescription, style: .warning))
-        }
-        pendingDelete = nil
+        withMotion { TrashActions.moveToTrash([entry], context: context, toasts: toasts) }
     }
 }
 

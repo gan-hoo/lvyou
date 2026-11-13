@@ -2323,6 +2323,22 @@
         }
       }
     },
+    "Couldn't Restore": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法恢复"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法恢復"
+          }
+        }
+      }
+    },
     "Create Backup": {
       "localizations": {
         "zh-Hans": {
@@ -2723,6 +2739,22 @@
         }
       }
     },
+    "Delete %lld transactions permanently?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除这 %lld 笔交易？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久刪除這 %lld 筆交易？"
+          }
+        }
+      }
+    },
     "Delete Account": {
       "localizations": {
         "zh-Hans": {
@@ -2771,6 +2803,22 @@
         }
       }
     },
+    "Delete Permanently": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久刪除"
+          }
+        }
+      }
+    },
     "Delete account?": {
       "localizations": {
         "zh-Hans": {
@@ -2783,6 +2831,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "刪除帳戶？"
+          }
+        }
+      }
+    },
+    "Delete permanently?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久刪除？"
           }
         }
       }
@@ -2803,22 +2867,6 @@
         }
       }
     },
-    "Delete this transaction?": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "删除这笔交易？"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "刪除這筆交易？"
-          }
-        }
-      }
-    },
     "Deleted": {
       "localizations": {
         "zh-Hans": {
@@ -2831,6 +2879,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "已刪除"
+          }
+        }
+      }
+    },
+    "Deleted transactions appear here for %lld days and can be restored.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除的交易会在这里保留 %lld 天，可以恢复。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除的交易會在這裡保留 %lld 天，可以恢復。"
+          }
+        }
+      }
+    },
+    "Deleted transactions stay here for %lld days, then are removed for good. Restoring puts a transaction back exactly as it was, and balances, analytics and budgets count it again. Swipe right to restore, left to delete permanently.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除的交易会在这里保留 %lld 天，之后永久删除。恢复后交易与原来完全一致，余额、统计和预算会重新计入。向右轻扫恢复，向左轻扫永久删除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除的交易會在這裡保留 %lld 天，之後永久刪除。恢復後交易與原來完全一致，餘額、統計和預算會重新計入。向右輕掃恢復，向左輕掃永久刪除。"
           }
         }
       }
@@ -3391,6 +3471,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "水電費"
+          }
+        }
+      }
+    },
+    "Empty Trash": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空回收站"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空回收站"
           }
         }
       }
@@ -5379,6 +5475,22 @@
         }
       }
     },
+    "Moved to Trash": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已移到回收站"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已移到回收站"
+          }
+        }
+      }
+    },
     "Movie night": {
       "localizations": {
         "zh-Hans": {
@@ -7331,6 +7443,22 @@
         }
       }
     },
+    "Restore All": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部恢复"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部恢復"
+          }
+        }
+      }
+    },
     "Restore Backup": {
       "localizations": {
         "zh-Hans": {
@@ -7391,6 +7519,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "已恢復"
+          }
+        }
+      }
+    },
+    "Restored %lld transactions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已恢复 %lld 笔交易"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已恢復 %lld 筆交易"
           }
         }
       }
@@ -8307,6 +8451,38 @@
         }
       }
     },
+    "The account this transfer went to no longer exists.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这笔转账的转入账户已不存在。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這筆轉帳的轉入帳戶已不存在。"
+          }
+        }
+      }
+    },
+    "The account “%@” no longer exists, so this transaction can't be restored.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "账户「%@」已不存在，无法恢复这笔交易。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帳戶「%@」已不存在，無法恢復這筆交易。"
+          }
+        }
+      }
+    },
     "The backup is damaged (checksum mismatch).": {
       "localizations": {
         "zh-Hans": {
@@ -8595,18 +8771,18 @@
         }
       }
     },
-    "This can't be undone. The deletion is kept in the change log.": {
+    "This can't be undone.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "此操作无法撤销。删除会记入变更记录。"
+            "value": "此操作无法撤销。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "此操作無法撤銷。刪除會記入變更記錄。"
+            "value": "此操作無法撤銷。"
           }
         }
       }
@@ -8639,6 +8815,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "此檔案不是 Tally 備份。"
+          }
+        }
+      }
+    },
+    "This item in the trash can't be read.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回收站中的这条记录无法读取。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回收站中的這條記錄無法讀取。"
           }
         }
       }
@@ -8899,22 +9091,6 @@
         }
       }
     },
-    "Transaction deleted": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "交易已删除"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "交易已刪除"
-          }
-        }
-      }
-    },
     "Transaction updated": {
       "localizations": {
         "zh-Hans": {
@@ -9075,6 +9251,38 @@
         }
       }
     },
+    "Trash": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回收站"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回收站"
+          }
+        }
+      }
+    },
+    "Trash Is Empty": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回收站是空的"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回收站是空的"
+          }
+        }
+      }
+    },
     "Travel": {
       "localizations": {
         "zh-Hans": {
@@ -9135,6 +9343,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "未分類"
+          }
+        }
+      }
+    },
+    "Undo": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "撤销"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "撤銷"
           }
         }
       }

@@ -5,7 +5,7 @@ import OSLog
 enum Persistence {
     static let models: [any PersistentModel.Type] = [
         Account.self, LedgerEntry.self, LedgerCategory.self, Tag.self, Budget.self, ExchangeRate.self,
-        TransactionSplit.self, RecurringRule.self, AuditRecord.self,
+        TransactionSplit.self, RecurringRule.self, AuditRecord.self, TrashedEntry.self,
     ]
 
     static var schema: Schema { Schema(models) }

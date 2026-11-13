@@ -112,7 +112,7 @@ struct BackupService {
 
     // MARK: Encoding
 
-    private static func encoder() -> JSONEncoder {
+    static func encoder() -> JSONEncoder {
         let e = JSONEncoder()
         e.outputFormatting = [.sortedKeys, .prettyPrinted]
         // Exact round trip (reference-date seconds), so checksums are reproducible.
@@ -120,7 +120,7 @@ struct BackupService {
         return e
     }
 
-    private static func decoder() -> JSONDecoder {
+    static func decoder() -> JSONDecoder {
         let d = JSONDecoder()
         d.dateDecodingStrategy = .deferredToDate
         return d
@@ -147,18 +147,7 @@ struct BackupService {
                         sortOrder: $0.sortOrder, archived: $0.isArchived)
         }
         p.tags = repository.all(Tag.self).map { TagDTO(id: $0.id, name: $0.name, color: $0.colorHex) }
-        p.entries = repository.all(LedgerEntry.self).sorted { $0.date < $1.date }.map { e in
-            EntryDTO(id: e.id, kind: e.kindRaw, amount: e.amountRaw, currency: e.currencyCode, date: e.date,
-                     note: e.note, payee: e.payee, accountID: e.account?.id, toAccountID: e.toAccount?.id,
-                     toAmount: e.toAmountRaw, fee: e.feeRaw, feeCategoryID: e.feeCategoryIDRaw, categoryID: e.category?.id,
-                     tagIDs: (e.tags ?? []).map(\.id).sorted { $0.uuidString < $1.uuidString },
-                     splits: e.splitList.map { SplitDTO(amount: $0.amountRaw, categoryID: $0.category?.id, note: $0.note) },
-                     baseCurrency: e.baseCurrencyCode, rateToBase: e.rateToBaseRaw, baseAmount: e.baseAmountRaw,
-                     refundOf: e.refundOfIDRaw, adjustmentDelta: e.adjustmentDeltaRaw,
-                     adjustmentPrevious: e.adjustmentPreviousBalanceRaw, recurringRuleID: e.recurringRuleIDRaw,
-                     occurrenceDate: e.occurrenceDate, createdAt: e.createdAt, updatedAt: e.updatedAt,
-                     discount: e.discountRaw.isEmpty ? nil : e.discountRaw)
-        }
+        p.entries = repository.all(LedgerEntry.self).sorted { $0.date < $1.date }.map(Self.entryDTO)
         p.budgets = repository.all(Budget.self).map {
             BudgetDTO(id: $0.id, amount: $0.amountRaw, currency: $0.currencyCode, categoryID: $0.category?.id,
                       threshold: $0.alertThreshold, period: $0.periodRaw, customLengthDays: $0.customLengthDays,
@@ -195,6 +184,57 @@ struct BackupService {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("Tally-Backup-\(stamp).json")
         try exportData(now: now).write(to: url, options: .atomic)
         return url
+    }
+
+    // MARK: Entry conversion (shared with the trash)
+
+    static func entryDTO(_ e: LedgerEntry) -> EntryDTO {
+        EntryDTO(id: e.id, kind: e.kindRaw, amount: e.amountRaw, currency: e.currencyCode, date: e.date,
+                 note: e.note, payee: e.payee, accountID: e.account?.id, toAccountID: e.toAccount?.id,
+                 toAmount: e.toAmountRaw, fee: e.feeRaw, feeCategoryID: e.feeCategoryIDRaw, categoryID: e.category?.id,
+                 tagIDs: (e.tags ?? []).map(\.id).sorted { $0.uuidString < $1.uuidString },
+                 splits: e.splitList.map { SplitDTO(amount: $0.amountRaw, categoryID: $0.category?.id, note: $0.note) },
+                 baseCurrency: e.baseCurrencyCode, rateToBase: e.rateToBaseRaw, baseAmount: e.baseAmountRaw,
+                 refundOf: e.refundOfIDRaw, adjustmentDelta: e.adjustmentDeltaRaw,
+                 adjustmentPrevious: e.adjustmentPreviousBalanceRaw, recurringRuleID: e.recurringRuleIDRaw,
+                 occurrenceDate: e.occurrenceDate, createdAt: e.createdAt, updatedAt: e.updatedAt,
+                 discount: e.discountRaw.isEmpty ? nil : e.discountRaw)
+    }
+
+    /// Rebuilds an entry exactly as stored (same ID, amounts, rate snapshot and links).
+    @discardableResult
+    static func makeEntry(from d: EntryDTO, in context: ModelContext, accounts: [UUID: Account],
+                          categories: [UUID: LedgerCategory], tags: [UUID: Tag]) -> LedgerEntry {
+        let e = LedgerEntry(kind: TransactionKind(rawValue: d.kind) ?? .expense, amount: DecimalCodec.decode(d.amount),
+                            currencyCode: d.currency, date: d.date, note: d.note)
+        e.id = d.id
+        context.insert(e)
+        e.payee = d.payee
+        e.account = d.accountID.flatMap { accounts[$0] }
+        e.toAccount = d.toAccountID.flatMap { accounts[$0] }
+        e.toAmountRaw = d.toAmount
+        e.feeRaw = d.fee
+        e.feeCategoryIDRaw = d.feeCategoryID
+        e.discountRaw = d.discount ?? ""
+        e.category = d.categoryID.flatMap { categories[$0] }
+        e.tags = d.tagIDs.compactMap { tags[$0] }
+        e.baseCurrencyCode = d.baseCurrency
+        e.rateToBaseRaw = d.rateToBase
+        e.baseAmountRaw = d.baseAmount
+        e.refundOfIDRaw = d.refundOf
+        e.adjustmentDeltaRaw = d.adjustmentDelta
+        e.adjustmentPreviousBalanceRaw = d.adjustmentPrevious
+        e.recurringRuleIDRaw = d.recurringRuleID
+        e.occurrenceDate = d.occurrenceDate
+        e.createdAt = d.createdAt
+        e.updatedAt = d.updatedAt
+        for (i, s) in d.splits.enumerated() {
+            let split = TransactionSplit(amount: DecimalCodec.decode(s.amount), note: s.note, sortOrder: i)
+            context.insert(split)
+            split.category = s.categoryID.flatMap { categories[$0] }
+            split.entry = e
+        }
+        return e
     }
 
     // MARK: Import
@@ -268,35 +308,7 @@ struct BackupService {
         }
         for d in p.entries {
             guard !entryIDs.contains(d.id) else { summary.skipped += 1; continue }
-            let e = LedgerEntry(kind: TransactionKind(rawValue: d.kind) ?? .expense, amount: DecimalCodec.decode(d.amount),
-                                currencyCode: d.currency, date: d.date, note: d.note)
-            e.id = d.id
-            context.insert(e)
-            e.payee = d.payee
-            e.account = d.accountID.flatMap { accounts[$0] }
-            e.toAccount = d.toAccountID.flatMap { accounts[$0] }
-            e.toAmountRaw = d.toAmount
-            e.feeRaw = d.fee
-            e.feeCategoryIDRaw = d.feeCategoryID
-            e.discountRaw = d.discount ?? ""
-            e.category = d.categoryID.flatMap { categories[$0] }
-            e.tags = d.tagIDs.compactMap { tags[$0] }
-            e.baseCurrencyCode = d.baseCurrency
-            e.rateToBaseRaw = d.rateToBase
-            e.baseAmountRaw = d.baseAmount
-            e.refundOfIDRaw = d.refundOf
-            e.adjustmentDeltaRaw = d.adjustmentDelta
-            e.adjustmentPreviousBalanceRaw = d.adjustmentPrevious
-            e.recurringRuleIDRaw = d.recurringRuleID
-            e.occurrenceDate = d.occurrenceDate
-            e.createdAt = d.createdAt
-            e.updatedAt = d.updatedAt
-            for (i, s) in d.splits.enumerated() {
-                let split = TransactionSplit(amount: DecimalCodec.decode(s.amount), note: s.note, sortOrder: i)
-                context.insert(split)
-                split.category = s.categoryID.flatMap { categories[$0] }
-                split.entry = e
-            }
+            Self.makeEntry(from: d, in: context, accounts: accounts, categories: categories, tags: tags)
             summary.added += 1
         }
         for d in p.budgets {

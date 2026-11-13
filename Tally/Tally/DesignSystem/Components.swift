@@ -238,6 +238,11 @@ struct ToastMessage: Identifiable, Equatable {
     var symbol: String
     var text: String
     var style: Style = .info
+    /// Optional button in the toast, e.g. "Undo".
+    var actionTitle: String? = nil
+    var action: (@MainActor () -> Void)? = nil
+
+    static func == (lhs: ToastMessage, rhs: ToastMessage) -> Bool { lhs.id == rhs.id }
 }
 
 @Observable
@@ -264,6 +269,7 @@ final class ToastCenter {
 
 struct ToastView: View {
     var message: ToastMessage
+    var onAction: () -> Void = {}
 
     private var tint: Color {
         switch message.style {
@@ -281,12 +287,24 @@ struct ToastView: View {
             Text(message.text)
                 .font(.subheadline.weight(.medium))
                 .lineLimit(2)
+            if let title = message.actionTitle, let action = message.action {
+                Button {
+                    action()
+                    onAction()
+                } label: {
+                    Text(verbatim: title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(DS.Colors.accent)
+                        .padding(.leading, 4)
+                }
+                .buttonStyle(.plain)
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
         .glassCapsule()
         .padding(.horizontal, 24)
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: message.action == nil ? .combine : .contain)
         .accessibilityAddTraits(.updatesFrequently)
     }
 }
@@ -297,7 +315,7 @@ struct ToastOverlay: ViewModifier {
     func body(content: Content) -> some View {
         content.overlay(alignment: .top) {
             if let message = toasts.current {
-                ToastView(message: message)
+                ToastView(message: message) { toasts.dismiss() }
                     .padding(.top, 6)
                     .transition(.move(edge: .top).combined(with: .opacity))
                     .onTapGesture { toasts.dismiss() }

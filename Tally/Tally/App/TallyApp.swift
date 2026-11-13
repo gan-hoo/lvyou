@@ -26,6 +26,8 @@ struct TallyApp: App {
         #endif
         // Recurring occurrences that fell due while the app was closed. Never books future dates.
         RecurringService(context: context).postDueOccurrences()
+        // Trash items older than 30 days are removed for good.
+        TrashService(context: context).purgeExpired()
         _router = State(initialValue: router)
         _cache = State(initialValue: LedgerCache(context: context))
     }

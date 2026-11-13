@@ -20,6 +20,7 @@ struct SettingsView: View {
     @Query private var categories: [LedgerCategory]
     @Query private var tags: [Tag]
     @Query private var rules: [RecurringRule]
+    @Query private var trash: [TrashedEntry]
 
     @State private var lockToggleBusy = false
 
@@ -176,6 +177,11 @@ struct SettingsView: View {
                 DataManagementView()
             } label: {
                 SettingsLabel("Import, Export & Backup", symbol: "externaldrive", color: "E8B730")
+            }
+            NavigationLink {
+                TrashView()
+            } label: {
+                SettingsLabel("Trash", symbol: "trash", color: "8E8E93", detail: trash.isEmpty ? nil : trash.count.formatted())
             }
             NavigationLink {
                 IntegrityView()

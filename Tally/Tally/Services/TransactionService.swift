@@ -257,12 +257,9 @@ struct TransactionService {
 
     // MARK: Delete / duplicate
 
+    /// Deletes by moving the entries to the trash (restorable for 30 days).
     func delete(_ entries: [LedgerEntry]) throws {
-        for e in entries {
-            repository.audit(AuditRecord.Action.delete, "entry", id: e.id, summary(of: e))
-            context.delete(e)
-        }
-        try repository.commit()
+        try TrashService(repository: repository).trash(entries)
     }
 
     func delete(_ entry: LedgerEntry) throws { try delete([entry]) }

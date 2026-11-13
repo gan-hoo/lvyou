@@ -10,7 +10,6 @@ struct TransactionDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ToastCenter.self) private var toasts
     @AppStorage(SettingsKey.baseCurrency) private var baseCurrency: String = CurrencyInfo.suggestedBase
-    @State private var confirmDelete = false
 
     var body: some View {
         if entry.isDeleted || entry.modelContext == nil {
@@ -180,7 +179,14 @@ struct TransactionDetailView: View {
                 if entry.kind == .expense {
                     Button { router.refund(entry) } label: { Label("Record Refund", systemImage: "arrow.uturn.backward") }
                 }
-                Button(role: .destructive) { confirmDelete = true } label: { Label("Delete", systemImage: "trash") }
+                Button(role: .destructive) {
+                    let target = entry
+                    dismiss()
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(350))
+                        TrashActions.moveToTrash([target], context: context, toasts: toasts)
+                    }
+                } label: { Label("Delete", systemImage: "trash") }
             } footer: {
                 Text("Created \(entry.createdAt.text(date: .abbreviated, time: .shortened)) · Updated \(entry.updatedAt.text(date: .abbreviated, time: .shortened))")
             }
@@ -195,20 +201,6 @@ struct TransactionDetailView: View {
                     Button("Edit") { router.edit(entry) }
                 }
             }
-        }
-        .confirmationDialog("Delete this transaction?", isPresented: $confirmDelete, titleVisibility: .visible) {
-            Button("Delete", role: .destructive) {
-                let target = entry
-                let service = TransactionService(context: context)
-                dismiss()
-                Task { @MainActor in
-                    try? await Task.sleep(for: .milliseconds(350))
-                    try? service.delete(target)
-                    Haptics.success()
-                }
-            }
-        } message: {
-            Text("This can't be undone. The deletion is kept in the change log.")
         }
     }
 

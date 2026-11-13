@@ -124,3 +124,34 @@ final class AuditRecord {
         static let importCSV = "import"
     }
 }
+
+/// A deleted transaction, kept for `TrashService.retentionDays` so it can be restored.
+/// It lives apart from the ledger: balances, reports, budgets and exports only ever read
+/// `LedgerEntry`, so nothing in the trash can be counted by mistake.
+@Model
+final class TrashedEntry {
+    /// The original entry's ID (restored under the same ID).
+    var id: UUID = UUID()
+    var deletedAt: Date = Date()
+    /// JSON of `BackupService.EntryDTO`: everything needed to rebuild the entry.
+    var payload: Data = Data()
+    // Display copies, so the trash can be listed without decoding.
+    var kindRaw: String = TransactionKind.expense.rawValue
+    var paidAmountRaw: String = "0"
+    var currencyCode: String = "CNY"
+    var date: Date = Date()
+    var title: String = ""
+    var accountName: String = ""
+    var symbolName: String = "questionmark"
+    var colorHex: String = "8E8E93"
+    var isDemo: Bool = false
+
+    init(id: UUID, payload: Data) {
+        self.id = id
+        self.payload = payload
+        self.deletedAt = Date()
+    }
+
+    var kind: TransactionKind { TransactionKind(rawValue: kindRaw) ?? .expense }
+    var paidAmount: Decimal { DecimalCodec.decode(paidAmountRaw) }
+}

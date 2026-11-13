@@ -163,6 +163,62 @@ struct LedgerServiceTests {
         #expect(vm.discount.isSameAmount(as: 10))
     }
 
+    @Test func deletedEntriesGoToTrashAndRestoreExactly() throws {
+        let cash = account("Cash", opening: 1_000)
+        let food = category(), pets = category("Pets")
+        let tag = Tag(name: "Trip", colorHex: "3E7BFA")
+        context.insert(tag)
+        var d = TransactionDraft(kind: .expense, amount: 100, date: day(2025, 3, 1), account: cash)
+        d.splits = [SplitDraft(category: food, amount: 60), SplitDraft(category: pets, amount: 40)]
+        d.discount = 10
+        d.fee = 2
+        d.tags = [tag]
+        let e = try service.save(d, baseCurrency: "CNY")
+        let id = e.id
+        #expect(balances()[cash.id]?.isSameAmount(as: 908) == true)
+
+        try service.delete(e)
+        #expect(try context.fetchCount(FetchDescriptor<LedgerEntry>()) == 0)
+        #expect(balances()[cash.id]?.isSameAmount(as: 1_000) == true)
+        let trash = try context.fetch(FetchDescriptor<TrashedEntry>())
+        #expect(trash.count == 1)
+        #expect(trash.first?.paidAmount.isSameAmount(as: 92) == true)
+
+        try TrashService(context: context).restore(trash)
+        let back = try #require(try context.fetch(FetchDescriptor<LedgerEntry>()).first)
+        #expect(back.id == id)
+        #expect(back.splitList.count == 2)
+        #expect(back.discount.isSameAmount(as: 10) && back.fee.isSameAmount(as: 2))
+        #expect(back.tagList.map(\.name) == ["Trip"])
+        #expect(balances()[cash.id]?.isSameAmount(as: 908) == true)
+        #expect(try context.fetchCount(FetchDescriptor<TrashedEntry>()) == 0)
+        let actions = try context.fetch(FetchDescriptor<AuditRecord>()).map(\.action)
+        #expect(actions.contains(AuditRecord.Action.delete) && actions.contains(AuditRecord.Action.restore))
+    }
+
+    @Test func restoreFailsCleanlyWhenTheAccountIsGone() throws {
+        let a = account("Old")
+        let e = try service.save(TransactionDraft(kind: .expense, amount: 5, date: .now, account: a), baseCurrency: "CNY")
+        try service.delete(e)
+        try repo.deleteAccount(a)
+        let items = try context.fetch(FetchDescriptor<TrashedEntry>())
+        #expect(throws: TrashService.TrashError.accountMissing("Old")) { try TrashService(context: context).restore(items) }
+        #expect(try context.fetchCount(FetchDescriptor<TrashedEntry>()) == 1)
+        #expect(try context.fetchCount(FetchDescriptor<LedgerEntry>()) == 0)
+    }
+
+    @Test func trashKeepsItemsForThirtyDays() throws {
+        let a = account("A")
+        let e1 = try service.save(TransactionDraft(kind: .expense, amount: 5, date: .now, account: a), baseCurrency: "CNY")
+        let e2 = try service.save(TransactionDraft(kind: .expense, amount: 6, date: .now, account: a), baseCurrency: "CNY")
+        try service.delete([e1, e2])
+        let items = try context.fetch(FetchDescriptor<TrashedEntry>())
+        items[0].deletedAt = Calendar.ledger.date(byAdding: .day, value: -31, to: .now)!
+        try context.save()
+        #expect(TrashService(context: context).purgeExpired() == 1)
+        #expect(try context.fetchCount(FetchDescriptor<TrashedEntry>()) == 1)
+    }
+
     @Test func refundLinksOriginalAndReducesSpending() throws {
         let card = account("Card", kind: .creditCard)
         let food = category()
