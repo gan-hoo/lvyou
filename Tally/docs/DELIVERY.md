@@ -4,13 +4,13 @@
 
 ## 1. 构建记录
 
-构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `b809eb2`（工作流运行 #23）。
+构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `5efcd1c`（工作流运行 #25）。
 
 | 项目 | 结果 |
 |---|---|
 | Release Archive（Xcode 26.3 / Build 17C529，iOS 26.2 SDK，`generic/platform=iOS`，未签名） | ✅ `ARCHIVE SUCCEEDED`，无 Swift 警告 |
-| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,734,397 字节，SHA-256 `088ec27d001be822175693901ed2b98c460108d79cba5189415dc0d03a3ce00e` |
-| IPA 内容核对 | `CFBundleIdentifier = com.ganhoo.tally`，版本 `3.0 (9)`，`MinimumOSVersion = 17.0`，`DTSDKName = iphoneos26.2`；含 zh-Hans / zh-Hant / en 本地化；无 `_CodeSignature`、无描述文件（未签名） |
+| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,741,418 字节，SHA-256 `1dc0c0806303103928c7555ec90568aacabd99a01cded10d9f4101b6c56252f7` |
+| IPA 内容核对 | `CFBundleIdentifier = com.ganhoo.tally`，版本 `3.0 (11)`，`MinimumOSVersion = 17.0`，`DTSDKName = iphoneos26.2`；含 zh-Hans / zh-Hant / en 本地化；无 `_CodeSignature`、无描述文件（未签名） |
 | Xcode 16（iOS 18 SDK，非 Liquid Glass 编译分支）Release 编译 | ✅ `BUILD SUCCEEDED` |
 | 单元测试（iPhone 17 Pro 模拟器，iOS 26.2） | ✅ 70 个测试 / 12 个套件全部通过（`TEST SUCCEEDED`） |
 | 模拟器截图 + OCR 文本校验 | ✅ 见第 3 节 |
@@ -28,6 +28,7 @@
 - **新增：流水页月历**（用户需求）：月份汇总下方显示当月日历（右上角按钮可开关，默认开启）；每天显示当日支出（只有收入时显示绿色收入），按金额深浅着色，今天描边、未来日期变淡；金额跟随当前筛选与搜索、使用本位币。点某天只看当天流水，再点或「显示整月」恢复；空白日提供「在这天记一笔」（打开记账并预填该日期）。截图 `3-transactions`、`13-transactions-glass` 可见月历。版本 3.0 (7)。
 - **五个主页面去掉大标题、流水页去掉月份下方的横线**（用户反馈）：资产 / 流水 / 统计 / 预算 / 设置不再显示标题文字（标题仍用于子页面返回按钮与旁白）；流水页月份、汇总、日历几行不再显示列表分隔线。截图 `1-assets`、`3-transactions` 已确认。版本 3.0 (8)。
 - **新增：回收站**（用户需求：删除确认不要出现在屏幕顶部，设置里加回收站）：删除交易不再弹出确认框，而是立即移入回收站，并在提示条中提供「撤销」；设置 › 数据 › 回收站 可恢复或永久删除，支持全部恢复 / 清空，30 天后自动永久删除。回收站独立存放（`TrashedEntry`），余额、统计、预算、导出与备份只读取账本，删除的记录不会被计入；恢复时按原 ID、金额、汇率快照、分类、拆分、标签、手续费与折扣原样重建；原账户已删除时拒绝恢复且不做任何改动。新增 3 个测试。版本 3.0 (9)。注：回收站不包含在 JSON 备份中。
+- **提示条改为底部深色样式**（用户反馈：不要显示在顶部，参照截图的位置与颜色）：所有提示条显示在标签栏上方，为不透明深灰圆角条、白色文字；可撤销的提示（已移到回收站）左侧为倒计时圆环、右侧为浅蓝色「撤销」，持续 5 秒；深色模式下略浅并带细边。截图 `14-toast`（浅色）、`15-toast-dark`（深色）已确认。版本 3.0 (11)。
 
 ## 2. 单元测试清单（全部通过）
 
