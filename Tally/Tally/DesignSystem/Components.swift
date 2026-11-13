@@ -276,21 +276,22 @@ final class ToastCenter {
     }
 }
 
-/// Dark bar above the tab bar: icon (or a countdown ring for undoable actions),
-/// message, and an optional light-blue action such as "Undo".
+/// Capsule bar above the tab bar (modelled on Telegram's undo bar): icon or countdown
+/// ring, message, and an optional light-blue action such as "Undo".
 struct ToastView: View {
     var message: ToastMessage
     var onAction: () -> Void = {}
 
-    static let actionBlue = Color(red: 0.42, green: 0.76, blue: 1.0)
-    /// Opaque dark grey; a little lighter in Dark Mode so it stands off a black page.
-    static let barColor = Color(light: "333335", dark: "3A3A3C")
+    static let actionBlue = Color(red: 0.43, green: 0.77, blue: 0.96)
+    /// Medium-dark grey, the same in Light and Dark Mode.
+    static let barColor = Color(red: 0.29, green: 0.29, blue: 0.30)
+    static let height: CGFloat = 50
 
     private var iconTint: Color {
         switch message.style {
-        case .success: Color(red: 0.40, green: 0.86, blue: 0.56)
+        case .success: Color(red: 0.42, green: 0.88, blue: 0.58)
         case .info: .white
-        case .warning: Color(red: 1.0, green: 0.72, blue: 0.36)
+        case .warning: Color(red: 1.0, green: 0.74, blue: 0.38)
         }
     }
 
@@ -298,9 +299,10 @@ struct ToastView: View {
         HStack(spacing: 14) {
             leading
             Text(message.text)
-                .font(.body.weight(.medium))
+                .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(.white)
-                .lineLimit(2)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if let title = message.actionTitle, let action = message.action {
                 Button {
@@ -308,28 +310,21 @@ struct ToastView: View {
                     onAction()
                 } label: {
                     Text(verbatim: title)
-                        .font(.body.weight(.semibold))
+                        .font(.system(size: 18, weight: .regular))
                         .foregroundStyle(Self.actionBlue)
-                        .padding(.vertical, 4)
-                        .padding(.leading, 8)
+                        .frame(maxHeight: .infinity)
+                        .padding(.leading, 10)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
-        .background(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(Self.barColor)
-        )
-        .overlay(
-            // A faint edge keeps the bar distinct on dark backgrounds.
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
-        )
-        .shadow(color: .black.opacity(0.2), radius: 16, y: 6)
-        .padding(.horizontal, DS.Spacing.screen)
+        .padding(.leading, 12)
+        .padding(.trailing, 22)
+        .frame(height: Self.height)
+        .background(Capsule(style: .continuous).fill(Self.barColor))
+        .shadow(color: .black.opacity(0.16), radius: 12, y: 4)
+        .padding(.horizontal, 12)
         .accessibilityElement(children: message.action == nil ? .combine : .contain)
         .accessibilityAddTraits(.updatesFrequently)
     }
@@ -344,9 +339,9 @@ struct ToastView: View {
             .accessibilityHidden(true)
         } else {
             Image(systemName: message.symbol)
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(iconTint)
-                .frame(width: 30, height: 30)
+                .frame(width: 28, height: 28)
         }
     }
 }
@@ -357,16 +352,15 @@ private struct CountdownRing: View {
 
     var body: some View {
         ZStack {
-            Circle().stroke(Color.white.opacity(0.2), lineWidth: 2.5)
             Circle()
                 .trim(from: 0, to: max(0, min(1, fraction)))
-                .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                .stroke(Color.white, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .rotationEffect(.degrees(-90))
             Text(verbatim: String(seconds))
-                .font(.subheadline.weight(.semibold).monospacedDigit())
+                .font(.system(size: 15, weight: .medium).monospacedDigit())
                 .foregroundStyle(.white)
         }
-        .frame(width: 30, height: 30)
+        .frame(width: 28, height: 28)
     }
 }
 
@@ -374,7 +368,7 @@ struct ToastOverlay: ViewModifier {
     @Environment(ToastCenter.self) private var toasts
 
     /// Clearance for the tab bar, so the toast sits just above it.
-    private let tabBarClearance: CGFloat = 72
+    private let tabBarClearance: CGFloat = 74
 
     func body(content: Content) -> some View {
         content.overlay(alignment: .bottom) {
