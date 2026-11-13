@@ -22,7 +22,7 @@ enum TrashActions {
                         toasts.show(ToastMessage(symbol: "exclamationmark.triangle", text: error.localizedDescription, style: .warning))
                     }
                 }
-            ), duration: .seconds(4))
+            ), duration: .seconds(5))
         } catch {
             Haptics.error()
             toasts.show(ToastMessage(symbol: "exclamationmark.triangle", text: error.localizedDescription, style: .warning))

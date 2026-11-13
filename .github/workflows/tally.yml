@@ -233,6 +233,8 @@ jobs:
           LOCALE_OVERRIDE=en_AU shoot 11-transactions-zh-enAU light zh-Hans transactions
           LOCALE_OVERRIDE=en_AU shoot 12-analytics-glass-zh-enAU light zh-Hans analytics -settings.theme liquidGlass
           shoot 13-transactions-glass light zh-Hans transactions -settings.theme liquidGlass
+          shoot 14-toast light zh-Hans transactions -TallyToast
+          shoot 15-toast-dark dark zh-Hans assets -TallyToast
           ls -la shots
       - name: OCR screenshots (printed to log)
         run: |

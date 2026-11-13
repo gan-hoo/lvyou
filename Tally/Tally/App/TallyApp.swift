@@ -5,7 +5,7 @@ import SwiftData
 struct TallyApp: App {
     private let container: ModelContainer
     @State private var lock = AppLockManager()
-    @State private var toasts = ToastCenter()
+    @State private var toasts: ToastCenter
     @State private var router: AppRouter
     @State private var cache: LedgerCache
     @AppStorage(SettingsKey.appearance) private var appearance: String = AppearanceMode.system.rawValue
@@ -20,7 +20,12 @@ struct TallyApp: App {
         DefaultData.ensureSeeded(in: context)
         DefaultData.relocalizeBuiltInNames(in: context)
         let router = AppRouter()
+        let toasts = ToastCenter()
         #if DEBUG
+        if ScreenshotMode.showsToast {
+            toasts.show(ToastMessage(symbol: "trash", text: String(localized: "Moved to Trash"),
+                                     actionTitle: String(localized: "Undo"), action: {}), duration: .seconds(60))
+        }
         ScreenshotMode.prepare(context)
         ScreenshotMode.configure(router)
         #endif
@@ -29,6 +34,7 @@ struct TallyApp: App {
         // Trash items older than 30 days are removed for good.
         TrashService(context: context).purgeExpired()
         _router = State(initialValue: router)
+        _toasts = State(initialValue: toasts)
         _cache = State(initialValue: LedgerCache(context: context))
     }
 

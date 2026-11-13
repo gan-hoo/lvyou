@@ -25,6 +25,9 @@ enum ScreenshotMode {
 
     static var opensEntry: Bool { arguments.contains("-TallyOpenEntry") }
 
+    /// Shows a sample undo toast (to check its look and position).
+    static var showsToast: Bool { arguments.contains("-TallyToast") }
+
     @MainActor
     static func prepare(_ context: ModelContext) {
         guard isEnabled else { return }
