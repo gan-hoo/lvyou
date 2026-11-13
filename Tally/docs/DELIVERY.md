@@ -4,13 +4,13 @@
 
 ## 1. 构建记录
 
-构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `7f5ef3a`（工作流运行 #20）。
+构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `540bb30`（工作流运行 #21）。
 
 | 项目 | 结果 |
 |---|---|
 | Release Archive（Xcode 26.3 / Build 17C529，iOS 26.2 SDK，`generic/platform=iOS`，未签名） | ✅ `ARCHIVE SUCCEEDED`，无 Swift 警告 |
-| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,661,448 字节，SHA-256 `079151140cfba278e2d63a5c3d37605cdb7443c0b13c5535c818ec1f52a3ab00` |
-| IPA 内容核对 | `CFBundleIdentifier = com.ganhoo.tally`，版本 `3.0 (6)`，`MinimumOSVersion = 17.0`，`DTSDKName = iphoneos26.2`；含 zh-Hans / zh-Hant / en 本地化；无 `_CodeSignature`、无描述文件（未签名） |
+| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,696,152 字节，SHA-256 `ed2ae66a358504800d2f42b2a4cd1c6900a2b6ef7ffff6af6b97a26baacde265` |
+| IPA 内容核对 | `CFBundleIdentifier = com.ganhoo.tally`，版本 `3.0 (7)`，`MinimumOSVersion = 17.0`，`DTSDKName = iphoneos26.2`；含 zh-Hans / zh-Hant / en 本地化；无 `_CodeSignature`、无描述文件（未签名） |
 | Xcode 16（iOS 18 SDK，非 Liquid Glass 编译分支）Release 编译 | ✅ `BUILD SUCCEEDED` |
 | 单元测试（iPhone 17 Pro 模拟器，iOS 26.2） | ✅ 67 个测试 / 12 个套件全部通过（`TEST SUCCEEDED`） |
 | 模拟器截图 + OCR 文本校验 | ✅ 见第 3 节 |
@@ -25,6 +25,7 @@
 - **拆分页填完后无法收起键盘、无法点「完成」**：数字键盘没有 Return 键；合计不等于总额时「完成」直接置灰。现在所有数字键盘上方都有「完成」按钮，拖动列表也可收起键盘；拆分的第一项自动填入剩余金额（直到手动修改）；合计不一致时点「完成」可选择「把总额改为合计」或「调整某一项」；缺少分类或金额时在列表下方说明原因。版本号改为 3.0 (4) 以便区分。
 - **新增：支出的折扣与手续费**（用户需求）：输入的金额为原价，实付 = 原价 − 折扣 + 手续费；折扣减少该分类支出（拆分时按比例分摊、合计精确）、不计为收入、不能为负或大于原价；手续费计入「手续费」分类。列表、详情、搜索、排序、换算均使用实付；退款默认原价 − 折扣；CSV 新增 Discount 列；备份格式升级为 4（旧备份仍可恢复）。新增 3 个测试，版本 3.0 (5)。截图 `2-entry` 中可见「折扣 / 手续费」输入行。
 - **记账页数字用 App 键盘、文字用系统键盘**（用户反馈：折扣 / 手续费弹出系统数字键盘与 App 键盘叠在一起）：折扣、手续费、手动汇率、跨币种转账到账金额改为由 App 键盘输入（点选后高亮，支持 + −，点大金额切回）；输入收付款方 / 备注时 App 键盘和账户 / 日期行收起，只显示系统键盘，点「完成」恢复。新增测试 `keypadTypesIntoTheSelectedNumber`，版本 3.0 (6)。
+- **新增：流水页月历**（用户需求）：月份汇总下方显示当月日历（右上角按钮可开关，默认开启）；每天显示当日支出（只有收入时显示绿色收入），按金额深浅着色，今天描边、未来日期变淡；金额跟随当前筛选与搜索、使用本位币。点某天只看当天流水，再点或「显示整月」恢复；空白日提供「在这天记一笔」（打开记账并预填该日期）。截图 `3-transactions`、`13-transactions-glass` 可见月历。版本 3.0 (7)。
 
 ## 2. 单元测试清单（全部通过）
 
