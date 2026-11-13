@@ -1,0 +1,271 @@
+name: Tally iOS
+
+on:
+  push:
+    paths:
+      - 'Tally/**'
+      - '.github/workflows/tally.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: tally-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  archive:
+    name: Archive & unsigned IPA
+    runs-on: macos-15
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: Tally
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select newest Xcode 26
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          xcodebuild -version
+
+      - name: Archive (Release, generic iOS device, unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project Tally.xcodeproj \
+            -scheme Tally \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/Tally.xcarchive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            OTHER_SWIFT_FLAGS='$(inherited) -Xfrontend -solver-expression-time-threshold=60 -Xfrontend -warn-long-expression-type-checking=400 -Xfrontend -warn-long-function-bodies=1500' \
+            | tee build.log | grep -E "error:|warning:|ARCHIVE|BUILD" || true
+          test -d build/Tally.xcarchive/Products/Applications/Tally.app
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p dist/Payload
+          cp -R build/Tally.xcarchive/Products/Applications/Tally.app dist/Payload/
+          (cd dist && zip -qry Tally-unsigned.ipa Payload)
+          ls -la dist
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" dist/Payload/Tally.app/Info.plist
+          /usr/libexec/PlistBuddy -c "Print :MinimumOSVersion" dist/Payload/Tally.app/Info.plist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Tally-unsigned-ipa
+          path: Tally/dist/Tally-unsigned.ipa
+
+      # Commit messages containing [publish-ipa] also store the IPA in the branch
+      # (Tally/release/), for environments that cannot download Actions artifacts.
+      - name: Publish IPA to branch
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-ipa]')
+        run: |
+          mkdir -p release
+          cp dist/Tally-unsigned.ipa release/Tally-unsigned.ipa
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release/Tally-unsigned.ipa
+          git commit -m "Add unsigned Tally IPA from ${GITHUB_SHA::7} [skip ci]" || exit 0
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tally-build-log
+          path: Tally/build.log
+
+  xcode16:
+    name: Build with Xcode 16 (iOS 18 SDK, non-Liquid-Glass path)
+    needs: archive
+    runs-on: macos-15
+    timeout-minutes: 40
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: Tally
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 16
+        run: |
+          OLDEST=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$OLDEST" ]; then echo "No Xcode 16 installed; skipping"; echo "SKIP=1" >> "$GITHUB_ENV"; exit 0; fi
+          echo "Using $OLDEST"
+          sudo xcode-select -s "$OLDEST"
+          xcodebuild -version
+      - name: Build
+        if: env.SKIP != '1'
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Tally.xcodeproj \
+            -scheme Tally \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee build-xcode16.log | grep -E "error:|BUILD" || true
+          grep -q "BUILD SUCCEEDED" build-xcode16.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tally-build-xcode16-log
+          path: Tally/build-xcode16.log
+
+  test:
+    name: Unit tests
+    needs: archive
+    runs-on: macos-15
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: Tally
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode 26
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          xcodebuild -version
+      - name: Run tests on an available iPhone simulator
+        run: |
+          set -o pipefail
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          ios = sorted((k for k in data if "iOS" in k), reverse=True)
+          for runtime in ios:
+              for d in data[runtime]:
+                  if d["name"].startswith("iPhone"):
+                      print(d["udid"]); sys.exit(0)
+          sys.exit(1)')
+          echo "Simulator: $DEVICE_ID"
+          xcodebuild test \
+            -project Tally.xcodeproj \
+            -scheme Tally \
+            -destination "id=$DEVICE_ID" \
+            -parallel-testing-enabled NO \
+            -test-timeouts-enabled YES \
+            -maximum-test-execution-time-allowance 180 \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee test.log | grep -E "error:|✔|✘|passed|failed|TEST" || true
+          grep -q "TEST SUCCEEDED" test.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tally-test-log
+          path: Tally/test.log
+
+  screenshots:
+    name: Simulator screenshots
+    needs: archive
+    permissions:
+      contents: write
+    runs-on: macos-15
+    timeout-minutes: 40
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: Tally
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode 26
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          xcodebuild -version
+      - name: Build for simulator and capture screens
+        run: |
+          set -o pipefail
+          UDID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          ios = sorted((k for k in data if "iOS" in k), reverse=True)
+          for runtime in ios:
+              for d in data[runtime]:
+                  if d["name"].startswith("iPhone") and "Pro" in d["name"] and "Max" not in d["name"]:
+                      print(d["udid"]); sys.exit(0)
+          sys.exit(1)')
+          echo "Device $UDID"
+          xcodebuild build -project Tally.xcodeproj -scheme Tally -configuration Debug \
+            -destination "id=$UDID" -derivedDataPath build CODE_SIGNING_ALLOWED=NO \
+            | grep -E "error:|BUILD" || true
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" build/Build/Products/Debug-iphonesimulator/Tally.app
+          xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
+          mkdir -p shots
+          shoot() { # name appearance lang tab extra...
+            local name=$1 look=$2 lang=$3 tab=$4; shift 4
+            xcrun simctl ui "$UDID" appearance "$look"
+            # LOCALE_OVERRIDE simulates a phone whose region/format language differs
+            # from the app language (e.g. Tally in Chinese on an English (Australia) iPhone).
+            local locale=${LOCALE_OVERRIDE:-zh_CN}
+            if [ "$lang" = en ] && [ -z "$LOCALE_OVERRIDE" ]; then locale=en_US; fi
+            xcrun simctl launch --terminate-running-process "$UDID" com.ganhoo.tally \
+              -TallyScreenshotMode -TallyTab "$tab" "$@" -AppleLanguages "($lang)" -AppleLocale "$locale"
+            sleep 9
+            xcrun simctl io "$UDID" screenshot "shots/$name.png"
+            # Read the whole list first: grep -q would close the pipe early and,
+            # under pipefail, report a running app as stopped.
+            local running
+            running=$(xcrun simctl spawn "$UDID" launchctl list 2>/dev/null || true)
+            if grep -q com.ganhoo.tally <<<"$running"; then
+              echo "ALIVE $name"
+            else
+              echo "NOT RUNNING after $name"
+            fi
+          }
+          shoot 1-assets light zh-Hans assets
+          sleep 2
+          shoot 1-assets light zh-Hans assets
+          shoot 2-entry light zh-Hans assets -TallyOpenEntry
+          shoot 3-transactions light zh-Hans transactions
+          shoot 4-analytics dark zh-Hans analytics
+          shoot 5-budgets light zh-Hans budgets
+          shoot 6-settings light en settings
+          shoot 7-assets-glass light zh-Hans assets -settings.theme liquidGlass
+          shoot 8-analytics-en light en analytics
+          shoot 9-budgets-hant dark zh-Hant budgets
+          shoot 10-assets-hidden light en assets -settings.hideAmounts YES
+          LOCALE_OVERRIDE=en_AU shoot 11-transactions-zh-enAU light zh-Hans transactions
+          LOCALE_OVERRIDE=en_AU shoot 12-analytics-glass-zh-enAU light zh-Hans analytics -settings.theme liquidGlass
+          shoot 13-transactions-glass light zh-Hans transactions -settings.theme liquidGlass
+          shoot 14-toast light zh-Hans transactions -TallyToast
+          shoot 15-toast-dark dark zh-Hans assets -TallyToast
+          ls -la shots
+      - name: OCR screenshots (printed to log)
+        run: |
+          for f in shots/*.png; do
+            echo "===== $(basename "$f") ====="
+            swift scripts/ocr.swift "$f" || true
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tally-screenshots
+          path: Tally/shots
+
+      # Commit messages containing [publish-shots] also store reduced JPEG copies in
+      # the branch (Tally/release/shots/) so they can be reviewed without artifacts.
+      - name: Publish screenshots to branch
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-shots]')
+        run: |
+          mkdir -p release/shots
+          rm -f release/shots/*.jpg
+          for f in shots/*.png; do
+            sips -Z 1200 -s format jpeg -s formatOptions 72 "$f" --out "release/shots/$(basename "${f%.png}").jpg" >/dev/null
+          done
+          ls -la release/shots
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release/shots
+          git commit -m "Add simulator screenshots from ${GITHUB_SHA::7} [skip ci]" || exit 0
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
+

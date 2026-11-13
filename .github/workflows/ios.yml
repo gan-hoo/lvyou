@@ -3,6 +3,9 @@ name: iOS Build
 on:
   push:
     branches: ['**']
+    paths-ignore:
+      - 'Tally/**'
+      - '.github/workflows/tally*.yml'
   workflow_dispatch:
 
 jobs:
