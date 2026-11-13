@@ -284,7 +284,7 @@ struct ToastView: View {
 
     static let actionBlue = Color(red: 0.43, green: 0.77, blue: 0.96)
     /// Medium-dark grey, the same in Light and Dark Mode.
-    static let barColor = Color(red: 0.29, green: 0.29, blue: 0.30)
+    static let barColor = Color(red: 82 / 255, green: 82 / 255, blue: 82 / 255)
     static let height: CGFloat = 50
 
     private var iconTint: Color {
@@ -357,10 +357,10 @@ private struct CountdownRing: View {
                 .stroke(Color.white, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .rotationEffect(.degrees(-90))
             Text(verbatim: String(seconds))
-                .font(.system(size: 15, weight: .medium).monospacedDigit())
+                .font(.system(size: 14, weight: .medium).monospacedDigit())
                 .foregroundStyle(.white)
         }
-        .frame(width: 28, height: 28)
+        .frame(width: 26, height: 26)
     }
 }
 
