@@ -4,13 +4,13 @@
 
 ## 1. 构建记录
 
-构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `cfa4769`（工作流运行 #17，第 2 次尝试；第 1 次因 GitHub 没有分配到 macOS 运行器、排队 15 分钟后被取消，未执行任何构建）。
+构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `32d804a`（工作流运行 #18）。
 
 | 项目 | 结果 |
 |---|---|
 | Release Archive（Xcode 26.3 / Build 17C529，iOS 26.2 SDK，`generic/platform=iOS`，未签名） | ✅ `ARCHIVE SUCCEEDED`，无 Swift 警告 |
-| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,619,560 字节，SHA-256 `e150eee22e327a148382517ca093292926b9ea68c64145c3d768222a96002cd9` |
-| IPA 内容核对 | `CFBundleIdentifier = com.ganhoo.tally`，版本 `3.0 (3)`，`MinimumOSVersion = 17.0`，`DTSDKName = iphoneos26.2`；含 zh-Hans / zh-Hant / en 本地化；无 `_CodeSignature`、无描述文件（未签名） |
+| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,635,241 字节，SHA-256 `afb1b54ca411527bfab091c044f75786bb76eb8e73c7ea0ef4873ffdb4564fc1` |
+| IPA 内容核对 | `CFBundleIdentifier = com.ganhoo.tally`，版本 `3.0 (4)`，`MinimumOSVersion = 17.0`，`DTSDKName = iphoneos26.2`；含 zh-Hans / zh-Hant / en 本地化；无 `_CodeSignature`、无描述文件（未签名） |
 | Xcode 16（iOS 18 SDK，非 Liquid Glass 编译分支）Release 编译 | ✅ `BUILD SUCCEEDED` |
 | 单元测试（iPhone 17 Pro 模拟器，iOS 26.2） | ✅ 63 个测试 / 12 个套件全部通过（`TEST SUCCEEDED`） |
 | 模拟器截图 + OCR 文本校验 | ✅ 见第 3 节 |
@@ -22,6 +22,7 @@
 真机反馈后修复（iOS 26 iPhone，App 语言为中文、手机为英文（澳大利亚））：
 - **日期显示为英文（「November 2026」）**：界面文字跟随 App 语言，但日期 / 金额 / 数字格式跟随手机地区语言。新增 `AppLocale`（App 运行语言 + 手机地区），所有日期、金额、数字、图表坐标与系统日期选择器统一使用；新增测试 `formattingFollowsTheAppLanguageNotThePhone`。截图 11、12 在「中文 App + en_AU 手机」组合下显示「2026年11月」「下午 6:34」「¥」。
 - **液态玻璃模式下净资产卡片底部出现灰色条**：卡片使用的是系统 `glassEffect`，但它位于 List 行内，玻璃自带的阴影被行边界裁切成一条灰带。内容卡片的玻璃现在限制在卡片自身形状内（标签栏、工具栏按钮、提示条仍使用系统玻璃）；截图 7、13 已确认灰带消失。
+- **拆分页填完后无法收起键盘、无法点「完成」**：数字键盘没有 Return 键；合计不等于总额时「完成」直接置灰。现在所有数字键盘上方都有「完成」按钮，拖动列表也可收起键盘；拆分的第一项自动填入剩余金额（直到手动修改）；合计不一致时点「完成」可选择「把总额改为合计」或「调整某一项」；缺少分类或金额时在列表下方说明原因。版本号改为 3.0 (4) 以便区分。
 
 ## 2. 单元测试清单（全部通过）
 
