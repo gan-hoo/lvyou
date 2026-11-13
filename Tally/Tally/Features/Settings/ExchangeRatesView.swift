@@ -227,6 +227,7 @@ struct AddRateSheet: View {
             }
             .navigationTitle("Add Rate")
             .navigationBarTitleDisplayMode(.inline)
+            .keyboardDoneButton()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

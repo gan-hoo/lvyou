@@ -723,6 +723,22 @@
         }
       }
     },
+    "Add at least two parts.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "至少需要两项。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "至少需要兩項。"
+          }
+        }
+      }
+    },
     "Add cash, cards, savings or debts to see where your money is.": {
       "localizations": {
         "zh-Hans": {
@@ -1791,6 +1807,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "變更記錄"
+          }
+        }
+      }
+    },
+    "Change total to %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把总额改为 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把總額改為 %@"
           }
         }
       }
@@ -3119,6 +3151,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "每一部分在統計和預算中計入各自的分類；帳戶餘額只按總額變動一次。"
+          }
+        }
+      }
+    },
+    "Each part needs a category and an amount.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每一项都需要选择分类并填写金额。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每一項都需要選擇分類並填寫金額。"
           }
         }
       }
@@ -6179,6 +6227,22 @@
         }
       }
     },
+    "Parts add up to %@, but the total is %@.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拆分合计 %@，但总额是 %@。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拆分合計 %@，但總額是 %@。"
+          }
+        }
+      }
+    },
     "Passcode": {
       "localizations": {
         "zh-Hans": {
@@ -7427,6 +7491,22 @@
         }
       }
     },
+    "Set %@ to %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把「%@」改为 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把「%@」改為 %@"
+          }
+        }
+      }
+    },
     "Set Monthly Budget": {
       "localizations": {
         "zh-Hans": {
@@ -8191,6 +8271,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "檔案至少需要「日期」和「金額」兩列。"
+          }
+        }
+      }
+    },
+    "The first part fills in the rest automatically until you edit it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第一项会自动填入剩余金额，直到你手动修改它。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第一項會自動填入剩餘金額，直到你手動修改它。"
           }
         }
       }

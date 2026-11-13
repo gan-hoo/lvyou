@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Category / account icon
 
@@ -308,4 +309,33 @@ struct ToastOverlay: ViewModifier {
 
 extension View {
     func toastOverlay() -> some View { modifier(ToastOverlay()) }
+}
+
+// MARK: - Keyboard
+
+extension View {
+    /// Number pads have no Return key. Adds a Done button above the keyboard and lets a
+    /// downward drag dismiss it. Apply once per screen, inside its NavigationStack.
+    func keyboardDoneButton() -> some View {
+        modifier(KeyboardDoneButton())
+    }
+}
+
+private struct KeyboardDoneButton: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .scrollDismissesKeyboard(.interactively)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { hideKeyboard() }
+                        .fontWeight(.semibold)
+                }
+            }
+    }
+}
+
+@MainActor
+func hideKeyboard() {
+    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
 }

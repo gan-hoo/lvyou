@@ -142,6 +142,7 @@ struct BudgetEditorSheet: View {
             }
             .navigationTitle(request.budget == nil ? String(localized: "New Budget") : String(localized: "Edit Budget"))
             .navigationBarTitleDisplayMode(.inline)
+            .keyboardDoneButton()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {

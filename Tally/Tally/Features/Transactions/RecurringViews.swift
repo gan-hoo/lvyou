@@ -193,6 +193,7 @@ struct RecurringEditorSheet: View {
             }
             .navigationTitle(rule == nil ? String(localized: "New Plan") : String(localized: "Edit Plan"))
             .navigationBarTitleDisplayMode(.inline)
+            .keyboardDoneButton()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {

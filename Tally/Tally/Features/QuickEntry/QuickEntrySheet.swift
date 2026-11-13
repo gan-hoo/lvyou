@@ -134,7 +134,9 @@ private struct QuickEntryContent: View {
             TagPickerSheet(selected: model.tags) { model.toggle($0) }
         }
         .sheet(isPresented: $showSplits) {
-            SplitEditorSheet(total: model.amount, currency: model.currencyCode, categories: visibleCategories, splits: $model.splits)
+            SplitEditorSheet(total: model.amount, currency: model.currencyCode, categories: visibleCategories, splits: $model.splits) { newTotal in
+                model.setAmount(newTotal)
+            }
         }
         .sheet(isPresented: $showCategories) {
             NavigationStack {
@@ -569,9 +571,15 @@ struct SplitEditorSheet: View {
     let currency: String
     let categories: [LedgerCategory]
     @Binding var splits: [SplitDraft]
+    /// Replaces the entry's total (offered when the parts add up to something else).
+    var onChangeTotal: (Decimal) -> Void = { _ in }
 
     @Environment(\.dismiss) private var dismiss
     @State private var rows: [Row] = []
+    /// The first row absorbs whatever is left until the user edits it directly.
+    @State private var balancingRowID: UUID?
+    @State private var confirmMismatch = false
+    @FocusState private var focusedRow: UUID?
 
     struct Row: Identifiable {
         let id = UUID()
@@ -580,10 +588,22 @@ struct SplitEditorSheet: View {
     }
 
     private var digits: Int { CurrencyInfo.info(for: currency).fractionDigits }
-    private var allocated: Decimal { rows.sum { DecimalCodec.parseLenient($0.amountText) ?? 0 } }
+    private func amount(_ row: Row) -> Decimal { (DecimalCodec.parseLenient(row.amountText) ?? 0).rounded(scale: digits) }
+    private var allocated: Decimal { rows.sum { amount($0) } }
     private var remaining: Decimal { (total - allocated).rounded(scale: digits) }
-    private var isValid: Bool {
-        remaining == 0 && rows.count >= 2 && rows.allSatisfy { $0.category != nil && (DecimalCodec.parseLenient($0.amountText) ?? 0) > 0 }
+
+    /// Why Done can't finish yet, if anything is missing (a mismatch is handled on Done).
+    private var problem: String? {
+        if rows.count < 2 { return String(localized: "Add at least two parts.") }
+        if !rows.allSatisfy({ $0.category != nil && amount($0) > 0 }) {
+            return String(localized: "Each part needs a category and an amount.")
+        }
+        return nil
+    }
+
+    /// Row that can take the difference: the one with the largest amount that stays above zero.
+    private var adjustableRow: Row? {
+        rows.filter { amount($0) + remaining > 0 }.max { amount($0) < amount($1) }
     }
 
     var body: some View {
@@ -592,7 +612,7 @@ struct SplitEditorSheet: View {
                 Section {
                     LabeledContent("Total", value: MoneyFormat.string(total, code: currency, reveal: true))
                     LabeledContent("Remaining", value: MoneyFormat.string(remaining, code: currency, reveal: true))
-                        .foregroundStyle(remaining == 0 ? Color.secondary : DS.Colors.warning)
+                        .foregroundStyle(remaining.isZero ? Color.secondary : DS.Colors.warning)
                 }
                 Section {
                     ForEach($rows) { $row in
@@ -614,16 +634,29 @@ struct SplitEditorSheet: View {
                                 .multilineTextAlignment(.trailing)
                                 .monospacedDigit()
                                 .frame(maxWidth: 110)
+                                .focused($focusedRow, equals: row.id)
                         }
                     }
-                    .onDelete { rows.remove(atOffsets: $0) }
+                    .onDelete { offsets in
+                        rows.remove(atOffsets: offsets)
+                        if let id = balancingRowID, !rows.contains(where: { $0.id == id }) { balancingRowID = nil }
+                        rebalance()
+                    }
                     Button {
                         rows.append(Row(category: nil, amountText: remaining > 0 ? DecimalCodec.encode(remaining) : ""))
                     } label: {
                         Label("Add Split", systemImage: "plus.circle.fill")
                     }
                 } footer: {
-                    Text("Each part is counted in its own category for reports and budgets. The account balance changes once, by the total.")
+                    VStack(alignment: .leading, spacing: 4) {
+                        if let problem {
+                            Text(problem).foregroundStyle(DS.Colors.warning)
+                        }
+                        if balancingRowID != nil {
+                            Text("The first part fills in the rest automatically until you edit it.")
+                        }
+                        Text("Each part is counted in its own category for reports and budgets. The account balance changes once, by the total.")
+                    }
                 }
                 if !splits.isEmpty {
                     Section {
@@ -636,21 +669,74 @@ struct SplitEditorSheet: View {
             }
             .navigationTitle("Split")
             .navigationBarTitleDisplayMode(.inline)
+            .keyboardDoneButton()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
-                        splits = rows.map { SplitDraft(category: $0.category, amount: (DecimalCodec.parseLenient($0.amountText) ?? 0).rounded(scale: digits)) }
-                        dismiss()
+                        focusedRow = nil
+                        if remaining.isZero {
+                            finish()
+                        } else {
+                            Haptics.warning()
+                            confirmMismatch = true
+                        }
                     }
                     .fontWeight(.semibold)
-                    .disabled(!isValid)
+                    .disabled(problem != nil)
                 }
+            }
+            .confirmationDialog(
+                Text("Parts add up to \(MoneyFormat.string(allocated, code: currency, reveal: true)), but the total is \(MoneyFormat.string(total, code: currency, reveal: true))."),
+                isPresented: $confirmMismatch,
+                titleVisibility: .visible
+            ) {
+                Button("Change total to \(MoneyFormat.string(allocated, code: currency, reveal: true))") {
+                    onChangeTotal(allocated)
+                    finish()
+                }
+                if let row = adjustableRow {
+                    let adjusted = (amount(row) + remaining).rounded(scale: digits)
+                    let name = row.category?.name ?? String(localized: "Uncategorized")
+                    let value = MoneyFormat.string(adjusted, code: currency, reveal: true)
+                    Button("Set \(name) to \(value)") {
+                        if let i = rows.firstIndex(where: { $0.id == row.id }) {
+                            rows[i].amountText = DecimalCodec.encode(adjusted)
+                        }
+                        finish()
+                    }
+                }
+                Button("Keep Editing", role: .cancel) {}
+            }
+            .onChange(of: rows.map(\.amountText)) { _, _ in rebalance() }
+            .onChange(of: focusedRow) { _, row in
+                // Typing into the balancing row hands it over to the user.
+                if let row, row == balancingRowID { balancingRowID = nil }
             }
         }
         .onAppear {
             rows = splits.map { Row(category: $0.category, amountText: DecimalCodec.encode($0.amount)) }
-            if rows.count < 2 { rows.append(Row(category: nil, amountText: remaining > 0 ? DecimalCodec.encode(remaining) : "")) }
+            if rows.isEmpty {
+                let first = Row(category: nil, amountText: DecimalCodec.encode(total))
+                rows = [first, Row(category: nil, amountText: "")]
+                balancingRowID = first.id
+            } else if rows.count < 2 {
+                rows.append(Row(category: nil, amountText: remaining > 0 ? DecimalCodec.encode(remaining) : ""))
+            }
         }
+    }
+
+    /// Keeps the balancing row equal to total minus the other parts (never below zero).
+    private func rebalance() {
+        guard let id = balancingRowID, let i = rows.firstIndex(where: { $0.id == id }) else { return }
+        let others = rows.filter { $0.id != id }.sum { amount($0) }
+        let value = max(0, (total - others).rounded(scale: digits))
+        let text = value > 0 ? DecimalCodec.encode(value) : ""
+        if rows[i].amountText != text { rows[i].amountText = text }
+    }
+
+    private func finish() {
+        splits = rows.map { SplitDraft(category: $0.category, amount: amount($0)) }
+        dismiss()
     }
 }

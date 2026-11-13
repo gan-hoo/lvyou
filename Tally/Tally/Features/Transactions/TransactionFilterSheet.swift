@@ -59,6 +59,7 @@ struct TransactionFilterSheet: View {
             }
             .navigationTitle("Filter")
             .navigationBarTitleDisplayMode(.inline)
+            .keyboardDoneButton()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Reset") {

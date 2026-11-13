@@ -88,6 +88,11 @@ final class QuickEntryViewModel {
 
     var currencyCode: String { account?.currencyCode ?? AppSettings.baseCurrency }
     var amount: Decimal { expression.value }
+
+    /// Replaces the typed amount (e.g. with the sum of the split parts).
+    func setAmount(_ value: Decimal) {
+        expression = AmountExpression(value: value, maxFractionDigits: expression.maxFractionDigits)
+    }
     var fee: Decimal { DecimalCodec.parseLenient(feeText)?.magnitudeValue ?? 0 }
     var manualRate: Decimal? { DecimalCodec.parseLenient(manualRateText).flatMap { $0 > 0 ? $0 : nil } }
     var isEditing: Bool { editing != nil }
