@@ -283,6 +283,8 @@ struct ToastView: View {
     var onAction: () -> Void = {}
 
     static let actionBlue = Color(red: 0.42, green: 0.76, blue: 1.0)
+    /// Opaque dark grey; a little lighter in Dark Mode so it stands off a black page.
+    static let barColor = Color(light: "333335", dark: "3A3A3C")
 
     private var iconTint: Color {
         switch message.style {
@@ -319,7 +321,12 @@ struct ToastView: View {
         .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(Color(white: 0.2).opacity(0.95))
+                .fill(Self.barColor)
+        )
+        .overlay(
+            // A faint edge keeps the bar distinct on dark backgrounds.
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
         )
         .shadow(color: .black.opacity(0.2), radius: 16, y: 6)
         .padding(.horizontal, DS.Spacing.screen)
