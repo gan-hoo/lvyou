@@ -4,13 +4,13 @@
 
 ## 1. 构建记录
 
-构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `323eef4`（工作流运行 #27）。
+构建全部在 GitHub Actions 的 macOS 15 runner 上完成（本仓库所在的开发环境是 Linux，无法运行 Xcode）。最终验证对应提交 `d173158`（工作流运行 #28）。
 
 | 项目 | 结果 |
 |---|---|
 | Release Archive（Xcode 26.3 / Build 17C529，iOS 26.2 SDK，`generic/platform=iOS`，未签名） | ✅ `ARCHIVE SUCCEEDED`，无 Swift 警告 |
-| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,741,201 字节，SHA-256 `4f087d526581c0e85b600f18487b844c14c2efef35327bdbade672ee493b7182` |
-| IPA 内容核对 | `CFBundleIdentifier = com.ganhoo.tally`，版本 `3.0 (13)`，`MinimumOSVersion = 17.0`，`DTSDKName = iphoneos26.2`；含 zh-Hans / zh-Hant / en 本地化；无 `_CodeSignature`、无描述文件（未签名） |
+| 未签名 IPA 打包 | ✅ `release/Tally-unsigned.ipa`，1,741,201 字节，SHA-256 `4fd7a2ddaf6aa6a2d07063f7c8816749b7bb7262d3a28db78eaa76e927c11136` |
+| IPA 内容核对 | `CFBundleIdentifier = com.ganhoo.tally`，版本 `3.0 (14)`，`MinimumOSVersion = 17.0`，`DTSDKName = iphoneos26.2`；含 zh-Hans / zh-Hant / en 本地化；无 `_CodeSignature`、无描述文件（未签名） |
 | Xcode 16（iOS 18 SDK，非 Liquid Glass 编译分支）Release 编译 | ✅ `BUILD SUCCEEDED` |
 | 单元测试（iPhone 17 Pro 模拟器，iOS 26.2） | ✅ 70 个测试 / 12 个套件全部通过（`TEST SUCCEEDED`） |
 | 模拟器截图 + OCR 文本校验 | ✅ 见第 3 节 |
@@ -30,6 +30,7 @@
 - **新增：回收站**（用户需求：删除确认不要出现在屏幕顶部，设置里加回收站）：删除交易不再弹出确认框，而是立即移入回收站，并在提示条中提供「撤销」；设置 › 数据 › 回收站 可恢复或永久删除，支持全部恢复 / 清空，30 天后自动永久删除。回收站独立存放（`TrashedEntry`），余额、统计、预算、导出与备份只读取账本，删除的记录不会被计入；恢复时按原 ID、金额、汇率快照、分类、拆分、标签、手续费与折扣原样重建；原账户已删除时拒绝恢复且不做任何改动。新增 3 个测试。版本 3.0 (9)。注：回收站不包含在 JSON 备份中。
 - **提示条改为底部深色样式**（用户反馈：不要显示在顶部，参照截图的位置与颜色）：所有提示条显示在标签栏上方，为不透明深灰圆角条、白色文字；可撤销的提示（已移到回收站）左侧为倒计时圆环、右侧为浅蓝色「撤销」，持续 5 秒；深色模式下略浅并带细边。截图 `14-toast`（浅色）、`15-toast-dark`（深色）已确认。版本 3.0 (11)。
 - **提示条按参考图精确调整**（用户反馈：太粗、两端不够圆）：改为两端全圆的胶囊形，高 50pt、左右边距 12pt、颜色 RGB(82,82,82)，倒计时为 26pt 细白弧、「撤销」18pt 浅蓝。对模拟器截图测量：高约 49.5pt、边距约 12.4pt、颜色 (82,82,82)，与参考图（高 50pt、边距 12pt、颜色 (82,82,82)）一致。版本 3.0 (13)。
+- **提示条文字缩小**（用户反馈：框里的字太大）：提示文字 16→15pt、「撤销」18→16pt、倒计时数字 14→13pt、图标 18→16pt。截图测量：提示文字字形高约 13.1pt（参考图 13.0pt），「撤销」约 13.1pt（参考图 15.0pt）。版本 3.0 (14)。
 
 ## 2. 单元测试清单（全部通过）
 
