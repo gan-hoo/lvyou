@@ -53,6 +53,7 @@ struct TransactionsView: View {
                     }
                 }
                 .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 2, leading: 4, bottom: 2, trailing: 4))
 
                 if let day = selectedDay, dayResults.isEmpty {
@@ -69,9 +70,11 @@ struct TransactionsView: View {
                         .padding(.vertical, DS.Spacing.m)
                     }
                     .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
                 } else if calendarVisible && results.isEmpty {
                     Section { emptyState }
                         .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                 }
 
                 if filter.sort.groupsByDay {
@@ -97,7 +100,7 @@ struct TransactionsView: View {
             .pageBackground()
             .animation(DS.Motion.adaptive(DS.Motion.spring), value: results.count)
             .searchable(text: $searchText, prompt: Text("Notes, payees, categories, tags, amounts"))
-            .navigationTitle("Transactions")
+            .tabRootTitle("Transactions")
             .toolbar { toolbarContent }
             .overlay {
                 if results.isEmpty && !calendarVisible { emptyState }

@@ -34,7 +34,7 @@ struct SettingsView: View {
             }
             .listStyle(.insetGrouped)
             .pageBackground()
-            .navigationTitle("Settings")
+            .tabRootTitle("Settings")
             .navigationDestination(for: LedgerEntry.self) { TransactionDetailView(entry: $0) }
             .navigationDestination(for: Account.self) { AccountDetailView(account: $0) }
         }

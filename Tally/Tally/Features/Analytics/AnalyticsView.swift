@@ -54,7 +54,7 @@ struct AnalyticsView: View {
                 .animation(DS.Motion.adaptive(DS.Motion.spring), value: result)
             }
             .background(PageBackground())
-            .navigationTitle("Analytics")
+            .tabRootTitle("Analytics")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) { AddMenuButton() }
             }

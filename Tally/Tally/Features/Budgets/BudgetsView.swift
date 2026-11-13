@@ -54,7 +54,7 @@ struct BudgetsView: View {
                 .animation(DS.Motion.adaptive(DS.Motion.spring), value: statuses)
             }
             .background(PageBackground())
-            .navigationTitle("Budgets")
+            .tabRootTitle("Budgets")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {

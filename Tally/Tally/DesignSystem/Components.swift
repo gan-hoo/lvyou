@@ -339,3 +339,19 @@ private struct KeyboardDoneButton: ViewModifier {
 func hideKeyboard() {
     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
 }
+
+// MARK: - Tab root titles
+
+extension View {
+    /// Main tab pages show no title text (the tab bar already says where you are).
+    /// The title is still set, so back buttons on sub-pages and VoiceOver use it.
+    func tabRootTitle(_ title: LocalizedStringKey) -> some View {
+        navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Color.clear.frame(width: 1, height: 1).accessibilityHidden(true)
+                }
+            }
+    }
+}

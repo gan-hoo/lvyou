@@ -124,7 +124,7 @@ struct AssetsView: View {
             }
             .listStyle(.insetGrouped)
             .pageBackground()
-            .navigationTitle("Assets")
+            .tabRootTitle("Assets")
             .toolbar { toolbar }
             .navigationDestination(for: Account.self) { AccountDetailView(account: $0) }
             .navigationDestination(for: LedgerEntry.self) { TransactionDetailView(entry: $0) }
