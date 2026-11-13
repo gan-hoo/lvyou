@@ -166,9 +166,15 @@ struct AssetsView: View {
             .accessibilityLabel(Text("View Options"))
         }
         ToolbarItem(placement: .topBarTrailing) {
-            AddMenuButton {
-                Button { editor = AccountEditorRequest(account: nil) } label: { Label("New Account", systemImage: "wallet.pass") }
+            // On Assets, + adds an account (transactions are recorded from the other tabs
+            // and from an account's own page).
+            Button {
+                Haptics.press()
+                editor = AccountEditorRequest(account: nil)
+            } label: {
+                Image(systemName: "plus").font(.body.weight(.semibold))
             }
+            .accessibilityLabel(Text("New Account"))
         }
     }
 

@@ -17,7 +17,7 @@ struct CalculatorKeypad: View {
     var tint: Color
     var onKey: (KeypadKey) -> Void
 
-    private let spacing: CGFloat = 8
+    private let spacing: CGFloat = 6
 
     var body: some View {
         Grid(horizontalSpacing: spacing, verticalSpacing: spacing) {
@@ -83,7 +83,8 @@ private struct KeyButton<Label: View>: View {
         } label: {
             label()
                 .font(DS.Typography.keypad)
-                .frame(maxWidth: .infinity, minHeight: 50, maxHeight: 58)
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
                 .foregroundStyle(foreground)
                 .background(background, in: RoundedRectangle(cornerRadius: DS.Radius.key, style: .continuous))
                 .contentShape(RoundedRectangle(cornerRadius: DS.Radius.key, style: .continuous))

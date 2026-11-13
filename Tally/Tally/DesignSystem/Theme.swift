@@ -65,7 +65,7 @@ enum DS {
         static let sectionTitle = Font.system(.title3, design: .default, weight: .semibold)
         static let caption = Font.footnote
         static let micro = Font.caption2.weight(.medium)
-        static let keypad = Font.system(.title2, design: .rounded, weight: .medium)
+        static let keypad = Font.system(.title3, design: .rounded, weight: .medium)
     }
 
     // MARK: Layout
